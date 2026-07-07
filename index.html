@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Seguridad: sólo se permite el propio código en línea; nada externo puede cargarse ni inyectarse -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
 <title>EL ESENSIAL · Simulador y Catálogo</title>
 <style>
   :root{
@@ -69,18 +73,49 @@
   .ee-hero-txt .st{color:rgba(255,255,255,.55);font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-top:6px}
   .ee-page{padding:24px 22px 0}
   .wrap{max-width:1040px;margin:0 auto}
-  @media(max-width:860px){
-    .ee-sidebar{width:64px}
-    .ee-brand .wordmark,.ee-navsec,.ee-navitem span:not(.ic),.ee-side-foot .ee-cred,.ee-logout span{display:none}
-    .ee-brand .carlogo{width:44px}
-    .ee-navitem{justify-content:center;padding:12px 0}
-    .ee-main{margin-left:64px}
-    .ee-hero .carlogo{width:110px}
+  /* Barra superior móvil + backdrop (ocultos en escritorio) */
+  .ee-topbar{display:none;align-items:center;gap:12px;height:56px;padding:0 14px;background:var(--negro);
+    position:fixed;top:0;left:0;right:0;z-index:70;border-bottom:1px solid rgba(225,29,42,.25)}
+  .ee-topbar .carlogo.tb{width:34px;height:auto}
+  .ee-topbar .wordmark.tb{font-size:16px}
+  .ee-burger{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;padding:6px 8px;border-radius:8px}
+  .ee-burger:hover{background:rgba(255,255,255,.1)}
+  .ee-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:75;opacity:0;pointer-events:none;transition:opacity .2s}
+
+  @media(max-width:900px){
+    .ee-topbar{display:flex}
+    .ee-backdrop{display:block}
+    body.menu-open .ee-backdrop{opacity:1;pointer-events:auto}
+    .ee-sidebar{width:250px;transform:translateX(-100%);transition:transform .22s ease;z-index:80}
+    body.menu-open .ee-sidebar{transform:none;box-shadow:0 0 40px rgba(0,0,0,.4)}
+    .ee-main{margin-left:0;padding-top:56px}
+    .ee-hero{padding:20px}
+    .ee-hero .carlogo{width:120px}
+    .ee-hero-txt .wordmark{font-size:24px}
+    .ee-page{padding:18px 14px 0}
+  }
+  @media(max-width:560px){
+    .fila2{grid-template-columns:1fr}
+    .kpis{grid-template-columns:1fr}
+    .mix{flex-direction:column}
+    .mix select{width:100%;min-width:0}
+    .ee-hero{gap:14px}
+    .ee-hero .carlogo{width:96px}
+    .ee-hero-txt .wordmark{font-size:20px}
+    .ee-hero-txt .st{font-size:11px}
+    .res-hero .big{font-size:32px}
+    header.sim{padding:20px 18px}
+    .card{padding:18px}
+    .inv-toolbar input,.inv-toolbar select{flex:1 1 100%;min-width:0}
+    .inv-grid{grid-template-columns:1fr}
+    .usr-grid{grid-template-columns:1fr}
+    .inv-form{padding:20px 18px}
+    #invModal,#usrModal{padding:16px 10px}
+    .pasos{flex-direction:column}
   }
 
   /* ===== SIMULADOR (base preservada) ===== */
-  header.sim{background:linear-gradient(135deg,var(--tinta) 0%,var(--tinta-2) 100%);border-radius:var(--r);padding:26px 26px 22px;color:#fff;box-shadow:var(--sombra);position:relative;overflow:hidden}
-  header.sim:before{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(225,29,42,.32),transparent 70%)}
+  header.sim{background:var(--tinta);border-radius:var(--r);padding:26px 26px 22px;color:#fff;box-shadow:var(--sombra);position:relative;overflow:hidden}
   .badge{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--amarillo);font-weight:700;margin-bottom:8px}
   .lote{font-size:26px;font-weight:800;background:transparent;border:none;color:#fff;width:100%;outline:none;border-bottom:2px dashed rgba(255,255,255,.22);padding:2px 0 6px;letter-spacing:-.01em}
   .lote::placeholder{color:rgba(255,255,255,.45)}
@@ -93,8 +128,8 @@
   .btn-wa:hover{background:#20c05c}
   .btn-gh{background:rgba(255,255,255,.12);color:#fff}
   .btn-gh:hover{background:rgba(255,255,255,.2)}
-  .btn-oro{background:linear-gradient(135deg,var(--rojo),#f0454f);color:#fff}
-  .btn-oro:hover{filter:brightness(1.05)}
+  .btn-oro{background:var(--rojo);color:#fff}
+  .btn-oro:hover{background:var(--rojo-2)}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
   @media(max-width:820px){.grid{grid-template-columns:1fr}}
   .card{background:var(--card);border-radius:var(--r);padding:22px;box-shadow:var(--sombra);border:1px solid var(--linea)}
@@ -122,7 +157,7 @@
   .cargo-grupo{background:#fafbfc;border:1px solid var(--linea);border-radius:12px;padding:14px;margin-bottom:12px}
   .cargo-grupo .gt{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
   .cargo-grupo .campo:last-child{margin-bottom:0}
-  .res-hero{background:linear-gradient(135deg,var(--tinta) 0%,var(--tinta-2) 100%);color:#fff;text-align:center;padding:24px;border-radius:14px;margin-bottom:16px;position:relative}
+  .res-hero{background:var(--tinta);color:#fff;text-align:center;padding:24px;border-radius:14px;margin-bottom:16px;position:relative}
   .res-hero .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--amarillo);font-weight:700}
   .res-hero .big{font-size:42px;font-weight:800;letter-spacing:-.02em;margin:4px 0 2px}
   .res-hero .peque{font-size:13px;color:rgba(255,255,255,.6)}
@@ -144,7 +179,7 @@
   .paso .n{width:22px;height:22px;border-radius:50%;background:var(--rojo);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:7px}
   .paso .t{font-size:12.5px;font-weight:700;color:var(--tinta);line-height:1.2}
   .paso .s{font-size:11px;color:var(--gris);margin-top:3px;line-height:1.35}
-  .res-hero.inicio{background:linear-gradient(135deg,#0f7a53 0%,#17a06a 100%);margin-bottom:12px}
+  .res-hero.inicio{background:#0f7a53;margin-bottom:12px}
   .res-hero .tip{font-size:12px;color:rgba(255,255,255,.8);margin-top:9px;line-height:1.4}
   .res-hero .tip b{color:#fff;font-weight:700}
   .res-hero.inicio .lbl{color:#c9f5df}
@@ -281,6 +316,13 @@
 
 <!-- ===================== APP ===================== -->
 <div id="app">
+  <!-- Barra superior (solo móvil) -->
+  <div class="ee-topbar">
+    <button class="ee-burger" onclick="toggleMenu()" aria-label="Abrir menú">☰</button>
+    <svg class="carlogo tb"><use href="#ee-car"/></svg>
+    <span class="wordmark tb">EL ESENSIAL</span>
+  </div>
+  <div class="ee-backdrop" onclick="toggleMenu(false)"></div>
   <!-- Barra izquierda -->
   <aside class="ee-sidebar">
     <div class="ee-brand">
@@ -545,14 +587,28 @@
 
 <script>
 /* ===================== ACCESO ===================== */
-const CLAVE_HASH='2e3f9c6ba02ac8bfe107939a6691353a504156d9031f8add7f5a254f77304d40'; // sha256 de la contraseña
-async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+const CLAVE_PBKDF2='103587e8e835513fb738855c2ce8cce301351fadbf050ffa95a9c574c9e9626c';
+const SALT='EL-ESENSIAL-2026', ITER=200000;
+async function derivar(pass){
+  const enc=new TextEncoder();
+  const key=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveBits']);
+  const bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:enc.encode(SALT),iterations:ITER,hash:'SHA-256'},key,256);
+  return [...new Uint8Array(bits)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function lockGet(){ try{return JSON.parse(localStorage.getItem('ee_lock')||'{}')}catch(e){return{}} }
+function mostrarErr(m){ const e=document.getElementById('gateErr'); e.textContent=m; e.style.display='block'; }
 async function entrar(){
+  const now=Date.now(), L=lockGet();
+  if(L.until && now<L.until){ mostrarErr('Demasiados intentos. Espera '+Math.ceil((L.until-now)/1000)+' s.'); return; }
   const v=document.getElementById('claveInput').value;
-  try{ const h=await sha256(v);
-    if(h===CLAVE_HASH){ sessionStorage.setItem('ee_auth','1'); mostrarApp(); }
-    else document.getElementById('gateErr').style.display='block';
-  }catch(e){ if(v==='esensial2026'){ sessionStorage.setItem('ee_auth','1'); mostrarApp(); } else document.getElementById('gateErr').style.display='block'; }
+  const btn=document.querySelector('.gate-btn'); btn.disabled=true; btn.textContent='Verificando…';
+  let ok=false; try{ ok=(await derivar(v))===CLAVE_PBKDF2; }catch(e){ ok=(v==='esensial2026'); }
+  btn.disabled=false; btn.textContent='Entrar →';
+  if(ok){ localStorage.removeItem('ee_lock'); sessionStorage.setItem('ee_auth','1'); mostrarApp(); return; }
+  const fails=(L.fails||0)+1, nl={fails};
+  if(fails>=5) nl.until=now+Math.min(300000,15000*Math.pow(2,fails-5));
+  localStorage.setItem('ee_lock',JSON.stringify(nl));
+  mostrarErr(nl.until?('Bloqueado por seguridad. Espera '+Math.ceil((nl.until-now)/1000)+' s.'):'Contraseña incorrecta.');
 }
 function mostrarApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block';
   invSeed(); usrSeed(); invRefreshFiltros(); invRender(); usrRender(); }
@@ -566,7 +622,11 @@ function irA(page){
   document.getElementById('page-simulador').hidden = page!=='simulador';
   document.getElementById('page-inventario').hidden = page!=='inventario';
   document.getElementById('page-usuarios').hidden = page!=='usuarios';
-  window.scrollTo(0,0);
+  window.scrollTo(0,0); toggleMenu(false);
+}
+function toggleMenu(force){
+  const open = (force===undefined) ? !document.body.classList.contains('menu-open') : force;
+  document.body.classList.toggle('menu-open', open);
 }
 
 /* ===================== INVENTARIO ===================== */
