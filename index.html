@@ -202,7 +202,53 @@
   .m-cancel{background:var(--gris-cl);color:var(--tinta-2)}
   .m-save{background:var(--rojo);color:#fff}
   .foto-prev{height:120px;border-radius:11px;border:1.5px dashed var(--linea);background:#f7f8fa center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:13px;cursor:pointer;margin-bottom:6px}
-  @media print{.ee-sidebar,.ee-hero,.acciones,.no-print{display:none!important}.ee-main{margin-left:0}.card,header.sim,.res-hero{box-shadow:none;border:1px solid #ddd;break-inside:avoid}header.sim,.res-hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}.scroll{overflow:visible}table{min-width:0}}
+  /* Selector de coche en el simulador */
+  .carsel-row{margin-top:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:11px;padding:10px 12px}
+  .carsel-lbl{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--amarillo);font-weight:700;margin-bottom:7px}
+  #carSelect{width:100%;background:#fff;color:var(--tinta)}
+
+  /* Inventario: toolbar + estados */
+  .inv-count{font-size:13px;font-weight:600;color:var(--gris);letter-spacing:0}
+  .btn-imp{background:var(--negro);color:#fff}
+  .btn-imp:hover{background:#26262c}
+  .inv-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+  .inv-toolbar input,.inv-toolbar select{font-weight:600}
+  .inv-toolbar #qSearch{flex:1;min-width:200px}
+  .inv-toolbar select{flex:0 0 auto;min-width:130px}
+  .cochecard{position:relative;transition:.15s}
+  .cochecard.dim{opacity:.62}
+  .cochecard .foto{position:relative}
+  .cc-estado{position:absolute;top:8px;left:8px;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em}
+  .cc-ver{font-size:11px;font-weight:600;color:#fff;background:var(--rojo);padding:1px 7px;border-radius:6px;vertical-align:middle;margin-left:4px}
+  .cc-acts2{display:flex;gap:6px;margin-top:8px}
+  .cc-acts2 .cc-mini{flex:1;padding:8px;border-radius:9px;border:1px solid var(--linea);background:#fff;color:var(--tinta-2);font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
+  .cc-mini:hover{border-color:var(--rojo);color:var(--rojo)}
+  .cc-mini.on-sold{background:#fee2e2;border-color:#fca5a5;color:#b91c1c}
+  .cc-mini.on-hide{background:#eef0f3;border-color:#cbd0d8;color:#374151}
+
+  /* Usuarios */
+  .usr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .usrcard{background:var(--card);border:1px solid var(--linea);border-radius:14px;padding:18px;box-shadow:var(--sombra)}
+  .usr-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .usr-av{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--rojo),#f0454f);color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex:none}
+  .usr-nom{font-size:16px;font-weight:800;color:var(--tinta);line-height:1.1}
+  .usr-rol{font-size:12.5px;color:var(--gris);font-weight:600;margin-top:2px}
+  .usr-estado{font-size:11px;font-weight:800;padding:4px 9px;border-radius:20px;flex:none}
+  .usr-estado.on{color:#0f7a53;background:#eafaf1}
+  .usr-estado.off{color:#6b7280;background:#eef0f3}
+  .usr-info{display:grid;gap:8px;margin-bottom:12px}
+  .usr-info>div{font-size:13px;color:var(--tinta-2);font-weight:600;word-break:break-word}
+  .usr-info span{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris);font-weight:700;margin-bottom:1px}
+  .usr-chips-lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris);font-weight:700;margin:6px 0 5px}
+  .usr-chips{display:flex;flex-wrap:wrap;gap:5px}
+  .chip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--gris-cl);color:var(--tinta-2)}
+  .chip-p{background:#fde8e9;color:#b3141f}
+  .chip-m{background:#eafaf1;color:#0f7a53}
+
+  #usrModal{position:fixed;inset:0;z-index:120;background:rgba(13,13,15,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+  #usrModal.show{display:flex}
+
+  @media print{.ee-sidebar,.ee-hero,.acciones,.carsel-row,.no-print{display:none!important}.ee-main{margin-left:0}.card,header.sim,.res-hero{box-shadow:none;border:1px solid #ddd;break-inside:avoid}header.sim,.res-hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}.scroll{overflow:visible}table{min-width:0}}
 </style>
 </head>
 <body>
@@ -245,6 +291,8 @@
       <div class="ee-navsec">Herramientas</div>
       <div class="ee-navitem active" data-page="simulador" onclick="irA('simulador')"><span class="ic">🧮</span><span>Simulador</span></div>
       <div class="ee-navitem" data-page="inventario" onclick="irA('inventario')"><span class="ic">🚗</span><span>Inventario de coches</span></div>
+      <div class="ee-navsec">Administración</div>
+      <div class="ee-navitem" data-page="usuarios" onclick="irA('usuarios')"><span class="ic">👥</span><span>Usuarios y perfiles</span></div>
     </nav>
     <div class="ee-side-foot">
       <button class="ee-logout" onclick="salir()"><span>🔒 Cerrar sesión</span></button>
@@ -269,6 +317,12 @@
           <span class="badge">Simulador de financiamiento</span>
           <input class="lote" id="lote" value="EL ESENSIAL" placeholder="Nombre / auto" oninput="calc()">
           <div class="sub">Amortización francesa · <b id="fecha">—</b></div>
+          <div class="carsel-row">
+            <span class="carsel-lbl">🚗 Cargar coche del inventario</span>
+            <select id="carSelect" onchange="if(this.value)cargarCoche(this.value,false)">
+              <option value="">— Elegir coche del inventario —</option>
+            </select>
+          </div>
           <div class="acciones">
             <button class="btn btn-wa" onclick="compartirWA()">💬 Compartir por WhatsApp</button>
             <button class="btn btn-gh" onclick="copiar()">📋 Copiar resumen</button>
@@ -382,17 +436,43 @@
       <div class="wrap">
         <div class="inv-top">
           <div>
-            <h1>🚗 Inventario de coches</h1>
-            <p>Agrega los autos del lote. Toca <b>Simular</b> en cualquiera para llevarlo al simulador con sus datos.</p>
+            <h1>🚗 Inventario de coches <span id="invCount" class="inv-count"></span></h1>
+            <p>Busca, filtra y edita las unidades. Toca <b>Simular</b> para llevar el coche al simulador con sus datos.</p>
           </div>
-          <button class="btn btn-add" onclick="invAbrir()">+ Agregar coche</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-imp" onclick="invImportar()" title="Cargar/mezclar el catálogo del Excel">⬇️ Importar catálogo</button>
+            <button class="btn btn-add" onclick="invAbrir()">+ Agregar coche</button>
+          </div>
         </div>
+
+        <div class="inv-toolbar">
+          <input type="text" id="qSearch" placeholder="🔎 Buscar marca, modelo, color…" oninput="invRender()">
+          <select id="fltMarca" onchange="invRender()"><option value="">Todas las marcas</option></select>
+          <select id="fltAnio" onchange="invRender()"><option value="">Todos los años</option></select>
+          <select id="fltTrans" onchange="invRender()"><option value="">Transmisión</option><option value="AUT">Automático</option><option value="STD">Estándar</option></select>
+          <select id="fltEstado" onchange="invRender()"><option value="">Disponibles</option><option value="disponible">Solo disponibles</option><option value="vendido">Vendidos</option><option value="oculto">Ocultos</option></select>
+        </div>
+
         <div id="invGrid" class="inv-grid"></div>
         <div id="invEmpty" class="inv-empty" style="display:none">
           <div class="big">🚙</div>
-          <div style="font-weight:700;color:var(--tinta-2);font-size:15px">Aún no hay coches en el inventario</div>
-          <div style="margin-top:6px">Toca «+ Agregar coche» para registrar el primero.</div>
+          <div style="font-weight:700;color:var(--tinta-2);font-size:15px">No hay coches con esos filtros</div>
+          <div style="margin-top:6px">Cambia la búsqueda, toca «⬇️ Importar catálogo» o «+ Agregar coche».</div>
         </div>
+      </div>
+    </section>
+
+    <!-- ========== PÁGINA: USUARIOS ========== -->
+    <section id="page-usuarios" class="ee-page" hidden>
+      <div class="wrap">
+        <div class="inv-top">
+          <div>
+            <h1>👥 Usuarios y perfiles</h1>
+            <p>Quién usa el sistema, su rol, área, permisos y a qué módulos tiene acceso.</p>
+          </div>
+          <button class="btn btn-add" onclick="usrAbrir()">+ Agregar usuario</button>
+        </div>
+        <div id="usrGrid" class="usr-grid"></div>
       </div>
     </section>
   </main>
@@ -405,22 +485,60 @@
     <div class="msub">Los datos se guardan en este dispositivo (navegador).</div>
     <div class="foto-prev" id="fotoPrev" onclick="document.getElementById('fFoto').click()">📷 Toca para agregar foto (opcional)</div>
     <input type="file" id="fFoto" accept="image/*" style="display:none" onchange="fotoElegida(event)">
-    <div class="campo"><label>Marca y modelo</label><input type="text" id="fNombre" placeholder="Ej: Nissan Versa Sense"></div>
     <div class="fila2">
-      <div class="campo"><label>Año</label><input type="number" id="fAnio" placeholder="2020" min="1990" max="2030"></div>
-      <div class="campo"><label>Precio</label><div class="inbox"><span class="pre">$</span><input type="number" id="fPrecio" class="has-pre" placeholder="280000" min="0" step="1000"></div></div>
+      <div class="campo"><label>Marca</label><input type="text" id="fMarca" placeholder="Ej: Audi"></div>
+      <div class="campo"><label>Modelo</label><input type="text" id="fModelo" placeholder="Ej: Q3"></div>
     </div>
     <div class="fila2">
-      <div class="campo"><label>Enganche sugerido</label><div class="inbox"><span class="pre">$</span><input type="number" id="fEnganche" class="has-pre" placeholder="56000" min="0" step="1000"></div></div>
+      <div class="campo"><label>Año</label><input type="number" id="fAnio" placeholder="2021" min="1990" max="2031"></div>
+      <div class="campo"><label>Color</label><input type="text" id="fColor" placeholder="Ej: Blanco"></div>
+    </div>
+    <div class="fila2">
+      <div class="campo"><label>Versión <span class="hint">(opcional)</span></label><input type="text" id="fVersion" placeholder="Ej: FR, Serie 4, Hybrid"></div>
+      <div class="campo"><label>Transmisión</label><select id="fTrans"><option value="AUT">Automático</option><option value="STD">Estándar</option></select></div>
+    </div>
+    <div class="fila2">
+      <div class="campo"><label>Kilometraje <span class="hint">(opcional)</span></label><input type="text" id="fKm" placeholder="Ej: 45,000 km"></div>
+      <div class="campo"><label>Motor <span class="hint">(opcional)</span></label><input type="text" id="fMotor" placeholder="Ej: 4 cil"></div>
+    </div>
+    <div class="fila2">
+      <div class="campo"><label>Precio</label><div class="inbox"><span class="pre">$</span><input type="number" id="fPrecio" class="has-pre" placeholder="459000" min="0" step="1000"></div></div>
+      <div class="campo"><label>Enganche sugerido</label><div class="inbox"><span class="pre">$</span><input type="number" id="fEnganche" class="has-pre" placeholder="91800" min="0" step="1000"></div></div>
+    </div>
+    <div class="fila2">
       <div class="campo"><label>Plazo sugerido</label><select id="fPlazo"><option>12</option><option>18</option><option selected>24</option><option>36</option><option>48</option><option>60</option><option>72</option></select></div>
+      <div class="campo"><label>Tasa anual</label><div class="inbox"><input type="number" id="fTasa" class="has-suf" placeholder="16.9" min="0" step="0.1" value="16.9"><span class="suf">%</span></div></div>
     </div>
     <div class="fila2">
-      <div class="campo"><label>Tasa anual</label><div class="inbox"><input type="number" id="fTasa" class="has-suf" placeholder="16.9" min="0" step="0.1" value="16.9"><span class="suf">%</span></div></div>
-      <div class="campo"><label>Notas (opcional)</label><input type="text" id="fNotas" placeholder="Ej: único dueño, factura original"></div>
+      <div class="campo"><label>Estado</label><select id="fEstado"><option value="disponible">Disponible</option><option value="vendido">Vendido</option><option value="oculto">Oculto</option></select></div>
+      <div class="campo"><label>Notas <span class="hint">(opcional)</span></label><input type="text" id="fNotas" placeholder="Ej: único dueño, factura original"></div>
     </div>
     <div class="mfoot">
       <button class="m-cancel" onclick="invCerrar()">Cancelar</button>
-      <button class="m-save" onclick="invGuardar()">Guardar coche</button>
+      <button class="m-save" onclick="invGuardar()">💾 Guardar coche</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal agregar/editar usuario -->
+<div id="usrModal">
+  <div class="inv-form">
+    <h3 id="usrFormTitle">Agregar usuario</h3>
+    <div class="msub">Perfil visible en el panel: quién es y a qué tiene acceso.</div>
+    <div class="fila2">
+      <div class="campo"><label>Nombre</label><input type="text" id="uNombre" placeholder="Ej: Juan Pérez"></div>
+      <div class="campo"><label>Rol / puesto</label><input type="text" id="uRol" placeholder="Ej: Vendedor"></div>
+    </div>
+    <div class="fila2">
+      <div class="campo"><label>Correo</label><input type="text" id="uCorreo" placeholder="correo@elesensial.com"></div>
+      <div class="campo"><label>Área asignada</label><input type="text" id="uArea" placeholder="Ej: Piso de ventas"></div>
+    </div>
+    <div class="campo"><label>Permisos <span class="hint">(separa con comas)</span></label><input type="text" id="uPermisos" placeholder="Ver, Editar, Simular, Administrar"></div>
+    <div class="campo"><label>Módulos con acceso <span class="hint">(separa con comas)</span></label><input type="text" id="uModulos" placeholder="Simulador, Inventario, Usuarios"></div>
+    <div class="campo"><label>Estado</label><select id="uEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div>
+    <div class="mfoot">
+      <button class="m-cancel" onclick="usrCerrar()">Cancelar</button>
+      <button class="m-save" onclick="usrGuardar()">💾 Guardar usuario</button>
     </div>
   </div>
 </div>
@@ -436,10 +554,10 @@ async function entrar(){
     else document.getElementById('gateErr').style.display='block';
   }catch(e){ if(v==='esensial2026'){ sessionStorage.setItem('ee_auth','1'); mostrarApp(); } else document.getElementById('gateErr').style.display='block'; }
 }
-function mostrarApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; invRender(); }
+function mostrarApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block';
+  invSeed(); usrSeed(); invRefreshFiltros(); invRender(); usrRender(); }
 function salir(){ sessionStorage.removeItem('ee_auth'); location.reload(); }
 document.getElementById('claveInput').addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
-if(sessionStorage.getItem('ee_auth')==='1') mostrarApp();
 setTimeout(()=>{ if(document.getElementById('gate').style.display!=='none') document.getElementById('claveInput').focus(); },100);
 
 /* ===================== NAVEGACIÓN ===================== */
@@ -447,74 +565,221 @@ function irA(page){
   document.querySelectorAll('.ee-navitem').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   document.getElementById('page-simulador').hidden = page!=='simulador';
   document.getElementById('page-inventario').hidden = page!=='inventario';
+  document.getElementById('page-usuarios').hidden = page!=='usuarios';
   window.scrollTo(0,0);
 }
 
 /* ===================== INVENTARIO ===================== */
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+// Catálogo real (Excel "concentrado venta") — 24 unidades
+const SEED_CARS=[
+ ['Mercedez-Benz','GLE 450 4Matic',2021,'Gris','','AUT',849000,169800,679200,33960],
+ ['Audi','Q3',2021,'Blanca','','AUT',459000,91800,367200,18360],
+ ['Audi','Q2',2022,'Azul Obscuro','','AUT',369000,73800,295200,14760],
+ ['Seat','Tarraco FR',2024,'Verde','','AUT',479000,95800,383200,19160],
+ ['Tesla','Cybertruck',2024,'Negro','','AUT',2100000,420000,1680000,84000],
+ ['Volkswaguen','Tiguan',2023,'Blanco','','AUT',435000,87000,348000,17400],
+ ['Toyota','Camry',2022,'Café','','AUT',389000,77800,311200,15560],
+ ['MINI','Cooper Chili',2029,'Crema','','AUT',269000,53800,215200,10760],
+ ['MG','5',2024,'Blanco','','AUT',225000,45000,180000,9000],
+ ['Chevrolet','Onix',2023,'Blanco','','AUT',235000,47000,188000,9400],
+ ['Renault','Koleos',2023,'Blanco','','AUT',349000,69800,279200,13960],
+ ['Volkswaguen','Jetta',2019,'Azul Claro','','AUT',229000,45800,183200,9160],
+ ['Ford','Bronco',2021,'Azul Obscuro','Outer Banks','AUT',445000,89000,356000,17800],
+ ['Tesla','Y',2025,'Gris','','AUT',849000,169800,679200,33960],
+ ['BMW','320i',2020,'Negro','','AUT',425000,85000,340000,17000],
+ ['Kia','k3',2027,'N/A','','AUT',369000,73800,295200,14760],
+ ['Kia','K3',2027,'N/A','','STD',339000,67800,271200,13560],
+ ['Ducati','Scrambler',2021,'Gris','','STD',159000,31800,127200,6360],
+ ['Volkswaguen','Tiguan',2018,'Gris','','AUT',299000,59800,239200,11960],
+ ['Volkswaguen','Tiguan',2018,'Blanco','','AUT',299000,59800,239200,11960],
+ ['Ford','Explorer',2019,'Blanco','','AUT',479000,95800,383200,19160],
+ ['BMW','440i',2023,'Azul Obscuro','Serie 4','AUT',969000,193800,775200,38760],
+ ['Jeep','Gladiator',2020,'Gris','','AUT',785000,157000,628000,31400],
+ ['Mercedez-Benz','C 200 Sport',2024,'Negro','Hybrid','AUT',775000,155000,620000,31000],
+].map((r,i)=>({ id:'seed'+(i+1), marca:r[0], modelo:r[1], anio:r[2], color:r[3], version:r[4],
+  transmision:r[5], km:'', motor:r[4]==='Hybrid'?'4 cil':'', precio:r[6], enganche:r[7], saldo:r[8],
+  comision:r[9], tasa:16.9, plazo:'24', notas:'', foto:'', estado:'disponible' }));
+
 let editandoId=null, fotoActual='';
 function invLoad(){ try{return JSON.parse(localStorage.getItem('ee_inv')||'[]')}catch(e){return[]} }
 function invSaveAll(a){ localStorage.setItem('ee_inv',JSON.stringify(a)); }
+function nombreCoche(c){ return [c.marca,c.modelo].filter(Boolean).join(' ')||'Sin nombre'; }
+function sig(c){ return (c.marca+'|'+c.modelo+'|'+c.anio+'|'+c.precio+'|'+c.color).toLowerCase(); }
+function invSeed(){ // primera vez: cargar catálogo
+  if(localStorage.getItem('ee_seeded_v1')) return;
+  const arr=invLoad(); const have=new Set(arr.map(sig));
+  SEED_CARS.forEach(c=>{ if(!have.has(sig(c))) arr.push({...c}); });
+  invSaveAll(arr); localStorage.setItem('ee_seeded_v1','1');
+}
+function invImportar(){ // botón: sincronizar/mezclar catálogo del Excel
+  const arr=invLoad(); const have=new Set(arr.map(sig)); let add=0;
+  SEED_CARS.forEach(c=>{ if(!have.has(sig(c))){ arr.push({...c,id:'c'+Date.now()+Math.floor(Math.random()*1e4)}); add++; } });
+  invSaveAll(arr); invRefreshFiltros(); invRender();
+  toast(add? `✅ ${add} autos importados del catálogo` : 'El catálogo ya está sincronizado');
+}
+
+const ESTADOS={disponible:{t:'Disponible',c:'#0f7a53',b:'#eafaf1'},vendido:{t:'Vendido',c:'#b91c1c',b:'#fee2e2'},oculto:{t:'Oculto',c:'#6b7280',b:'#eef0f3'}};
+function invRefreshFiltros(){
+  const arr=invLoad();
+  const marcas=[...new Set(arr.map(c=>c.marca).filter(Boolean))].sort();
+  const anios=[...new Set(arr.map(c=>c.anio).filter(Boolean))].sort((a,b)=>b-a);
+  const fm=$('fltMarca'), fa=$('fltAnio');
+  if(fm){ const v=fm.value; fm.innerHTML='<option value="">Todas las marcas</option>'+marcas.map(m=>`<option>${esc(m)}</option>`).join(''); fm.value=v; }
+  if(fa){ const v=fa.value; fa.innerHTML='<option value="">Todos los años</option>'+anios.map(a=>`<option>${a}</option>`).join(''); fa.value=v; }
+  rellenarSelectorCoches();
+}
+function invFiltrados(){
+  let arr=invLoad();
+  const q=($('qSearch')?.value||'').toLowerCase().trim();
+  const fm=$('fltMarca')?.value||'', fa=$('fltAnio')?.value||'', ft=$('fltTrans')?.value||'', fe=$('fltEstado')?.value||'';
+  return arr.filter(c=>{
+    if(fe){ if(c.estado!==fe) return false; } else { if(c.estado==='oculto') return false; }
+    if(fm && c.marca!==fm) return false;
+    if(fa && String(c.anio)!==fa) return false;
+    if(ft && c.transmision!==ft) return false;
+    if(q && !(nombreCoche(c)+' '+(c.version||'')+' '+(c.color||'')).toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
 function invRender(){
-  const arr=invLoad(); const g=document.getElementById('invGrid'), empty=document.getElementById('invEmpty');
+  const arr=invFiltrados(); const total=invLoad().length;
+  const g=$('invGrid'), empty=$('invEmpty'), cnt=$('invCount');
+  if(cnt) cnt.textContent = total? `${arr.length} de ${total} unidades` : '';
   if(!arr.length){ g.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
-  g.innerHTML=arr.map(c=>`
-    <div class="cochecard">
-      <div class="foto" style="${c.foto?`background-image:url('${c.foto}')`:''}">${c.foto?'':'🚗'}</div>
+  g.innerHTML=arr.map(c=>{ const e=ESTADOS[c.estado]||ESTADOS.disponible; const dim=c.estado!=='disponible';
+    return `<div class="cochecard${dim?' dim':''}">
+      <div class="foto" style="${c.foto?`background-image:url('${c.foto}')`:''}">${c.foto?'':'🚗'}
+        <span class="cc-estado" style="color:${e.c};background:${e.b}">${e.t}</span></div>
       <div class="cc-body">
-        <div class="cc-nom">${esc(c.nombre||'Sin nombre')}</div>
-        <div class="cc-anio">${c.anio?('Año '+c.anio):''}</div>
+        <div class="cc-nom">${esc(nombreCoche(c))} ${c.version?`<span class="cc-ver">${esc(c.version)}</span>`:''}</div>
+        <div class="cc-anio">${c.anio?('Año '+c.anio):''}${c.color&&c.color!=='N/A'?(' · '+esc(c.color)):''} · ${esc(c.transmision||'')}</div>
         <div class="cc-precio">${money(c.precio||0)}</div>
-        <div class="cc-sub">Enganche sug. ${money(c.enganche||0)} · ${c.plazo||24} meses · ${c.tasa||0}%</div>
-        ${c.notas?`<div class="cc-notas">${esc(c.notas)}</div>`:'<div class="cc-notas"></div>'}
+        <div class="cc-sub">Enganche ${money(c.enganche||0)} · Financiar ${money(c.saldo||((c.precio||0)-(c.enganche||0)))}</div>
+        ${c.notas?`<div class="cc-notas">${esc(c.notas)}</div>`:''}
         <div class="cc-acts">
           <button class="cc-sim" onclick="invSimular('${c.id}')">🧮 Simular</button>
-          <button class="cc-ed" onclick="invEditar('${c.id}')">✎</button>
-          <button class="cc-del" onclick="invBorrar('${c.id}')">🗑</button>
+          <button class="cc-ed" onclick="invEditar('${c.id}')" title="Editar">✎</button>
+          <button class="cc-del" onclick="invBorrar('${c.id}')" title="Borrar">🗑</button>
+        </div>
+        <div class="cc-acts2">
+          <button class="cc-mini${c.estado==='vendido'?' on-sold':''}" onclick="invEstado('${c.id}','vendido')">${c.estado==='vendido'?'↩ Disponible':'🏷️ Vendido'}</button>
+          <button class="cc-mini${c.estado==='oculto'?' on-hide':''}" onclick="invEstado('${c.id}','oculto')">${c.estado==='oculto'?'👁 Mostrar':'🚫 Ocultar'}</button>
         </div>
       </div>
-    </div>`).join('');
+    </div>`; }).join('');
 }
-function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function invEstado(id,estado){ const arr=invLoad(); const c=arr.find(x=>x.id===id); if(!c)return;
+  c.estado = (c.estado===estado)?'disponible':estado; invSaveAll(arr); invRefreshFiltros(); invRender();
+}
 function invAbrir(){ editandoId=null; fotoActual='';
-  document.getElementById('invFormTitle').textContent='Agregar coche';
-  ['fNombre','fAnio','fPrecio','fEnganche','fNotas'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fPlazo').value='24'; document.getElementById('fTasa').value='16.9';
-  document.getElementById('fotoPrev').style.backgroundImage=''; document.getElementById('fotoPrev').textContent='📷 Toca para agregar foto (opcional)';
-  document.getElementById('invModal').classList.add('show');
+  $('invFormTitle').textContent='Agregar coche';
+  ['fMarca','fModelo','fAnio','fColor','fVersion','fKm','fMotor','fPrecio','fEnganche','fNotas'].forEach(id=>$(id).value='');
+  $('fTrans').value='AUT'; $('fPlazo').value='24'; $('fTasa').value='16.9'; $('fEstado').value='disponible';
+  const fp=$('fotoPrev'); fp.style.backgroundImage=''; fp.textContent='📷 Toca para agregar foto (opcional)';
+  $('invModal').classList.add('show');
 }
 function invEditar(id){ const c=invLoad().find(x=>x.id===id); if(!c)return; editandoId=id; fotoActual=c.foto||'';
-  document.getElementById('invFormTitle').textContent='Editar coche';
-  document.getElementById('fNombre').value=c.nombre||''; document.getElementById('fAnio').value=c.anio||'';
-  document.getElementById('fPrecio').value=c.precio||''; document.getElementById('fEnganche').value=c.enganche||'';
-  document.getElementById('fPlazo').value=c.plazo||'24'; document.getElementById('fTasa').value=c.tasa||'16.9';
-  document.getElementById('fNotas').value=c.notas||'';
-  const fp=document.getElementById('fotoPrev');
-  if(c.foto){ fp.style.backgroundImage=`url('${c.foto}')`; fp.textContent=''; } else { fp.style.backgroundImage=''; fp.textContent='📷 Toca para agregar foto (opcional)'; }
-  document.getElementById('invModal').classList.add('show');
+  $('invFormTitle').textContent='Editar coche';
+  $('fMarca').value=c.marca||''; $('fModelo').value=c.modelo||''; $('fAnio').value=c.anio||''; $('fColor').value=c.color||'';
+  $('fVersion').value=c.version||''; $('fTrans').value=c.transmision||'AUT'; $('fKm').value=c.km||''; $('fMotor').value=c.motor||'';
+  $('fPrecio').value=c.precio||''; $('fEnganche').value=c.enganche||''; $('fPlazo').value=c.plazo||'24'; $('fTasa').value=c.tasa||'16.9';
+  $('fNotas').value=c.notas||''; $('fEstado').value=c.estado||'disponible';
+  const fp=$('fotoPrev'); if(c.foto){ fp.style.backgroundImage=`url('${c.foto}')`; fp.textContent=''; } else { fp.style.backgroundImage=''; fp.textContent='📷 Toca para agregar foto (opcional)'; }
+  $('invModal').classList.add('show');
 }
-function invCerrar(){ document.getElementById('invModal').classList.remove('show'); }
+function invCerrar(){ $('invModal').classList.remove('show'); }
 function fotoElegida(ev){ const f=ev.target.files[0]; if(!f)return; const rd=new FileReader();
-  rd.onload=e=>{ fotoActual=e.target.result; const fp=document.getElementById('fotoPrev'); fp.style.backgroundImage=`url('${fotoActual}')`; fp.textContent=''; };
+  rd.onload=e=>{ fotoActual=e.target.result; const fp=$('fotoPrev'); fp.style.backgroundImage=`url('${fotoActual}')`; fp.textContent=''; };
   rd.readAsDataURL(f);
 }
 function invGuardar(){
-  const nombre=document.getElementById('fNombre').value.trim();
-  if(!nombre){ alert('Ponle al menos la marca y modelo.'); return; }
-  const c={ id:editandoId||('c'+Date.now()), nombre,
-    anio:+document.getElementById('fAnio').value||'', precio:+document.getElementById('fPrecio').value||0,
-    enganche:+document.getElementById('fEnganche').value||0, plazo:document.getElementById('fPlazo').value,
-    tasa:+document.getElementById('fTasa').value||0, notas:document.getElementById('fNotas').value.trim(), foto:fotoActual };
+  const marca=$('fMarca').value.trim(), modelo=$('fModelo').value.trim();
+  if(!marca && !modelo){ alert('Ponle al menos la marca y el modelo.'); return; }
+  const precio=+$('fPrecio').value||0, enganche=+$('fEnganche').value||0;
+  const c={ id:editandoId||('c'+Date.now()), marca, modelo, anio:+$('fAnio').value||'', color:$('fColor').value.trim(),
+    version:$('fVersion').value.trim(), transmision:$('fTrans').value, km:$('fKm').value.trim(), motor:$('fMotor').value.trim(),
+    precio, enganche, saldo:Math.max(0,precio-enganche), comision:Math.round(precio*0.04),
+    plazo:$('fPlazo').value, tasa:+$('fTasa').value||0, notas:$('fNotas').value.trim(), foto:fotoActual, estado:$('fEstado').value };
   const arr=invLoad();
   if(editandoId){ const i=arr.findIndex(x=>x.id===editandoId); if(i>=0)arr[i]=c; } else arr.unshift(c);
-  invSaveAll(arr); invCerrar(); invRender();
+  invSaveAll(arr); invCerrar(); invRefreshFiltros(); invRender(); toast('✅ Guardado');
 }
-function invBorrar(id){ if(!confirm('¿Borrar este coche del inventario?'))return; invSaveAll(invLoad().filter(x=>x.id!==id)); invRender(); }
-function invSimular(id){ const c=invLoad().find(x=>x.id===id); if(!c)return;
-  $('lote').value=c.nombre+(c.anio?(' '+c.anio):''); $('precio').value=c.precio||0; $('bonificacion').value=0;
+function invBorrar(id){ if(!confirm('¿Borrar este coche del inventario?'))return; invSaveAll(invLoad().filter(x=>x.id!==id)); invRefreshFiltros(); invRender(); }
+
+// ----- Cargar coche en el simulador -----
+function cargarCoche(id, navegar){ const c=invLoad().find(x=>x.id===id); if(!c)return;
+  $('lote').value=[nombreCoche(c),c.anio,c.version].filter(Boolean).join(' ');
+  $('precio').value=c.precio||0; $('bonificacion').value=0;
   $('enganche').value=c.enganche||0; $('plazo').value=c.plazo||'24'; $('tasa').value=c.tasa||16.9;
-  calc(); irA('simulador');
+  // comisión de apertura real (4%) en cargos
+  $('tgl').checked=true; $('comisionModo').value='monto'; $('comision').value=c.comision||Math.round((c.precio||0)*0.04);
+  calc(); if(navegar) irA('simulador');
+  const sel=$('carSelect'); if(sel) sel.value=id;
 }
+function invSimular(id){ cargarCoche(id,true); }
+function rellenarSelectorCoches(){ const sel=$('carSelect'); if(!sel)return;
+  const arr=invLoad().filter(c=>c.estado==='disponible');
+  const v=sel.value;
+  sel.innerHTML='<option value="">— Elegir coche del inventario —</option>'+
+    arr.map(c=>`<option value="${c.id}">${esc([nombreCoche(c),c.anio,c.version].filter(Boolean).join(' '))} · ${money(c.precio||0)}</option>`).join('');
+  sel.value=v;
+}
+
+/* ===================== USUARIOS / PERFILES ===================== */
+const SEED_USERS=[
+ {id:'u1',nombre:'Administrador',rol:'Dirección',correo:'agencia@fiborti.com',area:'Administración',
+  permisos:['Ver','Editar','Administrar'],modulos:['Simulador','Inventario','Usuarios'],estado:'activo'},
+ {id:'u2',nombre:'Vendedor (ejemplo)',rol:'Ventas',correo:'ventas@elesensial.com',area:'Piso de ventas',
+  permisos:['Ver','Simular'],modulos:['Simulador','Inventario'],estado:'activo'},
+];
+let editandoUsr=null;
+function usrLoad(){ try{return JSON.parse(localStorage.getItem('ee_usr')||'null')}catch(e){return null} }
+function usrSaveAll(a){ localStorage.setItem('ee_usr',JSON.stringify(a)); }
+function usrSeed(){ if(!usrLoad()) usrSaveAll(SEED_USERS); }
+function iniciales(n){ return (n||'?').split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase(); }
+function usrRender(){ const arr=usrLoad()||[]; const g=$('usrGrid'); if(!g)return;
+  g.innerHTML=arr.map(u=>{ const on=u.estado==='activo';
+    return `<div class="usrcard">
+      <div class="usr-top">
+        <div class="usr-av">${esc(iniciales(u.nombre))}</div>
+        <div style="flex:1;min-width:0">
+          <div class="usr-nom">${esc(u.nombre)}</div>
+          <div class="usr-rol">${esc(u.rol||'')}</div>
+        </div>
+        <span class="usr-estado ${on?'on':'off'}">${on?'● Activo':'○ Inactivo'}</span>
+      </div>
+      <div class="usr-info">
+        <div><span>📧 Correo</span>${esc(u.correo||'—')}</div>
+        <div><span>🏢 Área</span>${esc(u.area||'—')}</div>
+      </div>
+      <div class="usr-chips-lbl">Permisos</div>
+      <div class="usr-chips">${(u.permisos||[]).map(p=>`<span class="chip chip-p">${esc(p)}</span>`).join('')||'<span class="chip">—</span>'}</div>
+      <div class="usr-chips-lbl">Módulos con acceso</div>
+      <div class="usr-chips">${(u.modulos||[]).map(m=>`<span class="chip chip-m">${esc(m)}</span>`).join('')||'<span class="chip">—</span>'}</div>
+      <div class="cc-acts" style="margin-top:12px">
+        <button class="cc-ed" style="flex:1" onclick="usrEditar('${u.id}')">✎ Editar</button>
+        <button class="cc-del" onclick="usrBorrar('${u.id}')" title="Borrar">🗑</button>
+      </div>
+    </div>`; }).join('');
+}
+function usrAbrir(){ editandoUsr=null; $('usrFormTitle').textContent='Agregar usuario';
+  ['uNombre','uRol','uCorreo','uArea','uPermisos','uModulos'].forEach(id=>$(id).value='');
+  $('uEstado').value='activo'; $('usrModal').classList.add('show'); }
+function usrEditar(id){ const u=(usrLoad()||[]).find(x=>x.id===id); if(!u)return; editandoUsr=id;
+  $('usrFormTitle').textContent='Editar usuario';
+  $('uNombre').value=u.nombre||''; $('uRol').value=u.rol||''; $('uCorreo').value=u.correo||''; $('uArea').value=u.area||'';
+  $('uPermisos').value=(u.permisos||[]).join(', '); $('uModulos').value=(u.modulos||[]).join(', '); $('uEstado').value=u.estado||'activo';
+  $('usrModal').classList.add('show'); }
+function usrCerrar(){ $('usrModal').classList.remove('show'); }
+function usrGuardar(){ const nombre=$('uNombre').value.trim(); if(!nombre){ alert('Ponle el nombre del usuario.'); return; }
+  const u={ id:editandoUsr||('u'+Date.now()), nombre, rol:$('uRol').value.trim(), correo:$('uCorreo').value.trim(), area:$('uArea').value.trim(),
+    permisos:$('uPermisos').value.split(',').map(s=>s.trim()).filter(Boolean),
+    modulos:$('uModulos').value.split(',').map(s=>s.trim()).filter(Boolean), estado:$('uEstado').value };
+  const arr=usrLoad()||[]; if(editandoUsr){ const i=arr.findIndex(x=>x.id===editandoUsr); if(i>=0)arr[i]=u; } else arr.push(u);
+  usrSaveAll(arr); usrCerrar(); usrRender(); toast('✅ Usuario guardado'); }
+function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll((usrLoad()||[]).filter(x=>x.id!==id)); usrRender(); }
 
 /* ===================== SIMULADOR ===================== */
   const MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
@@ -647,6 +912,9 @@ function invSimular(id){ const c=invLoad().find(x=>x.id===id); if(!c)return;
   function toggleTabla(){ const s=$('scrollTabla'),b=$('btnTabla');
     if(s.style.display==='none'){s.style.display='';b.textContent='Ocultar tabla';} else {s.style.display='none';b.textContent='Mostrar tabla';} }
   calc();
+
+  // Auto-entrar si ya se validó en esta sesión (al final: todo ya está definido)
+  if(sessionStorage.getItem('ee_auth')==='1') mostrarApp();
 </script>
 </body>
 </html>
