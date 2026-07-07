@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EL ESENSIAL · Simulador y Catálogo</title>
+<style>
+  :root{
+    --rojo:#e11d2a; --rojo-2:#b3141f; --amarillo:#f5c518; --negro:#0d0d0f; --negro-2:#17171b;
+    --oro:#c9a24b; --oro-2:#e3c775;
+    --tinta:#1c1e22; --tinta-2:#2a2d33; --gris:#6b7280; --gris-cl:#eef0f3; --linea:#e4e7ec;
+    --bg:#f5f6f8; --card:#ffffff;
+    --sombra:0 1px 2px rgba(16,24,40,.06),0 8px 24px rgba(16,24,40,.08); --r:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--tinta);line-height:1.45}
+
+  /* ===== LOGO ===== */
+  .carlogo{display:block}
+  .wordmark{font-family:Georgia,'Times New Roman',serif;font-weight:700;color:var(--amarillo);letter-spacing:.1em;line-height:1;white-space:nowrap}
+
+  /* ===== GATE (login) ===== */
+  #gate{position:fixed;inset:0;z-index:200;background:radial-gradient(1200px 600px at 50% -10%,#1c1c22,#000);
+    display:flex;align-items:center;justify-content:center;padding:24px}
+  .gate-box{width:100%;max-width:380px;text-align:center}
+  .gate-box .carlogo{width:190px;height:auto;margin:0 auto 6px}
+  .gate-box .wordmark{font-size:30px;display:block;margin-bottom:4px}
+  .gate-sub{color:rgba(255,255,255,.55);font-size:12px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:30px}
+  .gate-lbl{display:block;text-align:left;color:rgba(255,255,255,.6);font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px}
+  #claveInput{width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);
+    color:#fff;font-size:16px;outline:none;transition:.15s}
+  #claveInput:focus{border-color:var(--rojo);box-shadow:0 0 0 3px rgba(225,29,42,.25)}
+  .gate-btn{width:100%;margin-top:18px;padding:14px;border:none;border-radius:10px;background:var(--rojo);color:#fff;
+    font-size:15px;font-weight:800;letter-spacing:.02em;cursor:pointer;transition:.15s}
+  .gate-btn:hover{background:var(--rojo-2)}
+  #gateErr{display:none;color:#ff6b6b;font-size:13px;margin-top:14px;font-weight:600}
+  .gate-foot{color:rgba(255,255,255,.3);font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin-top:34px}
+
+  /* ===== APP LAYOUT ===== */
+  #app{display:none;min-height:100vh}
+  .ee-sidebar{position:fixed;top:0;left:0;width:230px;height:100vh;background:var(--negro);z-index:60;
+    display:flex;flex-direction:column;border-right:1px solid rgba(225,29,42,.25);overflow-y:auto}
+  .ee-brand{padding:22px 18px 18px;text-align:center;border-bottom:1px solid rgba(255,255,255,.07)}
+  .ee-brand .carlogo{width:130px;height:auto;margin:0 auto 4px}
+  .ee-brand .wordmark{font-size:18px}
+  .ee-nav{padding:14px 10px;flex:1}
+  .ee-navsec{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:12px 10px 6px;font-weight:700}
+  .ee-navitem{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;color:rgba(255,255,255,.72);
+    font-size:14px;font-weight:600;cursor:pointer;border-left:3px solid transparent;transition:.15s;margin-bottom:2px}
+  .ee-navitem:hover{background:rgba(255,255,255,.06);color:#fff}
+  .ee-navitem.active{background:rgba(225,29,42,.14);color:#fff;border-left-color:var(--rojo)}
+  .ee-navitem .ic{width:20px;text-align:center;font-size:16px}
+  .ee-side-foot{padding:14px;border-top:1px solid rgba(255,255,255,.07)}
+  .ee-logout{width:100%;padding:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);
+    border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+  .ee-logout:hover{border-color:var(--rojo);color:#fff}
+  .ee-cred{color:rgba(255,255,255,.28);font-size:10px;text-align:center;margin-top:10px;letter-spacing:.1em}
+
+  .ee-main{margin-left:230px;padding:0 0 60px}
+
+  /* Top hero con logo (al inicio) */
+  .ee-hero{background:var(--negro);color:#fff;padding:26px 32px;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden}
+  .ee-hero:before{content:"";position:absolute;right:-40px;top:50%;transform:translateY(-50%);width:280px;height:280px;
+    background:radial-gradient(circle,rgba(225,29,42,.22),transparent 70%)}
+  .ee-hero .carlogo{width:160px;height:auto;flex:none;position:relative}
+  .ee-hero-txt{position:relative}
+  .ee-hero-txt .wordmark{font-size:30px;display:block}
+  .ee-hero-txt .st{color:rgba(255,255,255,.55);font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-top:6px}
+  .ee-page{padding:24px 22px 0}
+  .wrap{max-width:1040px;margin:0 auto}
+  @media(max-width:860px){
+    .ee-sidebar{width:64px}
+    .ee-brand .wordmark,.ee-navsec,.ee-navitem span:not(.ic),.ee-side-foot .ee-cred,.ee-logout span{display:none}
+    .ee-brand .carlogo{width:44px}
+    .ee-navitem{justify-content:center;padding:12px 0}
+    .ee-main{margin-left:64px}
+    .ee-hero .carlogo{width:110px}
+  }
+
+  /* ===== SIMULADOR (base preservada) ===== */
+  header.sim{background:linear-gradient(135deg,var(--tinta) 0%,var(--tinta-2) 100%);border-radius:var(--r);padding:26px 26px 22px;color:#fff;box-shadow:var(--sombra);position:relative;overflow:hidden}
+  header.sim:before{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(225,29,42,.32),transparent 70%)}
+  .badge{display:inline-block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--amarillo);font-weight:700;margin-bottom:8px}
+  .lote{font-size:26px;font-weight:800;background:transparent;border:none;color:#fff;width:100%;outline:none;border-bottom:2px dashed rgba(255,255,255,.22);padding:2px 0 6px;letter-spacing:-.01em}
+  .lote::placeholder{color:rgba(255,255,255,.45)}
+  .sub{color:rgba(255,255,255,.6);font-size:13px;margin-top:6px}
+  .sub b{color:var(--amarillo)}
+  .acciones{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .btn{border:none;border-radius:12px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s;font-family:inherit}
+  .btn:active{transform:translateY(1px)}
+  .btn-wa{background:#25d366;color:#0a2e1a}
+  .btn-wa:hover{background:#20c05c}
+  .btn-gh{background:rgba(255,255,255,.12);color:#fff}
+  .btn-gh:hover{background:rgba(255,255,255,.2)}
+  .btn-oro{background:linear-gradient(135deg,var(--rojo),#f0454f);color:#fff}
+  .btn-oro:hover{filter:brightness(1.05)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border-radius:var(--r);padding:22px;box-shadow:var(--sombra);border:1px solid var(--linea)}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:var(--gris);margin-bottom:16px;display:flex;align-items:center;gap:8px;font-weight:700}
+  .card h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--rojo)}
+  .campo{margin-bottom:14px}
+  .campo label{display:block;font-size:13px;font-weight:600;color:var(--tinta-2);margin-bottom:6px}
+  .campo .hint{color:var(--gris);font-weight:400;font-size:12px}
+  .inbox{position:relative}
+  .inbox .pre,.inbox .suf{position:absolute;top:50%;transform:translateY(-50%);color:var(--gris);font-weight:600;font-size:14px;pointer-events:none}
+  .inbox .pre{left:14px}.inbox .suf{right:14px}
+  input[type=number],input[type=text],select{width:100%;padding:12px 14px;border:1.5px solid var(--linea);border-radius:11px;font-size:15px;font-family:inherit;color:var(--tinta);background:#fff;outline:none;transition:.15s;font-weight:600}
+  input.has-pre{padding-left:28px}input.has-suf{padding-right:34px}
+  input:focus,select:focus{border-color:var(--rojo);box-shadow:0 0 0 3px rgba(225,29,42,.15)}
+  .fila2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .toggle{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--tinta-2);cursor:pointer;user-select:none;margin-bottom:10px;font-weight:600}
+  .toggle input{width:38px;height:22px;appearance:none;-webkit-appearance:none;background:#d5d9e0;border-radius:20px;position:relative;cursor:pointer;transition:.2s;flex:none}
+  .toggle input:checked{background:var(--rojo)}
+  .toggle input:before{content:"";position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .toggle input:checked:before{left:18px}
+  .opcionales[hidden]{display:none}
+  .mix{display:flex;gap:8px;align-items:stretch}
+  .mix .inbox{flex:1;min-width:0}
+  .mix select{width:auto;flex:0 0 auto;min-width:132px;font-size:13px;font-weight:600}
+  .cargo-grupo{background:#fafbfc;border:1px solid var(--linea);border-radius:12px;padding:14px;margin-bottom:12px}
+  .cargo-grupo .gt{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .cargo-grupo .campo:last-child{margin-bottom:0}
+  .res-hero{background:linear-gradient(135deg,var(--tinta) 0%,var(--tinta-2) 100%);color:#fff;text-align:center;padding:24px;border-radius:14px;margin-bottom:16px;position:relative}
+  .res-hero .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--amarillo);font-weight:700}
+  .res-hero .big{font-size:42px;font-weight:800;letter-spacing:-.02em;margin:4px 0 2px}
+  .res-hero .peque{font-size:13px;color:rgba(255,255,255,.6)}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{background:var(--gris-cl);border-radius:11px;padding:13px 14px}
+  .kpi .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gris);font-weight:700}
+  .kpi .v{font-size:18px;font-weight:800;color:var(--tinta);margin-top:2px}
+  .kpi.wide{grid-column:1/-1}
+  .kpi .v.oro{color:#9a7b28}
+  .kpi .d{font-size:11px;color:var(--gris);margin-top:4px;font-weight:500;line-height:1.35}
+  .kpi.bonif{background:#eafaf1;border:1px solid #bfe8d1}
+  .kpi.bonif .v{color:#0f7a53}
+  .kpi.total{background:var(--tinta)}
+  .kpi.total .k{color:var(--amarillo)}
+  .kpi.total .v{color:#fff}
+  .kpi.total .d{color:rgba(255,255,255,.6)}
+  .pasos{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .paso{flex:1;min-width:120px;background:var(--gris-cl);border-radius:11px;padding:11px 12px}
+  .paso .n{width:22px;height:22px;border-radius:50%;background:var(--rojo);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:7px}
+  .paso .t{font-size:12.5px;font-weight:700;color:var(--tinta);line-height:1.2}
+  .paso .s{font-size:11px;color:var(--gris);margin-top:3px;line-height:1.35}
+  .res-hero.inicio{background:linear-gradient(135deg,#0f7a53 0%,#17a06a 100%);margin-bottom:12px}
+  .res-hero .tip{font-size:12px;color:rgba(255,255,255,.8);margin-top:9px;line-height:1.4}
+  .res-hero .tip b{color:#fff;font-weight:700}
+  .res-hero.inicio .lbl{color:#c9f5df}
+  .final-live{background:#eafaf1;border:1px solid #bfe8d1;border-radius:10px;padding:10px 12px;margin:-4px 0 14px;font-size:13px;color:#0f7a53;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+  .final-live span:first-child{color:#0a5c3e;font-weight:600}
+  .tabla-card{margin-top:18px}
+  .tabla-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .tabla-head h2{margin:0}
+  .scroll{overflow-x:auto;border:1px solid var(--linea);border-radius:12px}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+  th{background:var(--tinta);color:#fff;font-weight:700;text-align:right;padding:11px 14px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0}
+  th:first-child,th:nth-child(2){text-align:center}
+  td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--linea);font-variant-numeric:tabular-nums}
+  td:first-child{text-align:center;font-weight:700;color:var(--gris)}
+  tbody tr:nth-child(even){background:#fafbfc}
+  tbody tr:last-child td{border-bottom:none}
+  tfoot td{font-weight:800;background:var(--gris-cl);border-top:2px solid var(--rojo)}
+  .nota{font-size:12px;color:var(--gris);margin-top:14px;text-align:center;line-height:1.6}
+  .warn{background:#fff4e5;border:1px solid #ffd08a;color:#8a5a00;padding:12px 14px;border-radius:11px;font-size:13px;font-weight:600;margin-bottom:14px;display:none}
+  .warn.show{display:block}
+  footer{text-align:center;color:var(--gris);font-size:12px;margin-top:30px}
+  footer b{color:var(--rojo)}
+
+  /* ===== INVENTARIO ===== */
+  .inv-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+  .inv-top h1{font-size:24px;font-weight:800;letter-spacing:-.01em}
+  .inv-top p{font-size:13px;color:var(--gris);margin-top:2px}
+  .btn-add{background:var(--rojo);color:#fff}
+  .btn-add:hover{background:var(--rojo-2)}
+  .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+  .cochecard{background:var(--card);border:1px solid var(--linea);border-radius:14px;overflow:hidden;box-shadow:var(--sombra);display:flex;flex-direction:column}
+  .cochecard .foto{height:140px;background:#e9ebef center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:#aab;font-size:34px}
+  .cochecard .cc-body{padding:14px;flex:1;display:flex;flex-direction:column}
+  .cochecard .cc-nom{font-size:15px;font-weight:800;color:var(--tinta)}
+  .cochecard .cc-anio{font-size:12px;color:var(--gris);font-weight:600}
+  .cochecard .cc-precio{font-size:20px;font-weight:800;color:var(--rojo);margin:8px 0 2px}
+  .cochecard .cc-sub{font-size:12px;color:var(--gris)}
+  .cochecard .cc-notas{font-size:12px;color:var(--tinta-2);margin-top:8px;line-height:1.4;flex:1}
+  .cochecard .cc-acts{display:flex;gap:6px;margin-top:12px}
+  .cochecard .cc-acts button{flex:1;padding:9px;border-radius:9px;border:none;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:.15s}
+  .cc-sim{background:var(--rojo);color:#fff}.cc-sim:hover{background:var(--rojo-2)}
+  .cc-ed{background:var(--gris-cl);color:var(--tinta-2)}.cc-ed:hover{background:#e2e5ea}
+  .cc-del{background:transparent;border:1px solid var(--linea)!important;color:#b91c1c;flex:0 0 auto!important;width:40px}
+  .cc-del:hover{background:#fee2e2}
+  .inv-empty{text-align:center;padding:60px 20px;color:var(--gris);background:var(--card);border:1px dashed var(--linea);border-radius:14px}
+  .inv-empty .big{font-size:44px;margin-bottom:10px}
+  /* modal form */
+  #invModal{position:fixed;inset:0;z-index:120;background:rgba(13,13,15,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+  #invModal.show{display:flex}
+  .inv-form{background:var(--card);border-radius:16px;padding:24px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .inv-form h3{font-size:20px;font-weight:800;margin-bottom:4px}
+  .inv-form .msub{font-size:13px;color:var(--gris);margin-bottom:18px}
+  .inv-form .mfoot{display:flex;gap:10px;margin-top:20px}
+  .inv-form .mfoot button{flex:1;padding:13px;border-radius:11px;border:none;font-weight:800;cursor:pointer;font-family:inherit;font-size:14px}
+  .m-cancel{background:var(--gris-cl);color:var(--tinta-2)}
+  .m-save{background:var(--rojo);color:#fff}
+  .foto-prev{height:120px;border-radius:11px;border:1.5px dashed var(--linea);background:#f7f8fa center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:13px;cursor:pointer;margin-bottom:6px}
+  @media print{.ee-sidebar,.ee-hero,.acciones,.no-print{display:none!important}.ee-main{margin-left:0}.card,header.sim,.res-hero{box-shadow:none;border:1px solid #ddd;break-inside:avoid}header.sim,.res-hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}.scroll{overflow:visible}table{min-width:0}}
+</style>
+</head>
+<body>
+
+<!-- Símbolo del logo (auto rojo) reutilizable -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ee-car" viewBox="0 0 260 120">
+  <circle cx="54" cy="86" r="25" fill="#0d0d0f" stroke="#e11d2a" stroke-width="7"/>
+  <circle cx="54" cy="86" r="9" fill="none" stroke="#e11d2a" stroke-width="5"/>
+  <path d="M16 84 C 14 66, 28 59, 46 59 L74 59 C 86 42, 112 36, 138 39 C 178 43, 216 51, 248 60"
+        fill="none" stroke="#e11d2a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M96 72 L242 72" stroke="#e11d2a" stroke-width="7" stroke-linecap="round"/>
+  <path d="M82 88 L228 88" stroke="#e11d2a" stroke-width="7" stroke-linecap="round"/>
+  <path d="M108 102 L214 102" stroke="#e11d2a" stroke-width="7" stroke-linecap="round"/>
+  <path d="M18 86 L30 86 M80 86 L96 86" stroke="#e11d2a" stroke-width="7" stroke-linecap="round"/>
+</symbol></svg>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="gate">
+  <div class="gate-box">
+    <svg class="carlogo"><use href="#ee-car"/></svg>
+    <span class="wordmark">EL ESENSIAL</span>
+    <div class="gate-sub">Acceso privado</div>
+    <label class="gate-lbl" for="claveInput">Contraseña</label>
+    <input id="claveInput" type="password" placeholder="••••••••" autocomplete="current-password">
+    <button class="gate-btn" onclick="entrar()">Entrar →</button>
+    <div id="gateErr">Contraseña incorrecta.</div>
+    <div class="gate-foot">EL ESENSIAL · Uso interno</div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app">
+  <!-- Barra izquierda -->
+  <aside class="ee-sidebar">
+    <div class="ee-brand">
+      <svg class="carlogo"><use href="#ee-car"/></svg>
+      <span class="wordmark">EL ESENSIAL</span>
+    </div>
+    <nav class="ee-nav">
+      <div class="ee-navsec">Herramientas</div>
+      <div class="ee-navitem active" data-page="simulador" onclick="irA('simulador')"><span class="ic">🧮</span><span>Simulador</span></div>
+      <div class="ee-navitem" data-page="inventario" onclick="irA('inventario')"><span class="ic">🚗</span><span>Inventario de coches</span></div>
+    </nav>
+    <div class="ee-side-foot">
+      <button class="ee-logout" onclick="salir()"><span>🔒 Cerrar sesión</span></button>
+      <div class="ee-cred">by Fiborti Analytics</div>
+    </div>
+  </aside>
+
+  <main class="ee-main">
+    <!-- Logo al inicio -->
+    <div class="ee-hero">
+      <svg class="carlogo"><use href="#ee-car"/></svg>
+      <div class="ee-hero-txt">
+        <span class="wordmark">EL ESENSIAL</span>
+        <div class="st">Simulador de financiamiento · Catálogo</div>
+      </div>
+    </div>
+
+    <!-- ========== PÁGINA: SIMULADOR ========== -->
+    <section id="page-simulador" class="ee-page">
+      <div class="wrap">
+        <header class="sim">
+          <span class="badge">Simulador de financiamiento</span>
+          <input class="lote" id="lote" value="EL ESENSIAL" placeholder="Nombre / auto" oninput="calc()">
+          <div class="sub">Amortización francesa · <b id="fecha">—</b></div>
+          <div class="acciones">
+            <button class="btn btn-wa" onclick="compartirWA()">💬 Compartir por WhatsApp</button>
+            <button class="btn btn-gh" onclick="copiar()">📋 Copiar resumen</button>
+            <button class="btn btn-gh" onclick="window.print()">🖨️ Imprimir / PDF</button>
+            <button class="btn btn-oro" onclick="reset()">🔄 Nuevo cálculo</button>
+          </div>
+        </header>
+
+        <div class="grid">
+          <!-- ENTRADA -->
+          <div class="card">
+            <h2><span class="dot"></span> Datos del vehículo <span class="hint" style="text-transform:none;letter-spacing:0;font-weight:500">· los llena el vendedor</span></h2>
+            <div class="campo">
+              <label>Precio del auto <span class="hint">(precio de lista, sin descuento)</span></label>
+              <div class="inbox"><span class="pre">$</span><input type="number" id="precio" class="has-pre" value="280000" min="0" step="1000" oninput="calc()"></div>
+            </div>
+            <div class="campo">
+              <label>🎁 Bonificación / Descuento <span class="hint">(promoción del lote — se resta del precio)</span></label>
+              <div class="inbox"><span class="pre">$</span><input type="number" id="bonificacion" class="has-pre" value="0" min="0" step="1000" oninput="calc()"></div>
+            </div>
+            <div class="final-live"><span>Precio final con tu descuento</span><span id="precioFinalLive">$280,000</span></div>
+            <div class="fila2">
+              <div class="campo"><label>Enganche <span class="hint">(el pago inicial que das)</span></label>
+                <div class="inbox"><span class="pre">$</span><input type="number" id="enganche" class="has-pre" value="56000" min="0" step="1000" oninput="calc()"></div></div>
+              <div class="campo"><label>Plazo</label>
+                <select id="plazo" onchange="calc()"><option>12</option><option>18</option><option selected>24</option><option>36</option><option>48</option><option>60</option><option>72</option></select></div>
+            </div>
+            <div class="fila2">
+              <div class="campo"><label>Tasa anual <span class="hint">(de la financiera)</span></label>
+                <div class="inbox"><input type="number" id="tasa" class="has-suf" value="16.9" min="0" step="0.1" oninput="calc()"><span class="suf">%</span></div></div>
+              <div class="campo"><label>Enganche <span class="hint">(% rápido)</span></label>
+                <div class="inbox"><input type="number" id="engPct" class="has-suf" value="20" min="0" max="100" step="1" oninput="setEngPct()"><span class="suf">%</span></div></div>
+            </div>
+
+            <h2 style="margin-top:8px"><span class="dot"></span> Cargos adicionales</h2>
+            <label class="toggle"><input type="checkbox" id="tgl" onchange="calc()"> Agregar comisión, seguro, GPS, atraso, IVA…</label>
+            <div class="opcionales" id="opc" hidden>
+              <div class="cargo-grupo"><div class="gt">💳 Comisión por apertura</div>
+                <div class="campo" style="margin-bottom:0"><div class="mix">
+                  <div class="inbox"><input type="number" id="comision" value="2" min="0" step="0.1" oninput="calc()"></div>
+                  <select id="comisionModo" onchange="calc()"><option value="pct">% del precio</option><option value="monto">$ monto fijo</option></select></div>
+                  <div class="campo" style="margin:6px 0 0"><span class="hint">Se paga de contado al inicio (entra en el pago inicial).</span></div></div></div>
+              <div class="cargo-grupo"><div class="gt">🛡️ Seguro</div>
+                <div class="campo" style="margin-bottom:0"><div class="mix">
+                  <div class="inbox"><span class="pre">$</span><input type="number" id="seguro" class="has-pre" value="12000" min="0" step="500" oninput="calc()"></div>
+                  <select id="seguroModo" onchange="calc()"><option value="contado">De contado (al inicio)</option><option value="financiado">Financiado (a meses)</option><option value="mensual">Pago mensual (÷12)</option></select></div>
+                  <div class="campo" style="margin:6px 0 0"><span class="hint">Monto anual del seguro. Elige cómo lo cobra el lote.</span></div></div></div>
+              <div class="cargo-grupo"><div class="gt">📍 GPS</div>
+                <div class="campo" style="margin-bottom:0"><div class="mix">
+                  <div class="inbox"><span class="pre">$</span><input type="number" id="gps" class="has-pre" value="250" min="0" step="10" oninput="calc()"></div>
+                  <select id="gpsModo" onchange="calc()"><option value="mensual">Cada mes</option><option value="contado">De contado (instalación)</option></select></div></div></div>
+              <div class="cargo-grupo"><div class="gt">📆 Cargo mensual + atraso</div>
+                <div class="campo"><label>Cargo administrativo mensual</label>
+                  <div class="inbox"><span class="pre">$</span><input type="number" id="admin" class="has-pre" value="150" min="0" step="10" oninput="calc()"></div></div>
+                <div class="campo" style="margin-bottom:0"><label>Cargo por atraso <span class="hint">(si te retrasas en un pago)</span></label>
+                  <div class="mix"><div class="inbox"><input type="number" id="atraso" value="0" min="0" step="50" oninput="calc()"></div>
+                  <select id="atrasoModo" onchange="calc()"><option value="monto">$ por atraso</option><option value="pct">% de la mensualidad</option></select></div></div></div>
+              <label class="toggle"><input type="checkbox" id="ivaInt" onchange="calc()"> Cobrar IVA (16%) sobre los intereses</label>
+            </div>
+          </div>
+
+          <!-- RESULTADOS -->
+          <div class="card">
+            <h2><span class="dot"></span> Esto es lo que pagarías</h2>
+            <div class="warn" id="warn">⚠️ El enganche no puede ser mayor o igual al precio del auto.</div>
+            <div class="pasos">
+              <div class="paso"><div class="n">1</div><div class="t">Das el inicio</div><div class="s">Un solo pago para llevarte el auto hoy.</div></div>
+              <div class="paso"><div class="n">2</div><div class="t">Pagas cada mes</div><div class="s">Una mensualidad fija durante el plazo.</div></div>
+              <div class="paso"><div class="n">3</div><div class="t">El auto es tuyo</div><div class="s">Al terminar de pagar, sin deudas.</div></div>
+            </div>
+            <div class="res-hero inicio">
+              <div class="lbl">💵 Para llevarte el auto HOY necesitas</div>
+              <div class="big" id="rInicial">$0</div>
+              <div class="tip" id="rInicialDetalle">Enganche</div>
+            </div>
+            <div class="res-hero">
+              <div class="lbl">Después, pagas cada mes</div>
+              <div class="big" id="rMensual">$0</div>
+              <div class="peque" id="rPlazo">durante — meses</div>
+            </div>
+            <div class="warn" id="atrasoNote" style="margin-top:12px;display:none"></div>
+            <div class="kpis">
+              <div class="kpi"><div class="k">Precio de lista</div><div class="v" id="rPrecioLista">$0</div><div class="d">Precio del auto sin descuento.</div></div>
+              <div class="kpi bonif"><div class="k">🎁 Tu descuento</div><div class="v" id="rDescuento">$0</div><div class="d">Lo que te ahorras de la promoción.</div></div>
+              <div class="kpi"><div class="k">Precio final</div><div class="v" id="rPrecioFinal">$0</div><div class="d">Precio ya con tu descuento aplicado.</div></div>
+              <div class="kpi"><div class="k">Monto que financias</div><div class="v" id="rFinanciar">$0</div><div class="d">Lo que pagas en mensualidades.</div></div>
+              <div class="kpi"><div class="k">Intereses del plazo</div><div class="v oro" id="rInteres">$0</div><div class="d">El costo de pagar a meses.</div></div>
+              <div class="kpi"><div class="k">Terminas de pagar</div><div class="v" id="rLiquida" style="font-size:15px">—</div><div class="d">Fecha en que el auto queda liquidado.</div></div>
+              <div class="kpi total wide"><div class="k">Total que pagarías en total</div><div class="v" id="rTotal">$0</div><div class="d">Inicio + todas las mensualidades juntas.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card tabla-card">
+          <div class="tabla-head">
+            <h2><span class="dot"></span> Tabla de amortización mes a mes</h2>
+            <button class="btn no-print" style="background:var(--gris-cl);color:var(--tinta-2)" onclick="toggleTabla()" id="btnTabla">Ocultar tabla</button>
+          </div>
+          <div class="scroll" id="scrollTabla">
+            <table><thead><tr><th>#</th><th>Fecha</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead>
+            <tbody id="tbody"></tbody><tfoot id="tfoot"></tfoot></table>
+          </div>
+          <div class="nota">Mensualidad calculada con amortización francesa (sistema estándar en México).<br>Cifras informativas, no constituyen una oferta de crédito. Sujeto a aprobación de la financiera.</div>
+        </div>
+        <footer>EL ESENSIAL · Simulador entregado por <b>Fiborti Analytics</b></footer>
+      </div>
+    </section>
+
+    <!-- ========== PÁGINA: INVENTARIO ========== -->
+    <section id="page-inventario" class="ee-page" hidden>
+      <div class="wrap">
+        <div class="inv-top">
+          <div>
+            <h1>🚗 Inventario de coches</h1>
+            <p>Agrega los autos del lote. Toca <b>Simular</b> en cualquiera para llevarlo al simulador con sus datos.</p>
+          </div>
+          <button class="btn btn-add" onclick="invAbrir()">+ Agregar coche</button>
+        </div>
+        <div id="invGrid" class="inv-grid"></div>
+        <div id="invEmpty" class="inv-empty" style="display:none">
+          <div class="big">🚙</div>
+          <div style="font-weight:700;color:var(--tinta-2);font-size:15px">Aún no hay coches en el inventario</div>
+          <div style="margin-top:6px">Toca «+ Agregar coche» para registrar el primero.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Modal agregar/editar coche -->
+<div id="invModal">
+  <div class="inv-form">
+    <h3 id="invFormTitle">Agregar coche</h3>
+    <div class="msub">Los datos se guardan en este dispositivo (navegador).</div>
+    <div class="foto-prev" id="fotoPrev" onclick="document.getElementById('fFoto').click()">📷 Toca para agregar foto (opcional)</div>
+    <input type="file" id="fFoto" accept="image/*" style="display:none" onchange="fotoElegida(event)">
+    <div class="campo"><label>Marca y modelo</label><input type="text" id="fNombre" placeholder="Ej: Nissan Versa Sense"></div>
+    <div class="fila2">
+      <div class="campo"><label>Año</label><input type="number" id="fAnio" placeholder="2020" min="1990" max="2030"></div>
+      <div class="campo"><label>Precio</label><div class="inbox"><span class="pre">$</span><input type="number" id="fPrecio" class="has-pre" placeholder="280000" min="0" step="1000"></div></div>
+    </div>
+    <div class="fila2">
+      <div class="campo"><label>Enganche sugerido</label><div class="inbox"><span class="pre">$</span><input type="number" id="fEnganche" class="has-pre" placeholder="56000" min="0" step="1000"></div></div>
+      <div class="campo"><label>Plazo sugerido</label><select id="fPlazo"><option>12</option><option>18</option><option selected>24</option><option>36</option><option>48</option><option>60</option><option>72</option></select></div>
+    </div>
+    <div class="fila2">
+      <div class="campo"><label>Tasa anual</label><div class="inbox"><input type="number" id="fTasa" class="has-suf" placeholder="16.9" min="0" step="0.1" value="16.9"><span class="suf">%</span></div></div>
+      <div class="campo"><label>Notas (opcional)</label><input type="text" id="fNotas" placeholder="Ej: único dueño, factura original"></div>
+    </div>
+    <div class="mfoot">
+      <button class="m-cancel" onclick="invCerrar()">Cancelar</button>
+      <button class="m-save" onclick="invGuardar()">Guardar coche</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== ACCESO ===================== */
+const CLAVE_HASH='2e3f9c6ba02ac8bfe107939a6691353a504156d9031f8add7f5a254f77304d40'; // sha256 de la contraseña
+async function sha256(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+async function entrar(){
+  const v=document.getElementById('claveInput').value;
+  try{ const h=await sha256(v);
+    if(h===CLAVE_HASH){ sessionStorage.setItem('ee_auth','1'); mostrarApp(); }
+    else document.getElementById('gateErr').style.display='block';
+  }catch(e){ if(v==='esensial2026'){ sessionStorage.setItem('ee_auth','1'); mostrarApp(); } else document.getElementById('gateErr').style.display='block'; }
+}
+function mostrarApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block'; invRender(); }
+function salir(){ sessionStorage.removeItem('ee_auth'); location.reload(); }
+document.getElementById('claveInput').addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
+if(sessionStorage.getItem('ee_auth')==='1') mostrarApp();
+setTimeout(()=>{ if(document.getElementById('gate').style.display!=='none') document.getElementById('claveInput').focus(); },100);
+
+/* ===================== NAVEGACIÓN ===================== */
+function irA(page){
+  document.querySelectorAll('.ee-navitem').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
+  document.getElementById('page-simulador').hidden = page!=='simulador';
+  document.getElementById('page-inventario').hidden = page!=='inventario';
+  window.scrollTo(0,0);
+}
+
+/* ===================== INVENTARIO ===================== */
+let editandoId=null, fotoActual='';
+function invLoad(){ try{return JSON.parse(localStorage.getItem('ee_inv')||'[]')}catch(e){return[]} }
+function invSaveAll(a){ localStorage.setItem('ee_inv',JSON.stringify(a)); }
+function invRender(){
+  const arr=invLoad(); const g=document.getElementById('invGrid'), empty=document.getElementById('invEmpty');
+  if(!arr.length){ g.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  g.innerHTML=arr.map(c=>`
+    <div class="cochecard">
+      <div class="foto" style="${c.foto?`background-image:url('${c.foto}')`:''}">${c.foto?'':'🚗'}</div>
+      <div class="cc-body">
+        <div class="cc-nom">${esc(c.nombre||'Sin nombre')}</div>
+        <div class="cc-anio">${c.anio?('Año '+c.anio):''}</div>
+        <div class="cc-precio">${money(c.precio||0)}</div>
+        <div class="cc-sub">Enganche sug. ${money(c.enganche||0)} · ${c.plazo||24} meses · ${c.tasa||0}%</div>
+        ${c.notas?`<div class="cc-notas">${esc(c.notas)}</div>`:'<div class="cc-notas"></div>'}
+        <div class="cc-acts">
+          <button class="cc-sim" onclick="invSimular('${c.id}')">🧮 Simular</button>
+          <button class="cc-ed" onclick="invEditar('${c.id}')">✎</button>
+          <button class="cc-del" onclick="invBorrar('${c.id}')">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
+function invAbrir(){ editandoId=null; fotoActual='';
+  document.getElementById('invFormTitle').textContent='Agregar coche';
+  ['fNombre','fAnio','fPrecio','fEnganche','fNotas'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fPlazo').value='24'; document.getElementById('fTasa').value='16.9';
+  document.getElementById('fotoPrev').style.backgroundImage=''; document.getElementById('fotoPrev').textContent='📷 Toca para agregar foto (opcional)';
+  document.getElementById('invModal').classList.add('show');
+}
+function invEditar(id){ const c=invLoad().find(x=>x.id===id); if(!c)return; editandoId=id; fotoActual=c.foto||'';
+  document.getElementById('invFormTitle').textContent='Editar coche';
+  document.getElementById('fNombre').value=c.nombre||''; document.getElementById('fAnio').value=c.anio||'';
+  document.getElementById('fPrecio').value=c.precio||''; document.getElementById('fEnganche').value=c.enganche||'';
+  document.getElementById('fPlazo').value=c.plazo||'24'; document.getElementById('fTasa').value=c.tasa||'16.9';
+  document.getElementById('fNotas').value=c.notas||'';
+  const fp=document.getElementById('fotoPrev');
+  if(c.foto){ fp.style.backgroundImage=`url('${c.foto}')`; fp.textContent=''; } else { fp.style.backgroundImage=''; fp.textContent='📷 Toca para agregar foto (opcional)'; }
+  document.getElementById('invModal').classList.add('show');
+}
+function invCerrar(){ document.getElementById('invModal').classList.remove('show'); }
+function fotoElegida(ev){ const f=ev.target.files[0]; if(!f)return; const rd=new FileReader();
+  rd.onload=e=>{ fotoActual=e.target.result; const fp=document.getElementById('fotoPrev'); fp.style.backgroundImage=`url('${fotoActual}')`; fp.textContent=''; };
+  rd.readAsDataURL(f);
+}
+function invGuardar(){
+  const nombre=document.getElementById('fNombre').value.trim();
+  if(!nombre){ alert('Ponle al menos la marca y modelo.'); return; }
+  const c={ id:editandoId||('c'+Date.now()), nombre,
+    anio:+document.getElementById('fAnio').value||'', precio:+document.getElementById('fPrecio').value||0,
+    enganche:+document.getElementById('fEnganche').value||0, plazo:document.getElementById('fPlazo').value,
+    tasa:+document.getElementById('fTasa').value||0, notas:document.getElementById('fNotas').value.trim(), foto:fotoActual };
+  const arr=invLoad();
+  if(editandoId){ const i=arr.findIndex(x=>x.id===editandoId); if(i>=0)arr[i]=c; } else arr.unshift(c);
+  invSaveAll(arr); invCerrar(); invRender();
+}
+function invBorrar(id){ if(!confirm('¿Borrar este coche del inventario?'))return; invSaveAll(invLoad().filter(x=>x.id!==id)); invRender(); }
+function invSimular(id){ const c=invLoad().find(x=>x.id===id); if(!c)return;
+  $('lote').value=c.nombre+(c.anio?(' '+c.anio):''); $('precio').value=c.precio||0; $('bonificacion').value=0;
+  $('enganche').value=c.enganche||0; $('plazo').value=c.plazo||'24'; $('tasa').value=c.tasa||16.9;
+  calc(); irA('simulador');
+}
+
+/* ===================== SIMULADOR ===================== */
+  const MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const MESES_L=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const $=id=>document.getElementById(id);
+  const money=n=>'$'+ (Math.round(n)).toLocaleString('es-MX');
+  const HOY=new Date();
+  function fechaMas(meses){ return new Date(HOY.getFullYear(),HOY.getMonth()+meses,HOY.getDate()); }
+  function fmtFecha(d){return d.getDate()+' '+MESES[d.getMonth()]+' '+d.getFullYear();}
+  function fmtFechaL(d){return MESES_L[d.getMonth()]+' de '+d.getFullYear();}
+  $('fecha').textContent='Generado el '+HOY.getDate()+' '+MESES[HOY.getMonth()]+' '+HOY.getFullYear();
+
+  function setEngPct(){
+    const precioLista=+$('precio').value||0; const bonif=+$('bonificacion').value||0;
+    const precio=Math.max(0,precioLista-bonif); const pct=+$('engPct').value||0;
+    $('enganche').value=Math.round(precio*pct/100); calc();
+  }
+  let ultimo={};
+  function calc(){
+    const precioLista=+$('precio').value||0;
+    const bonif=Math.min(+$('bonificacion').value||0, precioLista);
+    const precio=Math.max(0,precioLista-bonif);
+    const enganche=+$('enganche').value||0;
+    const plazo=parseInt($('plazo').value)||1;
+    const tasaAnual=+$('tasa').value||0;
+    const opc=$('tgl').checked; $('opc').hidden=!opc;
+    const comisionVal=opc?(+$('comision').value||0):0; const comisionModo=$('comisionModo').value;
+    const seguro=opc?(+$('seguro').value||0):0; const seguroModo=$('seguroModo').value;
+    const gps=opc?(+$('gps').value||0):0; const gpsModo=$('gpsModo').value;
+    const admin=opc?(+$('admin').value||0):0;
+    const atrasoVal=opc?(+$('atraso').value||0):0; const atrasoModo=$('atrasoModo').value;
+    const cobrarIva=opc&&$('ivaInt').checked;
+
+    if(precio>0){ $('engPct').value=Math.round(enganche/precio*100); }
+    $('precioFinalLive').textContent=money(precio);
+    const warn=$('warn'); if(enganche>=precio && precio>0) warn.classList.add('show'); else warn.classList.remove('show');
+
+    const comisionApertura=comisionModo==='monto'?comisionVal:(precio*comisionVal/100);
+    const seguroContado   = seguroModo==='contado'   ? seguro : 0;
+    const seguroFinanciado= seguroModo==='financiado'? seguro : 0;
+    const seguroMensual   = seguroModo==='mensual'   ? seguro/12 : 0;
+    const gpsContado = gpsModo==='contado' ? gps : 0;
+    const gpsMensual = gpsModo==='contado' ? 0   : gps;
+    const financiar=Math.max(0,(precio-enganche)+seguroFinanciado);
+    const pagoInicial=enganche+comisionApertura+seguroContado+gpsContado;
+
+    const r=(tasaAnual/100)/12; const n=plazo; let cuota;
+    if(financiar<=0){ cuota=0; } else if(r===0){ cuota=financiar/n; }
+    else{ cuota=financiar*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1); }
+
+    let saldo=financiar, sumInt=0, sumIva=0, sumCap=0, sumPago=0;
+    const extrasMes=admin+gpsMensual+seguroMensual; let rows='';
+    for(let m=1;m<=n;m++){
+      let interes=saldo*r; let iva=cobrarIva?interes*0.16:0; let capital=cuota-interes;
+      if(m===n){ capital=saldo; } saldo=Math.max(0,saldo-capital);
+      const pagoMes=capital+interes+iva+extrasMes;
+      sumInt+=interes; sumIva+=iva; sumCap+=capital; sumPago+=pagoMes;
+      const f=fechaMas(m);
+      rows+=`<tr><td>${m}</td><td style="text-align:center">${fmtFecha(f)}</td><td>${money(pagoMes)}</td><td>${money(interes+iva)}</td><td>${money(capital)}</td><td>${money(saldo)}</td></tr>`;
+    }
+    const primerIva=cobrarIva?(financiar*r)*0.16:0;
+    const mensual1=(financiar<=0)?0:cuota+primerIva+extrasMes;
+    const totalGlobal=pagoInicial+sumPago;
+
+    $('tbody').innerHTML=rows;
+    $('tfoot').innerHTML=`<tr><td colspan="2">Totales</td><td>${money(sumPago)}</td><td>${money(sumInt+sumIva)}</td><td>${money(sumCap)}</td><td>$0</td></tr>`;
+    const fLiq=fechaMas(n);
+    const cargoAtraso = atrasoModo==='pct' ? mensual1*atrasoVal/100 : atrasoVal;
+
+    $('rInicial').textContent=money(pagoInicial);
+    const partes=['Enganche <b>'+money(enganche)+'</b>'];
+    if(comisionApertura>0) partes.push('apertura <b>'+money(comisionApertura)+'</b>');
+    if(seguroContado>0)    partes.push('seguro <b>'+money(seguroContado)+'</b>');
+    if(gpsContado>0)       partes.push('GPS <b>'+money(gpsContado)+'</b>');
+    $('rInicialDetalle').innerHTML = partes.length>1 ? partes.join(' + ') : 'Es tu enganche — con esto te entregan el auto.';
+    $('rMensual').textContent=money(mensual1);
+    $('rPlazo').textContent='durante '+n+' meses';
+    const an=$('atrasoNote');
+    if(cargoAtraso>0){ an.style.display='block'; an.innerHTML='⚠️ Si te atrasas en un pago se cobra <b>'+money(cargoAtraso)+'</b> extra'+(atrasoModo==='pct'?' ('+atrasoVal+'% de la mensualidad)':'')+'.'; }
+    else an.style.display='none';
+    $('rPrecioLista').textContent=money(precioLista);
+    $('rDescuento').textContent=(bonif>0?'− ':'')+money(bonif);
+    $('rPrecioFinal').textContent=money(precio);
+    $('rFinanciar').textContent=money(financiar);
+    $('rInteres').textContent=money(sumInt+sumIva);
+    $('rLiquida').textContent=fmtFechaL(fLiq);
+    $('rTotal').textContent=money(totalGlobal);
+    ultimo={ lote:$('lote').value, precioLista, bonif, precio, enganche, comisionApertura,
+      seguroContado, gpsContado, cargoAtraso, pagoInicial, plazo:n, tasaAnual, financiar, mensual1,
+      interes:sumInt+sumIva, total:totalGlobal, liquida:fmtFechaL(fLiq) };
+  }
+  function resumenTexto(){
+    const u=ultimo;
+    let t = `🚗 *${u.lote}* — Tu plan de financiamiento\n`+
+      `━━━━━━━━━━━━━━━\n`+ `Precio de lista: ${money(u.precioLista)}\n`;
+    if(u.bonif>0) t += `🎁 Descuento: − ${money(u.bonif)}\nPrecio final: ${money(u.precio)}\n`;
+    t += `Plazo: ${u.plazo} meses · Tasa ${u.tasaAnual}% anual\n`+
+      `━━━━━━━━━━━━━━━\n`+ `💵 *PARA LLEVÁRTELO HOY: ${money(u.pagoInicial)}*\n`;
+    const ini=['enganche '+money(u.enganche)];
+    if(u.comisionApertura>0) ini.push('apertura '+money(u.comisionApertura));
+    if(u.seguroContado>0)    ini.push('seguro '+money(u.seguroContado));
+    if(u.gpsContado>0)       ini.push('GPS '+money(u.gpsContado));
+    t += `   (${ini.join(' + ')})\n`;
+    t += `🗓️ *Pago mensual: ${money(u.mensual1)}*\n`;
+    if(u.cargoAtraso>0) t += `⚠️ Cargo por atraso: ${money(u.cargoAtraso)}\n`;
+    t += `━━━━━━━━━━━━━━━\n`+ `Monto que financias: ${money(u.financiar)}\n`+
+      `Intereses del plazo: ${money(u.interes)}\n`+ `Total que pagas: ${money(u.total)}\n`+
+      `Terminas de pagar: ${u.liquida}\n`+ `━━━━━━━━━━━━━━━\n`+
+      `_EL ESENSIAL · Cifras informativas, sujetas a aprobación de la financiera._`;
+    return t;
+  }
+  function compartirWA(){ window.open('https://wa.me/?text='+encodeURIComponent(resumenTexto()),'_blank'); }
+  function copiar(){ const t=resumenTexto();
+    if(navigator.clipboard){ navigator.clipboard.writeText(t).then(()=>toast('✅ Resumen copiado'),()=>fallbackCopy(t)); } else fallbackCopy(t); }
+  function fallbackCopy(t){ const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);
+    ta.select();try{document.execCommand('copy');toast('✅ Resumen copiado');}catch(e){alert(t);}document.body.removeChild(ta); }
+  function toast(msg){ const d=document.createElement('div');d.textContent=msg;
+    d.style.cssText='position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#0d0d0f;color:#fff;padding:12px 22px;border-radius:12px;font-weight:700;font-size:14px;z-index:150;box-shadow:0 8px 24px rgba(0,0,0,.25)';
+    document.body.appendChild(d);setTimeout(()=>{d.style.transition='.3s';d.style.opacity='0';setTimeout(()=>d.remove(),300);},1800); }
+  function reset(){
+    $('lote').value='EL ESENSIAL';
+    $('precio').value=280000;$('bonificacion').value=0;$('enganche').value=56000;$('plazo').value='24';
+    $('tasa').value=16.9;$('engPct').value=20;$('tgl').checked=false;
+    $('comision').value=2;$('comisionModo').value='pct';
+    $('seguro').value=12000;$('seguroModo').value='contado';
+    $('gps').value=250;$('gpsModo').value='mensual';
+    $('admin').value=150;$('atraso').value=0;$('atrasoModo').value='monto';
+    $('ivaInt').checked=false; calc();
+  }
+  function toggleTabla(){ const s=$('scrollTabla'),b=$('btnTabla');
+    if(s.style.display==='none'){s.style.display='';b.textContent='Ocultar tabla';} else {s.style.display='none';b.textContent='Mostrar tabla';} }
+  calc();
+</script>
+</body>
+</html>
