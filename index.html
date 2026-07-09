@@ -509,6 +509,14 @@
                 <div class="inbox"><input type="number" id="engPct" class="has-suf" value="20" min="0" max="100" step="1" oninput="setEngPct()"><span class="suf">%</span></div></div>
             </div>
 
+            <div class="campo">
+              <label>Esquema de interés <span class="hint">(cómo se calcula el crédito)</span></label>
+              <select id="esquema" onchange="calc()">
+                <option value="fijo" selected>Interés fijo — mismo interés y capital cada mes</option>
+                <option value="insoluto">Saldo insoluto — interés sobre el saldo pendiente</option>
+              </select>
+            </div>
+
             <h2 style="margin-top:8px"><span class="dot"></span> Cargos adicionales</h2>
             <label class="toggle"><input type="checkbox" id="tgl" onchange="calc()"> Agregar comisión, seguro, GPS, atraso, IVA…</label>
             <div class="opcionales" id="opc" hidden>
@@ -532,6 +540,17 @@
                 <div class="campo" style="margin-bottom:0"><label>Cargo por atraso <span class="hint">(si te retrasas en un pago)</span></label>
                   <div class="mix"><div class="inbox"><input type="number" id="atraso" value="0" min="0" step="50" oninput="calc()"></div>
                   <select id="atrasoModo" onchange="calc()"><option value="monto">$ por atraso</option><option value="pct">% de la mensualidad</option></select></div></div></div>
+              <div class="cargo-grupo"><div class="gt">💰 Abono a capital (adelanto)</div>
+                <div class="fila2">
+                  <div class="campo"><label>Monto del abono</label>
+                    <div class="inbox"><span class="pre">$</span><input type="number" id="abonoMonto" class="has-pre" value="0" min="0" step="1000" oninput="calc()"></div></div>
+                  <div class="campo"><label>En el mes #</label>
+                    <input type="number" id="abonoMes" value="0" min="0" step="1" oninput="calc()"></div>
+                </div>
+                <label class="toggle" style="margin-bottom:6px"><input type="checkbox" id="abonoCondona" checked onchange="calc()"> Se condona el interés de los meses que ya no se pagan</label>
+                <span class="hint">El abono aplica sólo a capital; la mensualidad no cambia. Si desactivas la casilla, el cliente debe el interés total completo aunque adelante capital.</span>
+              </div>
+
               <label class="toggle"><input type="checkbox" id="ivaInt" onchange="calc()"> Cobrar IVA (16%) sobre los intereses</label>
             </div>
           </div>
@@ -556,8 +575,11 @@
               <div class="peque" id="rPlazo">durante — meses</div>
             </div>
             <div class="warn" id="atrasoNote" style="margin-top:12px;display:none"></div>
+            <div class="warn" id="abonoNote" style="margin-top:12px;display:none;background:#eafaf1;border-color:#bfe8d1;color:#0f7a53"></div>
+            <div class="warn" id="esqNota" style="margin-top:12px;display:block;background:#eff6ff;border-color:#bfdbfe;color:#1e40af"></div>
             <div class="kpis">
               <div class="kpi"><div class="k">Precio de lista</div><div class="v" id="rPrecioLista">$0</div><div class="d">Precio del auto sin descuento.</div></div>
+              <div class="kpi"><div class="k">Tasa efectiva anual</div><div class="v oro" id="rTasaEf">—</div><div class="d">Costo real del crédito (interno).</div></div>
               <div class="kpi bonif"><div class="k">🎁 Tu descuento</div><div class="v" id="rDescuento">$0</div><div class="d">Lo que te ahorras de la promoción.</div></div>
               <div class="kpi"><div class="k">Precio final</div><div class="v" id="rPrecioFinal">$0</div><div class="d">Precio ya con tu descuento aplicado.</div></div>
               <div class="kpi"><div class="k">Monto que financias</div><div class="v" id="rFinanciar">$0</div><div class="d">Lo que pagas en mensualidades.</div></div>
@@ -713,6 +735,11 @@
     <div class="msub">Controla los valores y los textos que ve el prospecto en cada paso.</div>
 
     <div class="cfg-sec">Valores</div>
+    <div class="campo"><label>Esquema de interés</label>
+      <select id="cEsquema">
+        <option value="fijo">Interés fijo (add-on)</option>
+        <option value="insoluto">Saldo insoluto (francesa)</option>
+      </select></div>
     <div class="fila2">
       <div class="campo"><label>Seguro anual</label><div class="inbox"><span class="pre">$</span><input type="number" id="cSeguro" class="has-pre" min="0" step="500"></div></div>
       <div class="campo"><label>GPS mensual</label><div class="inbox"><span class="pre">$</span><input type="number" id="cGps" class="has-pre" min="0" step="10"></div></div>
@@ -992,6 +1019,7 @@ const PASOS=[{t:'Auto'},{t:'Enganche'},{t:'Plazo'},{t:'Extras'},{t:'Confirmar'},
 
 // Configuración editable del cotizador público (la controla el editor)
 const CFG_DEF={
+  esquema:'fijo',                                          // 'fijo' (add-on) | 'insoluto' (francesa)
   seguroAnual:12000, gpsMensual:250, tasaFija:0,          // tasaFija 0 = usar la tasa de cada auto
   engPcts:[10,20,30,40,50], engDefault:20,
   plazos:[12,24,36,48,60,72], plazoDefault:24,
@@ -1010,35 +1038,73 @@ function CFGsave(o){ localStorage.setItem('ee_wzcfg',JSON.stringify(o)); }
 let wzEditor=false;
 let wz={paso:0,carId:null,engPct:CFG().engDefault,engMonto:null,plazo:CFG().plazoDefault,seguro:'ninguno',gps:false};
 
-// Cálculo puro (amortización francesa). No toca el simulador interno.
+/* ===== MOTOR DE AMORTIZACIÓN =====
+   esquema 'fijo'     → interés fijo (add-on): interés y capital constantes cada mes.
+                        El interés se calcula UNA VEZ sobre el monto financiado original.
+   esquema 'insoluto' → francesa: el interés se recalcula sobre el saldo pendiente.
+   Abono a capital: aplica sólo a capital; la mensualidad NO cambia y el interés
+   por pago NO se recalcula. Sólo se acorta el plazo. */
+function tasaEfectivaAnual(P,cuota,n){
+  if(P<=0||cuota<=0||n<=0||cuota*n<=P) return 0;
+  const f=r=> r===0 ? P/n : P*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+  let lo=0,hi=1;
+  for(let k=0;k<200;k++){ const mid=(lo+hi)/2; if(f(mid)>cuota) hi=mid; else lo=mid; }
+  return ((lo+hi)/2)*12*100;
+}
+function tabla(P, tasaAnual, n, esquema, extrasMes, ivaInt, ab){
+  P=Math.max(0,+P||0); n=Math.max(1,parseInt(n)||1); extrasMes=+extrasMes||0;
+  const r=(( +tasaAnual||0)/100)/12;
+  const iFijo=P*r, cFijo=P/n;
+  const cuotaIns = P<=0 ? 0 : (r===0 ? P/n : P*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1));
+  const cuotaBase = esquema==='fijo' ? (iFijo+cFijo) : cuotaIns;
+  const filas=[]; let saldo=P,sumInt=0,sumIva=0,sumCap=0,sumPago=0,sumAbono=0;
+  for(let m=1;m<=n && saldo>0.005;m++){
+    const interes = esquema==='fijo' ? iFijo : saldo*r;
+    const iva = ivaInt ? interes*0.16 : 0;
+    let capital = esquema==='fijo' ? Math.min(cFijo,saldo) : Math.min(cuotaBase-interes,saldo);
+    if(esquema!=='fijo' && m===n) capital=saldo;
+    let abono=0;
+    if(ab && ab.monto>0 && m===ab.mes) abono=Math.min(ab.monto, Math.max(0,saldo-capital));
+    saldo=Math.max(0,saldo-capital-abono);
+    const pago=capital+abono+interes+iva+extrasMes;
+    sumInt+=interes; sumIva+=iva; sumCap+=capital+abono; sumPago+=pago; sumAbono+=abono;
+    filas.push({m,pago,interes:interes+iva,capital:capital+abono,saldo,abono});
+  }
+  const pagos=filas.length;
+  const intPleno = esquema==='fijo' ? iFijo*n : null;
+  let noCondonado=0;
+  if(esquema==='fijo' && sumAbono>0 && ab && !ab.condona){
+    noCondonado=Math.max(0,intPleno-sumInt);
+    sumInt+=noCondonado; sumPago+=noCondonado;
+  }
+  const ahorroInt = (esquema==='fijo' && sumAbono>0) ? Math.max(0,intPleno-sumInt) : 0;
+  return {filas,pagos,mesesAhorrados:Math.max(0,n-pagos),sumInt,sumIva,sumCap,sumPago,sumAbono,
+    mensualidad: pagos? (filas[0].pago-filas[0].abono) : 0,
+    cuotaBase,intPleno,noCondonado,ahorroInt,
+    tasaEfectiva: tasaEfectivaAnual(P,cuotaBase,n)};
+}
+
+// Cálculo del cotizador público (usa el mismo motor)
 function planCalc(p){
-  const precio=+p.precio||0, enganche=+p.enganche||0, n=+p.plazo||1, r=((+p.tasa||0)/100)/12;
+  const precio=+p.precio||0, enganche=+p.enganche||0, n=+p.plazo||1;
   const comision=+p.comision||0;
   const seguroContado = p.seguroModo==='contado'    ? (+p.seguro||0)    : 0;
   const seguroFin     = p.seguroModo==='financiado' ? (+p.seguro||0)    : 0;
   const seguroMes     = p.seguroModo==='mensual'    ? (+p.seguro||0)/12 : 0;
-  const gpsMes=+p.gps||0;
+  const gpsMes=+p.gps||0, extras=gpsMes+seguroMes;
   const financiar=Math.max(0,(precio-enganche)+seguroFin);
   const pagoInicial=enganche+comision+seguroContado;
-  const cuota = financiar<=0 ? 0 : (r===0 ? financiar/n : financiar*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1));
-  const extras=gpsMes+seguroMes;
-  let saldo=financiar,sumInt=0,sumPago=0; const filas=[];
-  for(let m=1;m<=n;m++){
-    const interes=saldo*r; let capital=cuota-interes; if(m===n) capital=saldo;
-    saldo=Math.max(0,saldo-capital);
-    const pago=capital+interes+extras;
-    sumInt+=interes; sumPago+=pago;
-    filas.push({m,pago,interes,capital,saldo});
-  }
-  const mensual = financiar<=0?0:cuota+extras;
-  return {financiar,pagoInicial,comision,seguroContado,cuota,extras,mensual,filas,sumInt,sumPago,total:pagoInicial+sumPago,n};
+  const T=tabla(financiar, +p.tasa||0, n, p.esquema||'fijo', extras, false, null);
+  return {financiar,pagoInicial,comision,seguroContado,extras,
+    cuota:T.cuotaBase, mensual:T.mensualidad, filas:T.filas, sumInt:T.sumInt, sumPago:T.sumPago,
+    tasaEfectiva:T.tasaEfectiva, total:pagoInicial+T.sumPago, n};
 }
 
 function wzCar(){ return invLoad().find(c=>c.id===wz.carId)||null; }
 function wzEnganche(){ const c=wzCar(); if(!c)return 0; return wz.engMonto!=null ? wz.engMonto : Math.round((c.precio||0)*wz.engPct/100); }
 function wzTasa(){ const g=CFG(); const c=wzCar(); return (+g.tasaFija>0) ? +g.tasaFija : (c&&c.tasa ? c.tasa : 16.9); }
 function wzPlan(){ const c=wzCar(); if(!c)return null; const g=CFG();
-  return planCalc({precio:c.precio, enganche:wzEnganche(), plazo:wz.plazo, tasa:wzTasa(),
+  return planCalc({precio:c.precio, enganche:wzEnganche(), plazo:wz.plazo, tasa:wzTasa(), esquema:g.esquema,
     comision:c.comision||Math.round((c.precio||0)*0.04),
     seguro: wz.seguro==='ninguno'?0:g.seguroAnual, seguroModo:wz.seguro, gps: wz.gps?g.gpsMensual:0 }); }
 function wzFecha(){ const d=new Date(); return d.getDate()+' de '+MESES_L[d.getMonth()]+' de '+d.getFullYear(); }
@@ -1136,7 +1202,7 @@ function wzPaso(){
       ${wzEd('Comisión por apertura (4%)',money(c.comision||0))}`;
   }
   if(wz.paso===2){
-    const base={precio:c.precio, enganche:wzEnganche(), tasa:wzTasa(),
+    const base={precio:c.precio, enganche:wzEnganche(), tasa:wzTasa(), esquema:g.esquema,
       comision:c.comision||0, seguro: wz.seguro==='ninguno'?0:g.seguroAnual, seguroModo:wz.seguro, gps: wz.gps?g.gpsMensual:0};
     return `<div class="wz-h">${esc(T[2][0])}</div><div class="wz-p">${esc(T[2][1])}</div>
       <div class="wz-chips">${g.plazos.map(n=>{ const m=planCalc({...base,plazo:n}).mensual;
@@ -1144,7 +1210,9 @@ function wzPaso(){
           <div class="t">${n}</div><div class="s">${money(m)}/mes</div></button>`; }).join('')}</div>
       <div class="wz-info"><div><span>Plazo elegido</span><b>${wz.plazo} meses</b></div>
         <div><span>Tu mensualidad</span><b>${money(wzPlan().mensual)}</b></div></div>
-      ${wzEd('Tasa anual aplicada',wzTasa()+'%')}
+      ${wzEd('Esquema', g.esquema==='fijo'?'Interés fijo (add-on)':'Saldo insoluto')}
+      ${wzEd('Tasa anual nominal',wzTasa()+'%')}
+      ${wzEd('Tasa efectiva anual (costo real)', wzPlan().tasaEfectiva.toFixed(2)+'%')}
       ${wzEd('Intereses totales del plazo',money(wzPlan().sumInt))}`;
   }
   if(wz.paso===3){
@@ -1252,6 +1320,7 @@ function wzWA(){
 
 /* --------- Ajustes del cotizador (solo editor) --------- */
 function cfgAbrir(){ const g=CFG();
+  $('cEsquema').value=g.esquema||'fijo';
   $('cSeguro').value=g.seguroAnual; $('cGps').value=g.gpsMensual; $('cTasa').value=g.tasaFija;
   $('cEngPcts').value=g.engPcts.join(', '); $('cEngDef').value=g.engDefault;
   $('cPlazos').value=g.plazos.join(', '); $('cPlazoDef').value=g.plazoDefault;
@@ -1262,7 +1331,7 @@ function cfgAbrir(){ const g=CFG();
 function cfgCerrar(){ $('cfgModal').classList.remove('show'); }
 function numList(s,def){ const a=String(s).split(',').map(x=>parseInt(x.trim(),10)).filter(n=>!isNaN(n)&&n>0); return a.length?a:def.slice(); }
 function cfgGuardar(){
-  const g={ seguroAnual:+$('cSeguro').value||0, gpsMensual:+$('cGps').value||0, tasaFija:+$('cTasa').value||0,
+  const g={ esquema:$('cEsquema').value, seguroAnual:+$('cSeguro').value||0, gpsMensual:+$('cGps').value||0, tasaFija:+$('cTasa').value||0,
     engPcts:numList($('cEngPcts').value,CFG_DEF.engPcts), engDefault:+$('cEngDef').value||20,
     plazos:numList($('cPlazos').value,CFG_DEF.plazos), plazoDefault:+$('cPlazoDef').value||24,
     mostrarSeguro:$('cSegOn').checked, mostrarGps:$('cGpsOn').checked,
@@ -1373,22 +1442,21 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll
     const financiar=Math.max(0,(precio-enganche)+seguroFinanciado);
     const pagoInicial=enganche+comisionApertura+seguroContado+gpsContado;
 
-    const r=(tasaAnual/100)/12; const n=plazo; let cuota;
-    if(financiar<=0){ cuota=0; } else if(r===0){ cuota=financiar/n; }
-    else{ cuota=financiar*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1); }
+    const esquema=$('esquema').value;
+    const abMonto=opc?(+$('abonoMonto').value||0):0;
+    const abMes=opc?(parseInt($('abonoMes').value)||0):0;
+    const abCondona=opc ? $('abonoCondona').checked : true;
+    const extrasMes=admin+gpsMensual+seguroMensual;
+    const ab = (abMonto>0 && abMes>0 && abMes<=plazo) ? {monto:abMonto,mes:abMes,condona:abCondona} : null;
+    const T=tabla(financiar, tasaAnual, plazo, esquema, extrasMes, cobrarIva, ab);
 
-    let saldo=financiar, sumInt=0, sumIva=0, sumCap=0, sumPago=0;
-    const extrasMes=admin+gpsMensual+seguroMensual; let rows='';
-    for(let m=1;m<=n;m++){
-      let interes=saldo*r; let iva=cobrarIva?interes*0.16:0; let capital=cuota-interes;
-      if(m===n){ capital=saldo; } saldo=Math.max(0,saldo-capital);
-      const pagoMes=capital+interes+iva+extrasMes;
-      sumInt+=interes; sumIva+=iva; sumCap+=capital; sumPago+=pagoMes;
-      const f=fechaMas(m);
-      rows+=`<tr><td>${m}</td><td style="text-align:center">${fmtFecha(f)}</td><td>${money(pagoMes)}</td><td>${money(interes+iva)}</td><td>${money(capital)}</td><td>${money(saldo)}</td></tr>`;
-    }
-    const primerIva=cobrarIva?(financiar*r)*0.16:0;
-    const mensual1=(financiar<=0)?0:cuota+primerIva+extrasMes;
+    const rows=T.filas.map(f=>{ const d=fechaMas(f.m);
+      return `<tr><td>${f.m}</td><td style="text-align:center">${fmtFecha(d)}</td><td>${money(f.pago)}</td>`
+        +`<td>${money(f.interes)}</td><td>${money(f.capital)}${f.abono>0?' <b style="color:#0f7a53">+abono</b>':''}</td><td>${money(f.saldo)}</td></tr>`;
+    }).join('');
+    const n=T.pagos||plazo;
+    const sumInt=T.sumInt, sumIva=T.sumIva, sumCap=T.sumCap, sumPago=T.sumPago;
+    const mensual1=T.mensualidad;
     const totalGlobal=pagoInicial+sumPago;
 
     $('tbody').innerHTML=rows;
@@ -1414,6 +1482,31 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll
     $('rInteres').textContent=money(sumInt+sumIva);
     $('rLiquida').textContent=fmtFechaL(fLiq);
     $('rTotal').textContent=money(totalGlobal);
+
+    // ----- Esquema de interés: costo real y efecto del abono -----
+    $('rTasaEf').textContent = (esquema==='fijo' ? T.tasaEfectiva : tasaAnual).toFixed(2)+'%';
+    const eq=$('esqNota');
+    if(esquema==='fijo'){
+      eq.innerHTML='<b>Interés fijo:</b> cada mes pagas <b>'+money(T.cuotaBase-financiar/plazo)+
+        '</b> de interés y <b>'+money(financiar/plazo)+'</b> de capital, siempre igual. El interés se calculó una sola vez sobre '+
+        money(financiar)+'. Costo real equivalente: <b>'+T.tasaEfectiva.toFixed(2)+'% anual</b> (nominal '+tasaAnual+'%).';
+    } else {
+      eq.innerHTML='<b>Saldo insoluto:</b> el interés se recalcula cada mes sobre el saldo pendiente, así que baja conforme amortizas.';
+    }
+    const ao=$('abonoNote');
+    if(ab && T.sumAbono>0){
+      ao.style.display='block';
+      if(T.noCondonado>0){
+        ao.style.background='#fff4e5'; ao.style.borderColor='#ffd08a'; ao.style.color='#8a5a00';
+        ao.innerHTML='⚠️ Abono de <b>'+money(T.sumAbono)+'</b> en el mes '+ab.mes+': el plazo baja a <b>'+T.pagos+
+          ' meses</b>, pero como el interés <b>no se condona</b>, el cliente igual paga <b>'+money(T.intPleno)+
+          '</b> de interés. <b>Abonar no le ahorra nada.</b>';
+      } else {
+        ao.style.background='#eafaf1'; ao.style.borderColor='#bfe8d1'; ao.style.color='#0f7a53';
+        ao.innerHTML='✅ Abono de <b>'+money(T.sumAbono)+'</b> en el mes '+ab.mes+': liquida en <b>'+T.pagos+
+          ' meses</b> (ahorra '+T.mesesAhorrados+') y se ahorra <b>'+money(T.ahorroInt)+'</b> de intereses. La mensualidad no cambia.';
+      }
+    } else ao.style.display='none';
     ultimo={ lote:$('lote').value, precioLista, bonif, precio, enganche, comisionApertura,
       seguroContado, gpsContado, cargoAtraso, pagoInicial, plazo:n, tasaAnual, financiar, mensual1,
       interes:sumInt+sumIva, total:totalGlobal, liquida:fmtFechaL(fLiq) };
@@ -1450,6 +1543,7 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll
     $('lote').value='EL ESENSIAL';
     $('precio').value=280000;$('bonificacion').value=0;$('enganche').value=56000;$('plazo').value='24';
     $('tasa').value=16.9;$('engPct').value=20;$('tgl').checked=false;
+    $('esquema').value='fijo';$('abonoMonto').value=0;$('abonoMes').value=0;$('abonoCondona').checked=true;
     $('comision').value=2;$('comisionModo').value='pct';
     $('seguro').value=12000;$('seguroModo').value='contado';
     $('gps').value=250;$('gpsModo').value='mensual';
