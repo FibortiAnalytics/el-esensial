@@ -288,10 +288,27 @@
   body.modo-publico .ee-main{margin-left:0;padding-top:0}
   .pub-header .carlogo{width:104px;height:auto}
   .pub-header .wordmark{font-size:21px}
-  .int-banner{background:#fff;border:1px solid #e6e8ec;border-radius:10px;padding:14px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-  .int-banner p{font-size:13px;color:var(--gris)}
-  .int-banner b{color:var(--tinta)}
-  .int-banner button{height:38px;padding:0 16px;border:1px solid var(--tinta);background:var(--tinta);color:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+  /* Barra de modo editor */
+  .wz-editbar{background:#fff;border:1px solid #e6e8ec;border-radius:10px;padding:14px 16px;margin-bottom:20px}
+  .eb-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .eb-t{font-size:14px;font-weight:600;color:var(--tinta)}
+  .eb-s{font-size:12.5px;color:var(--gris);margin-top:2px}
+  .eb-toggle{height:38px;padding:0 16px;border:1px solid #e6e8ec;background:#fff;color:var(--tinta-2);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
+  .eb-toggle:hover{border-color:#c9ccd2}
+  .eb-toggle.on{background:var(--tinta);border-color:var(--tinta);color:#fff}
+  .eb-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid #eceef1}
+  .eb-tools button{height:36px;padding:0 14px;border:1px solid #e6e8ec;background:#fff;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--tinta-2);cursor:pointer;font-family:inherit;transition:.15s}
+  .eb-tools button:hover{border-color:#c9ccd2;color:var(--tinta)}
+  /* Datos internos visibles solo en modo editor */
+  .ed-row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:9px 14px;margin-top:8px;background:#fffbeb;border:1px dashed #e2cb84;border-radius:8px}
+  .ed-row span{color:#8a6d1f;font-weight:600}
+  .ed-row b{color:#5c4708;font-weight:700}
+  .wz.editor .wz-card{border-color:#e2cb84}
+  .wz-step.clic{cursor:pointer;border:none;padding:0}
+  .wz-step.clic:hover{background:#b9bdc4}
+  .cfg-sec{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);font-weight:700;margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid #eceef1}
+  #cfgModal{position:fixed;inset:0;z-index:120;background:rgba(13,13,15,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+  #cfgModal.show{display:flex}
 
   .wz{max-width:720px;margin:0 auto}
   .wz-steps{display:flex;gap:6px;margin-bottom:10px}
@@ -573,9 +590,20 @@
         <span class="wordmark">EL ESENSIAL</span>
       </div>
       <div class="wz">
-        <div class="int-banner int-only">
-          <p><b>Versión pública</b> — así la ve un prospecto: paso a paso, sin datos administrativos.</p>
-          <button onclick="window.open('?publico=1','_blank')">Abrir versión pública ↗</button>
+        <div class="wz-editbar int-only">
+          <div class="eb-top">
+            <div>
+              <div class="eb-t">Vista del prospecto</div>
+              <div class="eb-s">Así lo ve un cliente. Activa el modo editor para controlar cada sección.</div>
+            </div>
+            <button class="eb-toggle" id="wzEdBtn" onclick="wzToggleEditor()">○ Activar modo editor</button>
+          </div>
+          <div class="eb-tools" id="wzEdTools" style="display:none">
+            <button onclick="cfgAbrir()">⚙ Ajustes del cotizador</button>
+            <button onclick="wzAlSimulador()">🧮 Abrir en simulador interno</button>
+            <button onclick="wzReset()">↺ Reiniciar</button>
+            <button onclick="window.open('?publico=1','_blank')">Ver como prospecto ↗</button>
+          </div>
         </div>
         <div class="wz-steps" id="wzSteps"></div>
         <div class="wz-cnt" id="wzCnt"></div>
@@ -674,6 +702,49 @@
     <div class="mfoot">
       <button class="m-cancel" onclick="invCerrar()">Cancelar</button>
       <button class="m-save" onclick="invGuardar()">💾 Guardar coche</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ajustes del cotizador (solo editor) -->
+<div id="cfgModal">
+  <div class="inv-form">
+    <h3>Ajustes del cotizador</h3>
+    <div class="msub">Controla los valores y los textos que ve el prospecto en cada paso.</div>
+
+    <div class="cfg-sec">Valores</div>
+    <div class="fila2">
+      <div class="campo"><label>Seguro anual</label><div class="inbox"><span class="pre">$</span><input type="number" id="cSeguro" class="has-pre" min="0" step="500"></div></div>
+      <div class="campo"><label>GPS mensual</label><div class="inbox"><span class="pre">$</span><input type="number" id="cGps" class="has-pre" min="0" step="10"></div></div>
+    </div>
+    <div class="campo"><label>Tasa anual fija <span class="hint">(0 = usar la tasa de cada auto)</span></label>
+      <div class="inbox"><input type="number" id="cTasa" class="has-suf" min="0" step="0.1"><span class="suf">%</span></div></div>
+    <div class="fila2">
+      <div class="campo"><label>% de enganche <span class="hint">(separados por coma)</span></label><input type="text" id="cEngPcts" placeholder="10, 20, 30, 40, 50"></div>
+      <div class="campo"><label>% por defecto</label><input type="number" id="cEngDef" min="0" max="100"></div>
+    </div>
+    <div class="fila2">
+      <div class="campo"><label>Plazos <span class="hint">(meses, por coma)</span></label><input type="text" id="cPlazos" placeholder="12, 24, 36, 48, 60, 72"></div>
+      <div class="campo"><label>Plazo por defecto</label><input type="number" id="cPlazoDef" min="1"></div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="cSegOn"> Mostrar opciones de seguro</label>
+    <label class="toggle"><input type="checkbox" id="cGpsOn"> Mostrar opción de GPS</label>
+
+    <div class="cfg-sec">Textos de cada paso</div>
+    <div class="campo"><label>1 · Auto</label><input type="text" id="cT0"><input type="text" id="cS0" style="margin-top:6px"></div>
+    <div class="campo"><label>2 · Enganche</label><input type="text" id="cT1"><input type="text" id="cS1" style="margin-top:6px"></div>
+    <div class="campo"><label>3 · Plazo</label><input type="text" id="cT2"><input type="text" id="cS2" style="margin-top:6px"></div>
+    <div class="campo"><label>4 · Extras</label><input type="text" id="cT3"><input type="text" id="cS3" style="margin-top:6px"></div>
+    <div class="campo"><label>5 · Confirmar</label><input type="text" id="cT4"><input type="text" id="cS4" style="margin-top:6px"></div>
+    <div class="campo"><label>6 · Cotización</label><input type="text" id="cT5"><input type="text" id="cS5" style="margin-top:6px" placeholder="(subtítulo extra, opcional)"></div>
+
+    <div class="mfoot">
+      <button class="m-cancel" onclick="cfgCerrar()">Cancelar</button>
+      <button class="m-save" onclick="cfgGuardar()">💾 Guardar</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="m-cancel" style="flex:1;padding:11px;border-radius:11px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px" onclick="cfgCopiar()">📋 Copiar configuración</button>
+      <button class="m-cancel" style="flex:1;padding:11px;border-radius:11px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px" onclick="cfgRestaurar()">↺ Restaurar</button>
     </div>
   </div>
 </div>
@@ -918,8 +989,26 @@ function rellenarSelectorCoches(){ const sel=$('carSelect'); if(!sel)return;
 
 /* ===================== COTIZADOR GUIADO (versión pública) ===================== */
 const PASOS=[{t:'Auto'},{t:'Enganche'},{t:'Plazo'},{t:'Extras'},{t:'Confirmar'},{t:'Cotización'}];
-const PUB_SEGURO=12000, PUB_GPS=250;
-let wz={paso:0,carId:null,engPct:20,engMonto:null,plazo:24,seguro:'ninguno',gps:false};
+
+// Configuración editable del cotizador público (la controla el editor)
+const CFG_DEF={
+  seguroAnual:12000, gpsMensual:250, tasaFija:0,          // tasaFija 0 = usar la tasa de cada auto
+  engPcts:[10,20,30,40,50], engDefault:20,
+  plazos:[12,24,36,48,60,72], plazoDefault:24,
+  mostrarSeguro:true, mostrarGps:true,
+  t:[['Elige tu auto','Selecciona la unidad que te interesa.'],
+     ['¿Cuánto darás de enganche?','Entre más enganche des, menor será tu mensualidad.'],
+     ['¿A cuántos meses?','Elige el plazo que mejor te acomode.'],
+     ['Seguro y extras','Opcionales. Puedes dejarlo como está.'],
+     ['Confirma tus datos','Revisa que todo esté correcto.'],
+     ['Tu cotización','']]
+};
+function CFG(){ try{ const s=JSON.parse(localStorage.getItem('ee_wzcfg')||'{}'); const c=Object.assign({},CFG_DEF,s);
+  if(!Array.isArray(c.t)||c.t.length!==6) c.t=CFG_DEF.t; return c; }catch(e){ return JSON.parse(JSON.stringify(CFG_DEF)); } }
+function CFGsave(o){ localStorage.setItem('ee_wzcfg',JSON.stringify(o)); }
+
+let wzEditor=false;
+let wz={paso:0,carId:null,engPct:CFG().engDefault,engMonto:null,plazo:CFG().plazoDefault,seguro:'ninguno',gps:false};
 
 // Cálculo puro (amortización francesa). No toca el simulador interno.
 function planCalc(p){
@@ -947,14 +1036,38 @@ function planCalc(p){
 
 function wzCar(){ return invLoad().find(c=>c.id===wz.carId)||null; }
 function wzEnganche(){ const c=wzCar(); if(!c)return 0; return wz.engMonto!=null ? wz.engMonto : Math.round((c.precio||0)*wz.engPct/100); }
-function wzPlan(){ const c=wzCar(); if(!c)return null;
-  return planCalc({precio:c.precio, enganche:wzEnganche(), plazo:wz.plazo, tasa:c.tasa||16.9,
+function wzTasa(){ const g=CFG(); const c=wzCar(); return (+g.tasaFija>0) ? +g.tasaFija : (c&&c.tasa ? c.tasa : 16.9); }
+function wzPlan(){ const c=wzCar(); if(!c)return null; const g=CFG();
+  return planCalc({precio:c.precio, enganche:wzEnganche(), plazo:wz.plazo, tasa:wzTasa(),
     comision:c.comision||Math.round((c.precio||0)*0.04),
-    seguro: wz.seguro==='ninguno'?0:PUB_SEGURO, seguroModo:wz.seguro, gps: wz.gps?PUB_GPS:0 }); }
+    seguro: wz.seguro==='ninguno'?0:g.seguroAnual, seguroModo:wz.seguro, gps: wz.gps?g.gpsMensual:0 }); }
 function wzFecha(){ const d=new Date(); return d.getDate()+' de '+MESES_L[d.getMonth()]+' de '+d.getFullYear(); }
 function wzTitulo(c){ return [nombreCoche(c), c.anio, c.version].filter(Boolean).join(' '); }
 
-function wzReset(){ wz={paso:0,carId:null,engPct:20,engMonto:null,plazo:24,seguro:'ninguno',gps:false}; wzRender(); }
+function wzReset(){ const g=CFG();
+  wz={paso:0,carId:null,engPct:g.engDefault,engMonto:null,plazo:g.plazoDefault,seguro:'ninguno',gps:false}; wzRender(); }
+function wzAsegurarCoche(){ if(wz.carId) return true;
+  const f=invLoad().find(x=>x.estado==='disponible'); if(f){ wz.carId=f.id; return true; } return false; }
+function wzGoto(i){ if(!wzEditor) return;
+  if(i>0) wzAsegurarCoche();
+  if(i>0 && !wz.carId) return;
+  wz.paso=Math.max(0,Math.min(PASOS.length-1,i)); wzRender(); window.scrollTo(0,0); }
+function wzToggleEditor(){ wzEditor=!wzEditor;
+  const b=$('wzEdBtn'); if(b){ b.textContent = wzEditor?'● Modo editor activo':'○ Activar modo editor'; b.classList.toggle('on',wzEditor); }
+  $('wzEdTools').style.display = wzEditor?'flex':'none';
+  wzRender();
+}
+function wzAlSimulador(){
+  const c=wzCar(); if(!c){ alert('Elige primero un coche.'); return; }
+  const g=CFG();
+  cargarCoche(c.id,false);
+  $('enganche').value=wzEnganche(); $('plazo').value=String(wz.plazo); $('tasa').value=wzTasa();
+  $('tgl').checked=true;
+  $('seguro').value = wz.seguro==='ninguno' ? 0 : g.seguroAnual;
+  $('seguroModo').value = wz.seguro==='ninguno' ? 'contado' : wz.seguro;
+  $('gps').value = wz.gps ? g.gpsMensual : 0; $('gpsModo').value='mensual';
+  calc(); irA('simulador'); toast('Cargado en el simulador interno');
+}
 function wzSelCar(id){ wz.carId=id; wz.engMonto=null; wzRender(); }
 function wzSelPct(p){ wz.engPct=p; wz.engMonto=null; const i=$('wzEngInput'); if(i)i.value=wzEnganche(); wzUpdEng(); }
 function wzEngManual(v){ const c=wzCar(); if(!c)return;
@@ -970,38 +1083,46 @@ function wzSelPlazo(n){ wz.plazo=n; wzRender(); }
 function wzSelSeguro(v){ wz.seguro=v; wzRender(); }
 function wzTogGps(){ wz.gps=!wz.gps; wzRender(); }
 function wzValido(){ return wz.paso!==0 || !!wz.carId; }
-function wzIr(d){ if(d>0 && !wzValido()) return; wz.paso=Math.max(0,Math.min(PASOS.length-1,wz.paso+d)); wzRender(); window.scrollTo(0,0); }
+function wzIr(d){
+  if(d>0 && !wzValido()){ if(wzEditor && wzAsegurarCoche()){} else return; }
+  wz.paso=Math.max(0,Math.min(PASOS.length-1,wz.paso+d)); wzRender(); window.scrollTo(0,0); }
 
 function wzRender(){
   const steps=$('wzSteps'); if(!steps) return;
-  steps.innerHTML=PASOS.map((p,i)=>`<div class="wz-step${i<=wz.paso?' on':''}"></div>`).join('');
-  $('wzCnt').textContent=`Paso ${wz.paso+1} de ${PASOS.length} · ${PASOS[wz.paso].t}`;
+  steps.innerHTML=PASOS.map((p,i)=>wzEditor
+    ? `<button class="wz-step clic${i<=wz.paso?' on':''}" title="Ir al paso: ${p.t}" onclick="wzGoto(${i})"></button>`
+    : `<div class="wz-step${i<=wz.paso?' on':''}"></div>`).join('');
+  $('wzCnt').textContent=`Paso ${wz.paso+1} de ${PASOS.length} · ${PASOS[wz.paso].t}`+(wzEditor?' · modo editor':'');
+  document.querySelector('.wz').classList.toggle('editor',wzEditor);
   $('wzBody').innerHTML=wzPaso();
   const ultimo = wz.paso===PASOS.length-1;
   $('wzNav').style.display = ultimo?'none':'flex';
   if(!ultimo){
     $('wzBack').style.visibility = wz.paso===0?'hidden':'visible';
-    $('wzNext').disabled=!wzValido();
+    $('wzNext').disabled = wzEditor ? false : !wzValido();
     $('wzNext').textContent = wz.paso===PASOS.length-2 ? 'Generar cotización' : 'Continuar';
   }
 }
 
+function wzEd(label,val){ return wzEditor?`<div class="ed-row"><span>🔒 ${label}</span><b>${val}</b></div>`:''; }
+
 function wzPaso(){
-  const c=wzCar();
+  const c=wzCar(), g=CFG(), T=g.t;
   if(wz.paso===0){
     const cars=invLoad().filter(x=>x.estado==='disponible');
     if(!cars.length) return `<div class="wz-h">Sin unidades disponibles</div><div class="wz-p">Vuelve más tarde o consulta con un asesor.</div>`;
-    return `<div class="wz-h">Elige tu auto</div><div class="wz-p">Selecciona la unidad que te interesa.</div>
+    return `<div class="wz-h">${esc(T[0][0])}</div><div class="wz-p">${esc(T[0][1])}</div>
       <div class="wz-cars">${cars.map(x=>`<button class="wz-car${wz.carId===x.id?' sel':''}" onclick="wzSelCar('${x.id}')">
         <div class="n">${esc(nombreCoche(x))}</div>
         <div class="m">${esc([x.anio,x.version,x.transmision,(x.color&&x.color!=='N/A')?x.color:''].filter(Boolean).join(' · '))}</div>
-        <div class="p">${money(x.precio||0)}</div></button>`).join('')}</div>`;
+        <div class="p">${money(x.precio||0)}</div>
+        ${wzEditor?`<div class="m" style="margin-top:6px">🔒 Comisión ${money(x.comision||0)} · Tasa ${x.tasa||16.9}%</div>`:''}
+        </button>`).join('')}</div>`;
   }
   if(wz.paso===1){
     const eng=wzEnganche(), fin=Math.max(0,(c.precio||0)-eng);
-    return `<div class="wz-h">¿Cuánto darás de enganche?</div>
-      <div class="wz-p">Entre más enganche des, menor será tu mensualidad.</div>
-      <div class="wz-chips" id="wzEngChips">${[10,20,30,40,50].map(p=>
+    return `<div class="wz-h">${esc(T[1][0])}</div><div class="wz-p">${esc(T[1][1])}</div>
+      <div class="wz-chips" id="wzEngChips">${g.engPcts.map(p=>
         `<button class="wz-chip${(wz.engMonto==null&&wz.engPct===p)?' sel':''}" data-pct="${p}" onclick="wzSelPct(${p})">
           <div class="t">${p}%</div><div class="s">${money((c.precio||0)*p/100)}</div></button>`).join('')}</div>
       <div class="campo" style="margin-top:16px"><label>O escribe una cantidad exacta</label>
@@ -1011,38 +1132,43 @@ function wzPaso(){
         <div><span>Precio del auto</span><b>${money(c.precio||0)}</b></div>
         <div><span>Tu enganche</span><b>${money(eng)}</b></div>
         <div><span>Monto a financiar</span><b>${money(fin)}</b></div>
-      </div>`;
+      </div>
+      ${wzEd('Comisión por apertura (4%)',money(c.comision||0))}`;
   }
   if(wz.paso===2){
-    const base={precio:c.precio, enganche:wzEnganche(), tasa:c.tasa||16.9,
-      comision:c.comision||0, seguro: wz.seguro==='ninguno'?0:PUB_SEGURO, seguroModo:wz.seguro, gps: wz.gps?PUB_GPS:0};
-    return `<div class="wz-h">¿A cuántos meses?</div><div class="wz-p">Elige el plazo que mejor te acomode.</div>
-      <div class="wz-chips">${[12,24,36,48,60,72].map(n=>{ const m=planCalc({...base,plazo:n}).mensual;
+    const base={precio:c.precio, enganche:wzEnganche(), tasa:wzTasa(),
+      comision:c.comision||0, seguro: wz.seguro==='ninguno'?0:g.seguroAnual, seguroModo:wz.seguro, gps: wz.gps?g.gpsMensual:0};
+    return `<div class="wz-h">${esc(T[2][0])}</div><div class="wz-p">${esc(T[2][1])}</div>
+      <div class="wz-chips">${g.plazos.map(n=>{ const m=planCalc({...base,plazo:n}).mensual;
         return `<button class="wz-chip${wz.plazo===n?' sel':''}" onclick="wzSelPlazo(${n})">
           <div class="t">${n}</div><div class="s">${money(m)}/mes</div></button>`; }).join('')}</div>
       <div class="wz-info"><div><span>Plazo elegido</span><b>${wz.plazo} meses</b></div>
-        <div><span>Tu mensualidad</span><b>${money(wzPlan().mensual)}</b></div></div>`;
+        <div><span>Tu mensualidad</span><b>${money(wzPlan().mensual)}</b></div></div>
+      ${wzEd('Tasa anual aplicada',wzTasa()+'%')}
+      ${wzEd('Intereses totales del plazo',money(wzPlan().sumInt))}`;
   }
   if(wz.paso===3){
     const op=(v,t,s)=>`<button class="wz-opt${wz.seguro===v?' sel':''}" onclick="wzSelSeguro('${v}')">
       <span class="rad"></span><span><span class="ot">${t}</span><span class="os" style="display:block">${s}</span></span></button>`;
-    return `<div class="wz-h">Seguro y extras</div><div class="wz-p">Opcionales. Puedes dejarlo como está.</div>
-      <div class="wz-opts">
+    const nada = !g.mostrarSeguro && !g.mostrarGps;
+    return `<div class="wz-h">${esc(T[3][0])}</div><div class="wz-p">${esc(T[3][1])}</div>
+      ${nada?`<div class="wz-info"><div><span>Sin opciones adicionales configuradas</span><b>—</b></div></div>`:''}
+      ${g.mostrarSeguro?`<div class="wz-opts">
         ${op('ninguno','Sin seguro','Lo contrato por mi cuenta')}
-        ${op('contado','Seguro de contado','Pago '+money(PUB_SEGURO)+' al inicio')}
+        ${op('contado','Seguro de contado','Pago '+money(g.seguroAnual)+' al inicio')}
         ${op('financiado','Seguro financiado','Se suma al crédito, sube la mensualidad')}
-        ${op('mensual','Seguro mensual','+'+money(PUB_SEGURO/12)+' cada mes')}
-      </div>
-      <div class="wz-opts" style="margin-top:14px">
+        ${op('mensual','Seguro mensual','+'+money(g.seguroAnual/12)+' cada mes')}
+      </div>`:''}
+      ${g.mostrarGps?`<div class="wz-opts" style="margin-top:14px">
         <button class="wz-opt${wz.gps?' sel':''}" onclick="wzTogGps()">
           <span class="rad"></span><span><span class="ot">Rastreo GPS</span>
-          <span class="os" style="display:block">+${money(PUB_GPS)} cada mes</span></span></button>
-      </div>`;
+          <span class="os" style="display:block">+${money(g.gpsMensual)} cada mes</span></span></button>
+      </div>`:''}`;
   }
   if(wz.paso===4){
     const p=wzPlan();
     const seg={ninguno:'Sin seguro',contado:'De contado',financiado:'Financiado',mensual:'Mensual'}[wz.seguro];
-    return `<div class="wz-h">Confirma tus datos</div><div class="wz-p">Revisa que todo esté correcto.</div>
+    return `<div class="wz-h">${esc(T[4][0])}</div><div class="wz-p">${esc(T[4][1])}</div>
       <div class="wz-info">
         <div><span>Auto</span><b>${esc(wzTitulo(c))}</b></div>
         <div><span>Precio</span><b>${money(c.precio||0)}</b></div>
@@ -1052,12 +1178,15 @@ function wzPaso(){
         <div><span>GPS</span><b>${wz.gps?'Sí':'No'}</b></div>
         <div><span>Pago inicial estimado</span><b>${money(p.pagoInicial)}</b></div>
         <div><span>Mensualidad estimada</span><b>${money(p.mensual)}</b></div>
-      </div>`;
+      </div>
+      ${wzEd('Monto a financiar',money(p.financiar))}
+      ${wzEd('Intereses del plazo',money(p.sumInt))}
+      ${wzEd('Total que paga el cliente',money(p.total))}`;
   }
   // Paso final: cotización
   const p=wzPlan();
   const filas=p.filas.map(f=>`<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
-  return `<div class="wz-h">Tu cotización</div><div class="wz-p">${esc(wzTitulo(c))}</div>
+  return `<div class="wz-h">${esc(T[5][0])}</div><div class="wz-p">${esc(wzTitulo(c))}${T[5][1]?' · '+esc(T[5][1]):''}</div>
     <div class="wz-res">
       <div class="wz-big g"><div class="l">Pago inicial hoy</div><div class="v">${money(p.pagoInicial)}</div><div class="s">Enganche + gastos iniciales</div></div>
       <div class="wz-big"><div class="l">Pago mensual</div><div class="v">${money(p.mensual)}</div><div class="s">durante ${p.n} meses</div></div>
@@ -1120,6 +1249,30 @@ function wzWA(){
   const t=`🚗 *${wzTitulo(c)}*\n━━━━━━━━━━━━━━━\nPrecio: ${money(c.precio||0)}\nEnganche: ${money(wzEnganche())}\nPlazo: ${p.n} meses\n━━━━━━━━━━━━━━━\n💵 *Pago inicial hoy: ${money(p.pagoInicial)}*\n🗓️ *Mensualidad: ${money(p.mensual)}*\nTotal estimado: ${money(p.total)}\n━━━━━━━━━━━━━━━\n_EL ESENSIAL · Cifras informativas, sujetas a aprobación de la financiera._`;
   window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
 }
+
+/* --------- Ajustes del cotizador (solo editor) --------- */
+function cfgAbrir(){ const g=CFG();
+  $('cSeguro').value=g.seguroAnual; $('cGps').value=g.gpsMensual; $('cTasa').value=g.tasaFija;
+  $('cEngPcts').value=g.engPcts.join(', '); $('cEngDef').value=g.engDefault;
+  $('cPlazos').value=g.plazos.join(', '); $('cPlazoDef').value=g.plazoDefault;
+  $('cSegOn').checked=!!g.mostrarSeguro; $('cGpsOn').checked=!!g.mostrarGps;
+  for(let i=0;i<6;i++){ $('cT'+i).value=g.t[i][0]; $('cS'+i).value=g.t[i][1]; }
+  $('cfgModal').classList.add('show');
+}
+function cfgCerrar(){ $('cfgModal').classList.remove('show'); }
+function numList(s,def){ const a=String(s).split(',').map(x=>parseInt(x.trim(),10)).filter(n=>!isNaN(n)&&n>0); return a.length?a:def.slice(); }
+function cfgGuardar(){
+  const g={ seguroAnual:+$('cSeguro').value||0, gpsMensual:+$('cGps').value||0, tasaFija:+$('cTasa').value||0,
+    engPcts:numList($('cEngPcts').value,CFG_DEF.engPcts), engDefault:+$('cEngDef').value||20,
+    plazos:numList($('cPlazos').value,CFG_DEF.plazos), plazoDefault:+$('cPlazoDef').value||24,
+    mostrarSeguro:$('cSegOn').checked, mostrarGps:$('cGpsOn').checked,
+    t:[0,1,2,3,4,5].map(i=>[$('cT'+i).value,$('cS'+i).value]) };
+  CFGsave(g); cfgCerrar(); wzReset(); toast('✅ Configuración guardada');
+}
+function cfgRestaurar(){ if(!confirm('¿Restaurar la configuración por defecto del cotizador?')) return;
+  localStorage.removeItem('ee_wzcfg'); cfgCerrar(); wzReset(); toast('Configuración restaurada'); }
+function cfgCopiar(){ const t=JSON.stringify(CFG(),null,2);
+  if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>toast('📋 Configuración copiada'),()=>alert(t)); else alert(t); }
 
 /* ===================== USUARIOS / PERFILES ===================== */
 const SEED_USERS=[
