@@ -281,6 +281,100 @@
   #usrModal{position:fixed;inset:0;z-index:120;background:rgba(13,13,15,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
   #usrModal.show{display:flex}
 
+  /* ===== Cotizador guiado (versión pública) ===== */
+  .pub-header{display:none;align-items:center;gap:14px;justify-content:center;padding:24px 16px;background:var(--negro);margin:-24px -22px 26px}
+  body.modo-publico .pub-header{display:flex}
+  body.modo-publico .ee-sidebar,body.modo-publico .ee-topbar,body.modo-publico .ee-hero,body.modo-publico .ee-backdrop,body.modo-publico .int-only{display:none!important}
+  body.modo-publico .ee-main{margin-left:0;padding-top:0}
+  .pub-header .carlogo{width:104px;height:auto}
+  .pub-header .wordmark{font-size:21px}
+  .int-banner{background:#fff;border:1px solid #e6e8ec;border-radius:10px;padding:14px 16px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .int-banner p{font-size:13px;color:var(--gris)}
+  .int-banner b{color:var(--tinta)}
+  .int-banner button{height:38px;padding:0 16px;border:1px solid var(--tinta);background:var(--tinta);color:#fff;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+
+  .wz{max-width:720px;margin:0 auto}
+  .wz-steps{display:flex;gap:6px;margin-bottom:10px}
+  .wz-step{flex:1;height:3px;border-radius:2px;background:#e6e8ec}
+  .wz-step.on{background:var(--rojo)}
+  .wz-cnt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);font-weight:600;margin-bottom:16px}
+  .wz-card{background:#fff;border:1px solid #e6e8ec;border-radius:12px;padding:26px}
+  .wz-h{font-size:21px;font-weight:600;color:var(--tinta);letter-spacing:-.01em}
+  .wz-p{font-size:13.5px;color:var(--gris);margin:5px 0 22px}
+  .wz-nav{display:flex;gap:10px;margin-top:26px;padding-top:20px;border-top:1px solid #e6e8ec}
+  .wz-back{padding:0 20px;height:44px;border:1px solid #e6e8ec;background:#fff;border-radius:8px;font-size:14px;font-weight:600;color:var(--tinta-2);cursor:pointer;font-family:inherit}
+  .wz-back:hover{border-color:#c9ccd2}
+  .wz-next{flex:1;height:44px;border:none;border-radius:8px;background:var(--rojo);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+  .wz-next:hover{background:var(--rojo-2)}
+  .wz-next:disabled{background:#d8dade;cursor:not-allowed}
+  .wz-cars{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:10px;max-height:430px;overflow-y:auto;padding-right:2px}
+  .wz-car{border:1px solid #e6e8ec;border-radius:10px;padding:13px;cursor:pointer;transition:.15s;background:#fff;text-align:left;font-family:inherit}
+  .wz-car:hover{border-color:#c9ccd2}
+  .wz-car.sel{border-color:var(--rojo);box-shadow:inset 0 0 0 1px var(--rojo)}
+  .wz-car .n{font-size:13.5px;font-weight:600;color:var(--tinta);line-height:1.3}
+  .wz-car .m{font-size:11.5px;color:var(--gris);margin-top:2px}
+  .wz-car .p{font-size:15px;font-weight:700;color:var(--tinta);margin-top:8px}
+  .wz-chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+  .wz-chip{border:1px solid #e6e8ec;background:#fff;border-radius:9px;padding:12px 8px;cursor:pointer;text-align:center;transition:.15s;font-family:inherit}
+  .wz-chip:hover{border-color:#c9ccd2}
+  .wz-chip.sel{border-color:var(--rojo);box-shadow:inset 0 0 0 1px var(--rojo)}
+  .wz-chip .t{font-size:15px;font-weight:700;color:var(--tinta)}
+  .wz-chip .s{font-size:11px;color:var(--gris);margin-top:3px}
+  .wz-info{margin-top:18px;background:#f7f8fa;border:1px solid #e6e8ec;border-radius:9px;padding:6px 14px}
+  .wz-info div{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid #eceef1}
+  .wz-info div:last-child{border-bottom:none}
+  .wz-info span{color:var(--gris)}
+  .wz-info b{color:var(--tinta);font-weight:600}
+  .wz-opts{display:grid;gap:8px}
+  .wz-opt{border:1px solid #e6e8ec;border-radius:9px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;background:#fff;transition:.15s;text-align:left;font-family:inherit;width:100%}
+  .wz-opt:hover{border-color:#c9ccd2}
+  .wz-opt.sel{border-color:var(--rojo)}
+  .wz-opt .rad{width:18px;height:18px;border-radius:50%;border:1.5px solid #c9ccd2;flex:none;position:relative}
+  .wz-opt.sel .rad{border-color:var(--rojo)}
+  .wz-opt.sel .rad:after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--rojo)}
+  .wz-opt .ot{font-size:13.5px;font-weight:600;color:var(--tinta)}
+  .wz-opt .os{font-size:12px;color:var(--gris);margin-top:1px}
+  .wz-res{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+  .wz-big{background:var(--tinta);color:#fff;border-radius:10px;padding:20px;text-align:center}
+  .wz-big.g{background:#0f7a53}
+  .wz-big .l{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;font-weight:600}
+  .wz-big .v{font-size:27px;font-weight:700;margin-top:6px;letter-spacing:-.02em}
+  .wz-big .s{font-size:12px;opacity:.65;margin-top:3px}
+  .wz-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+  .wz-acts button{height:44px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid #e6e8ec;background:#fff;color:var(--tinta-2)}
+  .wz-acts .pdf{background:var(--rojo);border-color:var(--rojo);color:#fff}
+  .wz-acts .pdf:hover{background:var(--rojo-2)}
+  .wz-acts .wa{background:#25d366;border-color:#25d366;color:#0a2e1a}
+  .wz-tab{max-height:280px;overflow-y:auto;border:1px solid #e6e8ec;border-radius:9px;margin-top:16px}
+  @media(max-width:560px){.wz-res,.wz-acts{grid-template-columns:1fr}.wz-card{padding:20px 16px}.pub-header{margin:-18px -14px 20px}}
+
+  /* ===== Documento PDF de cotización ===== */
+  #printDoc{display:none;color:#111;font-size:12px;padding:0}
+  .pdf-head{display:flex;align-items:center;gap:18px;border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:18px}
+  .pdf-head .carlogo{width:112px;height:auto}
+  .pdf-brand{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:22px;letter-spacing:.09em}
+  .pdf-meta{margin-left:auto;text-align:right;font-size:10px;color:#555}
+  .pdf-t{font-size:13px;font-weight:700;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.08em}
+  .pdf-row{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:6px 0;font-size:12px}
+  .pdf-row span{color:#555}
+  .pdf-row b{font-weight:700}
+  .pdf-hi{display:flex;gap:12px;margin:16px 0}
+  .pdf-hi div{flex:1;border:1.5px solid #111;padding:12px;text-align:center}
+  .pdf-hi .l{font-size:8.5px;text-transform:uppercase;letter-spacing:.1em;color:#555}
+  .pdf-hi .v{font-size:18px;font-weight:800;margin-top:4px}
+  table.pdf-tab{width:100%;border-collapse:collapse;font-size:9.5px;margin-top:6px}
+  table.pdf-tab th{background:#111;color:#fff;padding:6px;text-align:right;font-size:8.5px;text-transform:uppercase;letter-spacing:.05em}
+  table.pdf-tab th:first-child{text-align:center}
+  table.pdf-tab td{padding:4px 6px;border-bottom:1px solid #eee;text-align:right}
+  table.pdf-tab td:first-child{text-align:center;color:#666}
+  .pdf-foot{margin-top:16px;font-size:9px;color:#666;border-top:1px solid #ddd;padding-top:10px;line-height:1.5}
+  @media print{
+    body.print-cotiza #gate,body.print-cotiza #app{display:none!important}
+    body.print-cotiza #printDoc{display:block!important}
+    body.print-cotiza{background:#fff;padding:0}
+    .pdf-head,.pdf-hi div,table.pdf-tab th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+
   @media print{.ee-sidebar,.ee-hero,.acciones,.carsel-row,.no-print{display:none!important}.ee-main{margin-left:0}.card,header.sim,.res-hero{box-shadow:none;border:1px solid #ddd;break-inside:avoid}header.sim,.res-hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}.scroll{overflow:visible}table{min-width:0}}
 </style>
 </head>
@@ -329,7 +423,8 @@
     </div>
     <nav class="ee-nav">
       <div class="ee-navsec">Herramientas</div>
-      <div class="ee-navitem active" data-page="simulador" onclick="irA('simulador')"><span class="ic">🧮</span><span>Simulador</span></div>
+      <div class="ee-navitem active" data-page="simulador" onclick="irA('simulador')"><span class="ic">🧮</span><span>Simulador interno</span></div>
+      <div class="ee-navitem" data-page="cotizador" onclick="irA('cotizador')"><span class="ic">📄</span><span>Cotizador guiado</span></div>
       <div class="ee-navitem" data-page="inventario" onclick="irA('inventario')"><span class="ic">🚗</span><span>Inventario de coches</span></div>
       <div class="ee-navsec">Administración</div>
       <div class="ee-navitem" data-page="usuarios" onclick="irA('usuarios')"><span class="ic">👥</span><span>Usuarios y perfiles</span></div>
@@ -471,6 +566,29 @@
       </div>
     </section>
 
+    <!-- ========== PÁGINA: COTIZADOR GUIADO (público) ========== -->
+    <section id="page-cotizador" class="ee-page" hidden>
+      <div class="pub-header">
+        <svg class="carlogo"><use href="#ee-car"/></svg>
+        <span class="wordmark">EL ESENSIAL</span>
+      </div>
+      <div class="wz">
+        <div class="int-banner int-only">
+          <p><b>Versión pública</b> — así la ve un prospecto: paso a paso, sin datos administrativos.</p>
+          <button onclick="window.open('?publico=1','_blank')">Abrir versión pública ↗</button>
+        </div>
+        <div class="wz-steps" id="wzSteps"></div>
+        <div class="wz-cnt" id="wzCnt"></div>
+        <div class="wz-card">
+          <div id="wzBody"></div>
+          <div class="wz-nav" id="wzNav">
+            <button class="wz-back" id="wzBack" onclick="wzIr(-1)">Atrás</button>
+            <button class="wz-next" id="wzNext" onclick="wzIr(1)">Continuar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ========== PÁGINA: INVENTARIO ========== -->
     <section id="page-inventario" class="ee-page" hidden>
       <div class="wrap">
@@ -560,6 +678,9 @@
   </div>
 </div>
 
+<!-- Documento imprimible de la cotización (PDF) -->
+<div id="printDoc"></div>
+
 <!-- Modal agregar/editar usuario -->
 <div id="usrModal">
   <div class="inv-form">
@@ -618,8 +739,10 @@ setTimeout(()=>{ if(document.getElementById('gate').style.display!=='none') docu
 function irA(page){
   document.querySelectorAll('.ee-navitem').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   document.getElementById('page-simulador').hidden = page!=='simulador';
+  document.getElementById('page-cotizador').hidden = page!=='cotizador';
   document.getElementById('page-inventario').hidden = page!=='inventario';
   document.getElementById('page-usuarios').hidden = page!=='usuarios';
+  if(page==='cotizador') wzRender();
   window.scrollTo(0,0); toggleMenu(false);
 }
 function toggleMenu(force){
@@ -791,6 +914,211 @@ function rellenarSelectorCoches(){ const sel=$('carSelect'); if(!sel)return;
   sel.innerHTML='<option value="">— Elegir coche del inventario —</option>'+
     arr.map(c=>`<option value="${c.id}">${esc([nombreCoche(c),c.anio,c.version].filter(Boolean).join(' '))} · ${money(c.precio||0)}</option>`).join('');
   sel.value=v;
+}
+
+/* ===================== COTIZADOR GUIADO (versión pública) ===================== */
+const PASOS=[{t:'Auto'},{t:'Enganche'},{t:'Plazo'},{t:'Extras'},{t:'Confirmar'},{t:'Cotización'}];
+const PUB_SEGURO=12000, PUB_GPS=250;
+let wz={paso:0,carId:null,engPct:20,engMonto:null,plazo:24,seguro:'ninguno',gps:false};
+
+// Cálculo puro (amortización francesa). No toca el simulador interno.
+function planCalc(p){
+  const precio=+p.precio||0, enganche=+p.enganche||0, n=+p.plazo||1, r=((+p.tasa||0)/100)/12;
+  const comision=+p.comision||0;
+  const seguroContado = p.seguroModo==='contado'    ? (+p.seguro||0)    : 0;
+  const seguroFin     = p.seguroModo==='financiado' ? (+p.seguro||0)    : 0;
+  const seguroMes     = p.seguroModo==='mensual'    ? (+p.seguro||0)/12 : 0;
+  const gpsMes=+p.gps||0;
+  const financiar=Math.max(0,(precio-enganche)+seguroFin);
+  const pagoInicial=enganche+comision+seguroContado;
+  const cuota = financiar<=0 ? 0 : (r===0 ? financiar/n : financiar*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1));
+  const extras=gpsMes+seguroMes;
+  let saldo=financiar,sumInt=0,sumPago=0; const filas=[];
+  for(let m=1;m<=n;m++){
+    const interes=saldo*r; let capital=cuota-interes; if(m===n) capital=saldo;
+    saldo=Math.max(0,saldo-capital);
+    const pago=capital+interes+extras;
+    sumInt+=interes; sumPago+=pago;
+    filas.push({m,pago,interes,capital,saldo});
+  }
+  const mensual = financiar<=0?0:cuota+extras;
+  return {financiar,pagoInicial,comision,seguroContado,cuota,extras,mensual,filas,sumInt,sumPago,total:pagoInicial+sumPago,n};
+}
+
+function wzCar(){ return invLoad().find(c=>c.id===wz.carId)||null; }
+function wzEnganche(){ const c=wzCar(); if(!c)return 0; return wz.engMonto!=null ? wz.engMonto : Math.round((c.precio||0)*wz.engPct/100); }
+function wzPlan(){ const c=wzCar(); if(!c)return null;
+  return planCalc({precio:c.precio, enganche:wzEnganche(), plazo:wz.plazo, tasa:c.tasa||16.9,
+    comision:c.comision||Math.round((c.precio||0)*0.04),
+    seguro: wz.seguro==='ninguno'?0:PUB_SEGURO, seguroModo:wz.seguro, gps: wz.gps?PUB_GPS:0 }); }
+function wzFecha(){ const d=new Date(); return d.getDate()+' de '+MESES_L[d.getMonth()]+' de '+d.getFullYear(); }
+function wzTitulo(c){ return [nombreCoche(c), c.anio, c.version].filter(Boolean).join(' '); }
+
+function wzReset(){ wz={paso:0,carId:null,engPct:20,engMonto:null,plazo:24,seguro:'ninguno',gps:false}; wzRender(); }
+function wzSelCar(id){ wz.carId=id; wz.engMonto=null; wzRender(); }
+function wzSelPct(p){ wz.engPct=p; wz.engMonto=null; const i=$('wzEngInput'); if(i)i.value=wzEnganche(); wzUpdEng(); }
+function wzEngManual(v){ const c=wzCar(); if(!c)return;
+  wz.engMonto=Math.max(0,Math.min(+v||0, Math.max(0,(c.precio||0)-1000))); wzUpdEng(); }
+function wzUpdEng(){ const c=wzCar(); if(!c)return; const eng=wzEnganche(), fin=Math.max(0,(c.precio||0)-eng);
+  document.querySelectorAll('#wzEngChips .wz-chip').forEach(ch=>ch.classList.toggle('sel', wz.engMonto==null && +ch.dataset.pct===wz.engPct));
+  const inf=$('wzEngInfo'); if(inf) inf.innerHTML=
+    `<div><span>Precio del auto</span><b>${money(c.precio||0)}</b></div>
+     <div><span>Tu enganche</span><b>${money(eng)}</b></div>
+     <div><span>Monto a financiar</span><b>${money(fin)}</b></div>`;
+}
+function wzSelPlazo(n){ wz.plazo=n; wzRender(); }
+function wzSelSeguro(v){ wz.seguro=v; wzRender(); }
+function wzTogGps(){ wz.gps=!wz.gps; wzRender(); }
+function wzValido(){ return wz.paso!==0 || !!wz.carId; }
+function wzIr(d){ if(d>0 && !wzValido()) return; wz.paso=Math.max(0,Math.min(PASOS.length-1,wz.paso+d)); wzRender(); window.scrollTo(0,0); }
+
+function wzRender(){
+  const steps=$('wzSteps'); if(!steps) return;
+  steps.innerHTML=PASOS.map((p,i)=>`<div class="wz-step${i<=wz.paso?' on':''}"></div>`).join('');
+  $('wzCnt').textContent=`Paso ${wz.paso+1} de ${PASOS.length} · ${PASOS[wz.paso].t}`;
+  $('wzBody').innerHTML=wzPaso();
+  const ultimo = wz.paso===PASOS.length-1;
+  $('wzNav').style.display = ultimo?'none':'flex';
+  if(!ultimo){
+    $('wzBack').style.visibility = wz.paso===0?'hidden':'visible';
+    $('wzNext').disabled=!wzValido();
+    $('wzNext').textContent = wz.paso===PASOS.length-2 ? 'Generar cotización' : 'Continuar';
+  }
+}
+
+function wzPaso(){
+  const c=wzCar();
+  if(wz.paso===0){
+    const cars=invLoad().filter(x=>x.estado==='disponible');
+    if(!cars.length) return `<div class="wz-h">Sin unidades disponibles</div><div class="wz-p">Vuelve más tarde o consulta con un asesor.</div>`;
+    return `<div class="wz-h">Elige tu auto</div><div class="wz-p">Selecciona la unidad que te interesa.</div>
+      <div class="wz-cars">${cars.map(x=>`<button class="wz-car${wz.carId===x.id?' sel':''}" onclick="wzSelCar('${x.id}')">
+        <div class="n">${esc(nombreCoche(x))}</div>
+        <div class="m">${esc([x.anio,x.version,x.transmision,(x.color&&x.color!=='N/A')?x.color:''].filter(Boolean).join(' · '))}</div>
+        <div class="p">${money(x.precio||0)}</div></button>`).join('')}</div>`;
+  }
+  if(wz.paso===1){
+    const eng=wzEnganche(), fin=Math.max(0,(c.precio||0)-eng);
+    return `<div class="wz-h">¿Cuánto darás de enganche?</div>
+      <div class="wz-p">Entre más enganche des, menor será tu mensualidad.</div>
+      <div class="wz-chips" id="wzEngChips">${[10,20,30,40,50].map(p=>
+        `<button class="wz-chip${(wz.engMonto==null&&wz.engPct===p)?' sel':''}" data-pct="${p}" onclick="wzSelPct(${p})">
+          <div class="t">${p}%</div><div class="s">${money((c.precio||0)*p/100)}</div></button>`).join('')}</div>
+      <div class="campo" style="margin-top:16px"><label>O escribe una cantidad exacta</label>
+        <div class="inbox"><span class="pre">$</span>
+        <input type="number" id="wzEngInput" class="has-pre" value="${eng}" min="0" step="1000" oninput="wzEngManual(this.value)"></div></div>
+      <div class="wz-info" id="wzEngInfo">
+        <div><span>Precio del auto</span><b>${money(c.precio||0)}</b></div>
+        <div><span>Tu enganche</span><b>${money(eng)}</b></div>
+        <div><span>Monto a financiar</span><b>${money(fin)}</b></div>
+      </div>`;
+  }
+  if(wz.paso===2){
+    const base={precio:c.precio, enganche:wzEnganche(), tasa:c.tasa||16.9,
+      comision:c.comision||0, seguro: wz.seguro==='ninguno'?0:PUB_SEGURO, seguroModo:wz.seguro, gps: wz.gps?PUB_GPS:0};
+    return `<div class="wz-h">¿A cuántos meses?</div><div class="wz-p">Elige el plazo que mejor te acomode.</div>
+      <div class="wz-chips">${[12,24,36,48,60,72].map(n=>{ const m=planCalc({...base,plazo:n}).mensual;
+        return `<button class="wz-chip${wz.plazo===n?' sel':''}" onclick="wzSelPlazo(${n})">
+          <div class="t">${n}</div><div class="s">${money(m)}/mes</div></button>`; }).join('')}</div>
+      <div class="wz-info"><div><span>Plazo elegido</span><b>${wz.plazo} meses</b></div>
+        <div><span>Tu mensualidad</span><b>${money(wzPlan().mensual)}</b></div></div>`;
+  }
+  if(wz.paso===3){
+    const op=(v,t,s)=>`<button class="wz-opt${wz.seguro===v?' sel':''}" onclick="wzSelSeguro('${v}')">
+      <span class="rad"></span><span><span class="ot">${t}</span><span class="os" style="display:block">${s}</span></span></button>`;
+    return `<div class="wz-h">Seguro y extras</div><div class="wz-p">Opcionales. Puedes dejarlo como está.</div>
+      <div class="wz-opts">
+        ${op('ninguno','Sin seguro','Lo contrato por mi cuenta')}
+        ${op('contado','Seguro de contado','Pago '+money(PUB_SEGURO)+' al inicio')}
+        ${op('financiado','Seguro financiado','Se suma al crédito, sube la mensualidad')}
+        ${op('mensual','Seguro mensual','+'+money(PUB_SEGURO/12)+' cada mes')}
+      </div>
+      <div class="wz-opts" style="margin-top:14px">
+        <button class="wz-opt${wz.gps?' sel':''}" onclick="wzTogGps()">
+          <span class="rad"></span><span><span class="ot">Rastreo GPS</span>
+          <span class="os" style="display:block">+${money(PUB_GPS)} cada mes</span></span></button>
+      </div>`;
+  }
+  if(wz.paso===4){
+    const p=wzPlan();
+    const seg={ninguno:'Sin seguro',contado:'De contado',financiado:'Financiado',mensual:'Mensual'}[wz.seguro];
+    return `<div class="wz-h">Confirma tus datos</div><div class="wz-p">Revisa que todo esté correcto.</div>
+      <div class="wz-info">
+        <div><span>Auto</span><b>${esc(wzTitulo(c))}</b></div>
+        <div><span>Precio</span><b>${money(c.precio||0)}</b></div>
+        <div><span>Enganche</span><b>${money(wzEnganche())}</b></div>
+        <div><span>Plazo</span><b>${wz.plazo} meses</b></div>
+        <div><span>Seguro</span><b>${seg}</b></div>
+        <div><span>GPS</span><b>${wz.gps?'Sí':'No'}</b></div>
+        <div><span>Pago inicial estimado</span><b>${money(p.pagoInicial)}</b></div>
+        <div><span>Mensualidad estimada</span><b>${money(p.mensual)}</b></div>
+      </div>`;
+  }
+  // Paso final: cotización
+  const p=wzPlan();
+  const filas=p.filas.map(f=>`<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
+  return `<div class="wz-h">Tu cotización</div><div class="wz-p">${esc(wzTitulo(c))}</div>
+    <div class="wz-res">
+      <div class="wz-big g"><div class="l">Pago inicial hoy</div><div class="v">${money(p.pagoInicial)}</div><div class="s">Enganche + gastos iniciales</div></div>
+      <div class="wz-big"><div class="l">Pago mensual</div><div class="v">${money(p.mensual)}</div><div class="s">durante ${p.n} meses</div></div>
+    </div>
+    <div class="wz-info">
+      <div><span>Precio del auto</span><b>${money(c.precio||0)}</b></div>
+      <div><span>Enganche</span><b>${money(wzEnganche())}</b></div>
+      <div><span>Comisión por apertura</span><b>${money(p.comision)}</b></div>
+      ${p.seguroContado>0?`<div><span>Seguro (de contado)</span><b>${money(p.seguroContado)}</b></div>`:''}
+      <div><span>Monto a financiar</span><b>${money(p.financiar)}</b></div>
+      <div><span>Intereses del plazo</span><b>${money(p.sumInt)}</b></div>
+      <div><span>Total final estimado</span><b>${money(p.total)}</b></div>
+    </div>
+    <div class="wz-tab"><table><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>${filas}</tbody></table></div>
+    <div class="wz-acts">
+      <button class="pdf" onclick="wzPDF()">Descargar PDF</button>
+      <button class="wa" onclick="wzWA()">Enviar por WhatsApp</button>
+    </div>
+    <div class="wz-acts" style="grid-template-columns:1fr;margin-top:10px"><button onclick="wzReset()">Nueva cotización</button></div>
+    <div class="nota" style="text-align:left;margin-top:16px">Cifras informativas, no constituyen una oferta de crédito. Sujeto a aprobación de la financiera.</div>`;
+}
+
+function wzPDF(){
+  const c=wzCar(), p=wzPlan(); if(!c||!p) return;
+  const filas=p.filas.map(f=>`<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
+  const specs=[c.version,c.transmision==='AUT'?'Automático':'Estándar',(c.color&&c.color!=='N/A')?c.color:'',c.motor].filter(Boolean).join(' · ')||'—';
+  $('printDoc').innerHTML=`
+    <div class="pdf-head">
+      <svg class="carlogo" style="width:112px;height:56px"><use href="#ee-car"/></svg>
+      <div class="pdf-brand">EL ESENSIAL</div>
+      <div class="pdf-meta">Cotización de financiamiento<br>${wzFecha()}</div>
+    </div>
+    <div class="pdf-t">Vehículo</div>
+    <div class="pdf-row"><span>Marca</span><b>${esc(c.marca||'—')}</b></div>
+    <div class="pdf-row"><span>Modelo</span><b>${esc(c.modelo||'—')}</b></div>
+    <div class="pdf-row"><span>Año</span><b>${esc(c.anio||'—')}</b></div>
+    <div class="pdf-row"><span>Versión / especificaciones</span><b>${esc(specs)}</b></div>
+    <div class="pdf-row"><span>Precio</span><b>${money(c.precio||0)}</b></div>
+    <div class="pdf-t">Tu plan de financiamiento</div>
+    <div class="pdf-row"><span>Enganche</span><b>${money(wzEnganche())}</b></div>
+    <div class="pdf-row"><span>Plazo</span><b>${p.n} meses</b></div>
+    <div class="pdf-row"><span>Tasa anual</span><b>${c.tasa||16.9}%</b></div>
+    <div class="pdf-row"><span>Monto a financiar</span><b>${money(p.financiar)}</b></div>
+    <div class="pdf-hi">
+      <div><div class="l">Pago inicial hoy</div><div class="v">${money(p.pagoInicial)}</div></div>
+      <div><div class="l">Mensualidad</div><div class="v">${money(p.mensual)}</div></div>
+      <div><div class="l">Total final estimado</div><div class="v">${money(p.total)}</div></div>
+    </div>
+    <div class="pdf-t">Tabla de amortización</div>
+    <table class="pdf-tab"><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>${filas}</tbody></table>
+    <div class="pdf-foot">Cotización generada el ${wzFecha()} · EL ESENSIAL.<br>
+    Cifras informativas. No constituyen una oferta de crédito. Sujeto a aprobación de la institución financiera; los montos pueden variar según la fecha de contratación.</div>`;
+  document.body.classList.add('print-cotiza');
+  const limpiar=()=>document.body.classList.remove('print-cotiza');
+  window.addEventListener('afterprint',limpiar,{once:true});
+  setTimeout(()=>{ window.print(); setTimeout(limpiar,1500); },80);
+}
+function wzWA(){
+  const c=wzCar(), p=wzPlan(); if(!c||!p) return;
+  const t=`🚗 *${wzTitulo(c)}*\n━━━━━━━━━━━━━━━\nPrecio: ${money(c.precio||0)}\nEnganche: ${money(wzEnganche())}\nPlazo: ${p.n} meses\n━━━━━━━━━━━━━━━\n💵 *Pago inicial hoy: ${money(p.pagoInicial)}*\n🗓️ *Mensualidad: ${money(p.mensual)}*\nTotal estimado: ${money(p.total)}\n━━━━━━━━━━━━━━━\n_EL ESENSIAL · Cifras informativas, sujetas a aprobación de la financiera._`;
+  window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
 }
 
 /* ===================== USUARIOS / PERFILES ===================== */
@@ -979,8 +1307,18 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll
     if(s.style.display==='none'){s.style.display='';b.textContent='Ocultar tabla';} else {s.style.display='none';b.textContent='Mostrar tabla';} }
   calc();
 
-  // Auto-entrar si ya se validó en esta sesión (al final: todo ya está definido)
-  if(sessionStorage.getItem('ee_auth')==='1') mostrarApp();
+  // Arranque: modo público (?publico=1) sin contraseña, o auto-entrar al panel interno
+  (function(){
+    const publico = new URLSearchParams(location.search).get('publico')==='1';
+    if(publico){
+      document.body.classList.add('modo-publico');
+      document.getElementById('gate').style.display='none';
+      document.getElementById('app').style.display='block';
+      invSeed(); irA('cotizador'); wzReset();
+      return;
+    }
+    if(sessionStorage.getItem('ee_auth')==='1') mostrarApp();
+  })();
 </script>
 </body>
 </html>
