@@ -238,7 +238,10 @@
   .inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
   .cochecard{background:var(--card);border:1px solid #e6e8ec;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:100%}
   .cochecard.dim{opacity:.55}
-  .cc-foto{position:relative;aspect-ratio:16/10;background:#f4f5f7 center/cover no-repeat;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #e6e8ec}
+  /* Foto centrada y completa sobre blanco (contain, no recorta) */
+  .cc-foto{position:relative;aspect-ratio:16/10;background-color:#fff;background-position:center;
+    background-size:contain;background-repeat:no-repeat;display:flex;align-items:center;justify-content:center;
+    border-bottom:1px solid #e6e8ec}
   .cc-foto .ph{width:48px;height:48px}
   .cc-estado{position:absolute;top:10px;left:10px;display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#374151;background:#fff;border:1px solid #e6e8ec;padding:4px 9px;border-radius:6px}
   .cc-estado i{width:6px;height:6px;border-radius:50%;flex:none}
@@ -496,15 +499,17 @@
   .esn .gridCars{grid-template-columns:repeat(3,1fr)}
   .esn .carCard{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);transition:.25s;display:flex;flex-direction:column}
   .esn .carCard:hover{border-color:var(--acid);transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,0,0,.4)}
-  .esn .carImg{position:relative;aspect-ratio:16/10;overflow:hidden}
-  .esn .carImg img{width:100%;height:100%;object-fit:cover}
-  .esn .carImgPh{width:100%;height:100%;display:grid;place-items:center;align-content:center;gap:6px;color:var(--muted);
-    background:repeating-linear-gradient(45deg,#0e100e,#0e100e 12px,#121412 12px,#121412 24px)}
+  /* Foto de la unidad: completa y centrada sobre blanco (contain, no recorta) */
+  .esn .carImg{position:relative;aspect-ratio:16/10;overflow:hidden;background:#fff;
+    display:flex;align-items:center;justify-content:center}
+  .esn .carImg img{width:100%;height:100%;object-fit:contain;object-position:center}
+  .esn .carImgPh{width:100%;height:100%;display:grid;place-items:center;align-content:center;gap:6px;color:#9aa0a6;
+    background:#f4f5f7}
   .esn .carImgPh svg{width:44px;height:44px}
   .esn .carImgPh span{font-weight:800;letter-spacing:.1em;font-size:13px}
-  .esn .carYearTag{position:absolute;top:12px;left:12px;background:var(--acid);color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:7px}
-  .esn .carBrand{position:absolute;top:11px;right:11px;width:30px;height:30px;padding:6px;border-radius:8px;
-    background:rgba(8,9,8,.72);border:1px solid var(--line2);color:#fff;backdrop-filter:blur(4px)}
+  .esn .carYearTag{position:absolute;top:12px;left:12px;background:var(--acid);color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:7px;z-index:1}
+  .esn .carBrand{position:absolute;top:11px;right:11px;width:30px;height:30px;padding:6px;border-radius:8px;z-index:1;
+    background:#fff;border:1px solid #e6e8ec;color:#1c1e22}
   /* Tarjetas de marca del paso 03 */
   .esn .brandBlock{min-height:124px}
   .esn .brandIcon{padding:10px;background:var(--panel2);color:var(--txt)}
@@ -709,10 +714,9 @@
   .esn .logo{min-width:0}
   .esn .brandtxt{overflow:hidden;text-overflow:ellipsis}
 
-  /* Etiqueta "imagen de referencia" */
-  .esn .carImg{background:var(--panel2)}
-  .esn .refTag{position:absolute;bottom:10px;left:10px;font-size:9.5px;font-weight:700;letter-spacing:.05em;
-    text-transform:uppercase;color:#cfd4cb;background:rgba(8,9,8,.78);border:1px solid var(--line2);
+  /* Etiqueta "imagen de referencia" (sobre fondo blanco) */
+  .esn .refTag{position:absolute;bottom:10px;left:10px;z-index:1;font-size:9.5px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:#6b7280;background:rgba(255,255,255,.92);border:1px solid #e6e8ec;
     padding:3px 8px;border-radius:6px}
   .cc-ref{position:absolute;bottom:8px;left:8px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
     color:#6b7280;background:rgba(255,255,255,.92);border:1px solid #e6e8ec;padding:2px 7px;border-radius:5px}
