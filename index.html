@@ -497,11 +497,59 @@
   .esn .carPrice{font-family:'Space Mono',monospace;font-size:22px;font-weight:700}
   .esn .carMonthly{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:var(--acid);text-align:right}
   .esn .carMonthly small{display:block;font-size:10px;color:var(--muted);font-family:'Archivo'}
-  .esn .carActs{display:grid;grid-template-columns:1fr;gap:8px}
-  .esn .carPdf{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;
-    border:1px solid var(--line2);border-radius:11px;color:var(--txt);font-weight:700;font-size:13px;transition:.2s}
-  .esn .carPdf svg{width:16px;height:16px}
-  .esn .carPdf:hover{border-color:var(--acid);color:var(--acid);background:rgba(225,29,42,.06)}
+  .esn .carActs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .esn .carActs .btnPrimary{grid-column:1/-1;height:44px}
+  .esn .carPdf,.esn .carWa{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;
+    border:1px solid var(--line2);border-radius:10px;color:var(--txt);font-weight:700;font-size:12.5px;transition:.2s}
+  .esn .carPdf svg,.esn .carWa svg{width:15px;height:15px;flex:none}
+  .esn .carPdf:hover{border-color:var(--acid);color:var(--acid);background:rgba(225,29,42,.07)}
+  .esn .carWa{color:#25D366;border-color:rgba(37,211,102,.35)}
+  .esn .carWa:hover{background:rgba(37,211,102,.1);border-color:#25D366}
+
+  /* ===== Desglose de la cotización en pantalla (modal) ===== */
+  .esn .detCard{max-width:720px;width:100%;max-height:88vh;display:flex;flex-direction:column;
+    border:1px solid var(--line2);border-radius:18px;background:var(--panel2);animation:pop .3s both;overflow:hidden}
+  .esn .detHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+    padding:22px 24px 16px;border-bottom:1px solid var(--line)}
+  .esn .detEye{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--acid)}
+  .esn .detHead h3{font-size:20px;font-weight:800;letter-spacing:-.01em;margin-top:5px}
+  .esn .detBody{overflow-y:auto;padding:20px 24px;flex:1}
+  .esn .detStats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+  .esn .detStat{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:3px}
+  .esn .detStat .l{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .esn .detStat .v{font-size:22px;font-weight:800;font-family:'Space Mono',monospace;letter-spacing:-.02em;margin-top:2px}
+  .esn .detStat .s{font-size:11px;color:var(--muted)}
+  .esn .detStat.ok{border-color:rgba(37,211,102,.35)}
+  .esn .detStat.ok .v{color:#4ade80}
+  .esn .detStat.acc{border-color:rgba(225,29,42,.35)}
+  .esn .detStat.acc .v{color:var(--acid)}
+  .esn .detRow{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .esn .detRow span{color:var(--muted)}
+  .esn .detRow b{font-weight:700;text-align:right}
+  .esn .detToggle{display:flex;align-items:center;gap:9px;width:100%;margin-top:18px;padding:13px 15px;
+    border:1px solid var(--line2);border-radius:10px;font-size:13px;font-weight:700;color:var(--txt);transition:.2s}
+  .esn .detToggle:hover{border-color:var(--acid);color:var(--acid)}
+  .esn .detToggle svg{width:15px;height:15px;transition:transform .25s;flex:none}
+  .esn .detToggle.open svg{transform:rotate(90deg)}
+  .esn .detTab{max-height:0;overflow:hidden;transition:max-height .3s ease;border-radius:10px}
+  .esn .detTab.open{max-height:300px;overflow:auto;margin-top:10px;border:1px solid var(--line)}
+  .esn .detTab table{width:100%;border-collapse:collapse;font-size:11.5px;min-width:420px}
+  .esn .detTab th{position:sticky;top:0;background:#000;color:#fff;padding:8px 10px;text-align:right;font-size:9.5px;
+    text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+  .esn .detTab th:first-child{text-align:center}
+  .esn .detTab td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);font-family:'Space Mono',monospace}
+  .esn .detTab td:first-child{text-align:center;color:var(--muted)}
+  .esn .detNota{font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:16px}
+  .esn .detActs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:16px 24px;
+    border-top:1px solid var(--line);background:var(--panel)}
+  .esn .detActs .btn{height:44px;font-size:12.5px;padding:0 10px}
+  @media(max-width:640px){
+    .esn .detStats{grid-template-columns:1fr}
+    .esn .detActs{grid-template-columns:1fr}
+    .esn .detHead,.esn .detBody,.esn .detActs{padding-left:16px;padding-right:16px}
+    .esn .detCard{max-height:92vh}
+    .esn .carActs{grid-template-columns:1fr}
+  }
   .esn .resFoot{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
 
   /* AVISOS Y BARRA DE PLAN (resultados) */
@@ -1568,7 +1616,7 @@ const AVISO_PRIVACIDAD=`
 Fundamento: Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).</p>`;
 
 const PB={screen:'hero',stepIdx:0,editor:false,bmin:0,bmax:0,uso:null,marca:null,pago:null,
-  enganche:20,plazo:48,aval:null,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false};
+  enganche:20,plazo:48,aval:null,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false,detalle:null};
 
 const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' Km';
 function pbCars(){ return invLoad().filter(c=>c.estado==='disponible'); }
@@ -1681,6 +1729,63 @@ function pbWiki(k){ PB.wiki=k; pbOverlay(); }
 function pbVideo(i){ PB.video=i; pbOverlay(); }
 function pbCloseModal(){ PB.wiki=null; PB.video=null; pbOverlay(); }
 function pbLegal(){ PB.legal=true; pbOverlay(); window.scrollTo(0,0); }
+
+/* ---------- Desglose de la cotización en pantalla (sin salir a un PDF) ---------- */
+function pbDetalle(id){ PB.detalle=id; pbOverlay(); }
+function pbCerrarDetalle(){ PB.detalle=null; pbOverlay(); }
+function pbDetalleHTML(){
+  const v=pbCars().find(c=>c.id===PB.detalle); if(!v) return '';
+  const contado = PB.pago==='contado';
+  const titulo=[nombreCoche(v),v.anio,v.version].filter(Boolean).join(' ');
+  const stat=(l,val,sub,cls)=>`<div class="detStat ${cls||''}"><span class="l">${l}</span><b class="v">${val}</b>${sub?`<span class="s">${sub}</span>`:''}</div>`;
+  const row=(k,val)=>`<div class="detRow"><span>${k}</span><b>${val}</b></div>`;
+
+  if(contado){
+    return `<div class="detHead"><div><span class="detEye">Tu cotización</span><h3>${esc(titulo)}</h3></div>
+        <button class="closeX" onclick="pbCerrarDetalle()">${I.x}</button></div>
+      <div class="detBody">
+        <div class="detStats">${stat('Precio de contado',money(v.precio||0),'Pago en una exhibición','acc')}</div>
+        ${row('Marca / Modelo',esc(nombreCoche(v)))}
+        ${row('Año',v.anio||'—')}
+        ${row('Transmisión',v.transmision==='STD'?'Estándar':'Automática')}
+        <p class="detNota">Sin intereses. Al pagar de contado recibes factura, finiquito y responsiva.</p>
+      </div>`+pbDetalleActs(v);
+  }
+
+  const {eng,T}=pbPlanCoche(v);
+  const fin=Math.max(0,(v.precio||0)-eng);
+  const filas=T.filas.map(f=>`<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
+  return `<div class="detHead"><div><span class="detEye">Tu cotización</span><h3>${esc(titulo)}</h3></div>
+      <button class="closeX" onclick="pbCerrarDetalle()">${I.x}</button></div>
+    <div class="detBody">
+      <div class="detStats">
+        ${stat('Pago inicial hoy',money(eng),`Enganche del ${PB.enganche}%`,'ok')}
+        ${stat('Pagas cada mes',money(T.mensualidad),`durante ${PB.plazo} meses`,'acc')}
+        ${stat('Total estimado',money(eng+T.sumPago),'Inicial + mensualidades')}
+      </div>
+      ${row('Precio del auto',money(v.precio||0))}
+      ${row('Enganche',`${money(eng)} (${PB.enganche}%)`)}
+      ${row('Aval',PB.aval?'Sí':'No')}
+      ${row('Monto a financiar',money(fin))}
+      ${row('Plazo',`${PB.plazo} meses`)}
+      ${row('Tasa anual de referencia',`${pbTasa(PB.pago||'sinburo')}%`)}
+      ${row('Intereses del plazo',money(T.sumInt))}
+
+      <button class="detToggle" onclick="this.nextElementSibling.classList.toggle('open');this.classList.toggle('open')">
+        ${I.chevR} Ver los ${PB.plazo} pagos, mes a mes</button>
+      <div class="detTab">
+        <table><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>${filas}</tbody></table>
+      </div>
+      <p class="detNota">Cifras informativas. No constituyen una oferta de crédito; están sujetas a aprobación.</p>
+    </div>`+pbDetalleActs(v);
+}
+function pbDetalleActs(v){
+  return `<div class="detActs">
+      <button class="btn btnPrimary" onclick="pbPDF('${v.id}')">${I.dl} Descargar PDF</button>
+      <button class="btn btnWa" onclick="pbWA('${v.id}')">${I.msg} Sí, me interesa este</button>
+      <button class="btn btnGhost" onclick="pbCerrarDetalle()">${I.chevL} Seguir viendo otras</button>
+    </div>`;
+}
 function pbNosotros(){
   const li=(x)=>`<li>${I.check}<span>${esc(x)}</span></li>`;
   return `<main class="results">
@@ -1722,6 +1827,11 @@ function pbNosotros(){
 
 function pbOverlay(){
   const o=$('pubOverlay');
+  if(PB.detalle){
+    o.innerHTML=`<div class="overlay" onclick="pbCerrarDetalle()">
+      <div class="detCard" onclick="event.stopPropagation()">${pbDetalleHTML()}</div></div>`;
+    return;
+  }
   if(PB.legal){
     o.innerHTML=`<div class="overlay" onclick="PB.legal=false;pbOverlay()"><div class="legalCard" onclick="event.stopPropagation()">
       <div class="wikiTop"><span class="wikiTag">${I.shield} Aviso de privacidad</span>
@@ -1752,6 +1862,7 @@ function pbRender(){
   else if(PB.screen==='quiz') s.innerHTML=pbQuiz();
   else if(PB.screen==='nosotros') s.innerHTML=pbNosotros();
   else s.innerHTML=pbResults();
+  if(PB.screen!=='results') PB.detalle=null;
   pbOverlay();
 }
 function pbHero(){
@@ -1928,8 +2039,9 @@ function pbResults(){
             ${men?`<div class="carMonthly">${money(men)}<small>/mes est.</small></div>`:''}
           </div>
           <div class="carActs">
-            <button class="btn btnPrimary" onclick="pbWA('${v.id}')">Cotizar por WhatsApp ${I.arrow}</button>
-            <button class="carPdf" onclick="pbPDF('${v.id}')">${I.dl} Descargar cotización PDF</button>
+            <button class="btn btnPrimary" onclick="pbDetalle('${v.id}')">Ver mi cotización ${I.arrow}</button>
+            <button class="carPdf" onclick="pbPDF('${v.id}')">${I.dl} Descargar PDF</button>
+            <button class="carWa" onclick="pbWA('${v.id}')">${I.msg} WhatsApp</button>
           </div>
           ${PB.editor?`<button class="carPdf" style="width:100%;height:34px" onclick="pbAlSim('${v.id}')">Abrir en simulador interno</button>`:''}
         </div></article>`;}).join('')}</div>
