@@ -693,6 +693,38 @@
   .esn .consent span{font-size:13px;line-height:1.55;color:var(--muted)}
   .esn .consent .link{font-size:13px}
 
+  /* NAV MÓVIL: hamburguesa + menú desplegable */
+  .esn .navBurger{display:none;align-items:center;justify-content:center;width:38px;height:38px;flex:none;
+    border:1px solid var(--line2);border-radius:9px;color:var(--txt)}
+  .esn .navBurger svg{width:19px;height:19px}
+  .esn .navBurger:hover{border-color:var(--acid);color:var(--acid)}
+  .esn .navMenu{display:none;position:fixed;top:62px;left:12px;right:12px;z-index:40;flex-direction:column;
+    background:var(--panel2);border:1px solid var(--line2);border-radius:14px;padding:8px;
+    box-shadow:0 18px 50px rgba(0,0,0,.55)}
+  .esn .navMenu.open{display:flex}
+  .esn .navMenu button{text-align:left;padding:14px;border-radius:9px;font-size:15px;font-weight:600;color:var(--txt)}
+  .esn .navMenu button:hover{background:var(--panel);color:var(--acid)}
+  .esn .navMenuSep{height:1px;background:var(--line);margin:6px 10px}
+  .esn .nav{gap:12px}
+  .esn .logo{min-width:0}
+  .esn .brandtxt{overflow:hidden;text-overflow:ellipsis}
+
+  /* Etiqueta "imagen de referencia" */
+  .esn .carImg{background:var(--panel2)}
+  .esn .refTag{position:absolute;bottom:10px;left:10px;font-size:9.5px;font-weight:700;letter-spacing:.05em;
+    text-transform:uppercase;color:#cfd4cb;background:rgba(8,9,8,.78);border:1px solid var(--line2);
+    padding:3px 8px;border-radius:6px}
+  .cc-ref{position:absolute;bottom:8px;left:8px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    color:#6b7280;background:rgba(255,255,255,.92);border:1px solid #e6e8ec;padding:2px 7px;border-radius:5px}
+
+  /* Lista de créditos de imágenes */
+  .esn .credList{display:grid;gap:9px;margin:14px 0}
+  .esn .credRow{display:flex;flex-direction:column;gap:2px;padding:9px 11px;background:var(--panel);
+    border:1px solid var(--line);border-radius:9px}
+  .esn .credRow a{font-size:12.5px;font-weight:700;color:var(--txt);text-decoration:none;word-break:break-word}
+  .esn .credRow a:hover{color:var(--acid);text-decoration:underline}
+  .esn .credRow span{font-size:11px;color:var(--muted)}
+
   /* AVISO DE PRIVACIDAD (modal) */
   .esn .legalCard{max-width:640px;width:100%;max-height:84vh;display:flex;flex-direction:column;
     border:1px solid var(--line2);border-radius:18px;padding:24px;background:var(--panel2);animation:pop .3s both}
@@ -751,6 +783,15 @@
     .esn .gridCars{grid-template-columns:1fr 1fr}
     .esn .videoRow{grid-template-columns:1fr;max-width:none}
     .esn .navLinks{display:none}
+    .esn .navBurger{display:flex}          /* los enlaces pasan al menú */
+    .esn .nav{padding:12px 14px}
+    .esn .navIcons{gap:6px}
+    .esn .ni{width:38px;height:38px}
+  }
+  @media(max-width:480px){
+    .esn .navIcons .ni:nth-child(3){display:none}  /* el mapa vive en el menú */
+    .esn .nav .brandmark{height:20px}
+    .esn .nav .brandtxt{font-size:12px;letter-spacing:.12em}
   }
   @media(max-width:560px){
     .esn .gridCars{grid-template-columns:1fr}
@@ -1196,12 +1237,26 @@
       <a onclick="pbStart()">Financiamiento</a>
       <a onclick="pbGo('nosotros')">Nosotros</a>
     </nav>
+    <button class="navBurger" onclick="pbMenu()" aria-label="Menú">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <div class="navIcons">
-      <span class="ni" onclick="pbGo('results')" title="Catálogo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.9 8.4 8.4 0 0 1 8.4-9 8.4 8.4 0 0 1 8.6 8.4z"/></svg></span>
-      <span class="ni" title="Llámanos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7A2 2 0 0 1 22 16.9z"/></svg></span>
-      <span class="ni" title="Ubicación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+      <span class="ni" onclick="pbWhats()" title="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.9 8.4 8.4 0 0 1 8.4-9 8.4 8.4 0 0 1 8.6 8.4z"/></svg></span>
+      <span class="ni" onclick="pbLlamar()" title="Llámanos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7A2 2 0 0 1 22 16.9z"/></svg></span>
+      <span class="ni" onclick="pbMapa()" title="Ubicación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
     </div>
   </header>
+
+  <div class="navMenu" id="navMenu">
+    <button onclick="pbGo('results');pbMenu(false)">Catálogo</button>
+    <button onclick="pbStart();pbMenu(false)">Financiamiento</button>
+    <button onclick="pbGo('nosotros');pbMenu(false)">Nosotros</button>
+    <div class="navMenuSep"></div>
+    <button onclick="pbWhats();pbMenu(false)">Escríbenos por WhatsApp</button>
+    <button onclick="pbLlamar();pbMenu(false)">Llamar al lote</button>
+    <button onclick="pbMapa();pbMenu(false)">Cómo llegar</button>
+  </div>
 
   <div id="pubScreen"></div>
 
@@ -1209,6 +1264,7 @@
     <div class="footBrand"><img src="logo-mark.png" alt="" class="brandmark"><span class="brandtxt">EL ESENSIAL</span></div>
     <span class="footTxt">Seminuevos certificados</span>
     <button class="footLink" onclick="pbLegal()">Aviso de privacidad</button>
+    <button class="footLink" onclick="pbCreditos()">Créditos de imágenes</button>
     <button class="footLink" onclick="pbGo('nosotros')">Nosotros</button>
     <span class="footTxt dim">Cifras informativas · sujetas a aprobación</span>
   </footer>
@@ -1458,7 +1514,7 @@ function invRender(){
     const sold=c.estado==='vendido', hid=c.estado==='oculto';
     const meta=[c.anio?('Año '+c.anio):'', (c.color&&c.color!=='N/A')?c.color:'', c.version, c.transmision].filter(Boolean).join(' · ');
     return `<div class="cochecard${dim?' dim':''}">
-      <div class="cc-foto" style="${c.foto?`background-image:url('${c.foto}')`:''}">${c.foto?'':ICO.car}
+      <div class="cc-foto" style="${fotoDe(c).src?`background-image:url('${fotoDe(c).src}')`:''}">${fotoDe(c).src?(fotoDe(c).ref?'<span class="cc-ref">Referencia</span>':''):ICO.car}
         <span class="cc-estado"><i style="background:${e.c}"></i>${e.t}</span></div>
       <div class="cc-body">
         <div class="cc-nom">${logoMarca(c.marca,"cc-brand")}${esc(nombreCoche(c))}</div>
@@ -1639,6 +1695,12 @@ const I={
 const MARCA_SLUG={"Mercedez-Benz":"mercedes","Audi":"audi","Seat":"seat","Tesla":"tesla","Volkswaguen":"volkswagen",
   "Toyota":"toyota","MINI":"mini","MG":"mg","Chevrolet":"chevrolet","Renault":"renault","Ford":"ford",
   "BMW":"bmw","Kia":"kia","Ducati":"ducati","Jeep":"jeep"};
+/* Imágenes de referencia (Wikimedia Commons, licencias libres). [archivo,titulo,autor,licencia,fuente] */
+const IMG_REF={"seed1":["img/seed1.jpg","Mercedes-Benz GLE 450 4Matic Genf 2019 1Y7A5103.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Mercedes-Benz_GLE_450_4Matic_Genf_2019_1Y7A5103.jpg"],"seed2":["img/seed2.jpg","Audi Q3 1Y7A4914.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Audi_Q3_1Y7A4914.jpg"],"seed3":["img/seed3.jpg","Audi Q2 IMG 3835.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Audi_Q2_IMG_3835.jpg"],"seed4":["img/seed4.jpg","2019 SEAT Tarraco SE Tech TDi 4Drive SA 2.0 Front.jpg","Vauxford","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2019_SEAT_Tarraco_SE_Tech_TDi_4Drive_SA_2.0_Front.jpg"],"seed5":["img/seed5.jpg","2024 Tesla Cybertruck, Moab 02.jpg","A1C6","CC0","https://commons.wikimedia.org/wiki/File:2024_Tesla_Cybertruck,_Moab_02.jpg"],"seed6":["img/seed6.jpg","Volkswagen Tiguan R 1X7A0362.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Volkswagen_Tiguan_R_1X7A0362.jpg"],"seed7":["img/seed7.jpg","TOYOTA CAMRY (XV70) China.jpg","Dinkun Chen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:TOYOTA_CAMRY_(XV70)_China.jpg"],"seed8":["img/seed8.jpg","2021 Mini Hatch (F56) John Cooper Works 1X7A0150.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2021_Mini_Hatch_(F56)_John_Cooper_Works_1X7A0150.jpg"],"seed9":["img/seed9.jpg","MG 5 II 004.jpg","Jengtingchen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:MG_5_II_004.jpg"],"seed10":["img/seed10.jpg","Chevrolet Onix 20150814-DSC05650.JPG","Matti Blume","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Chevrolet_Onix_20150814-DSC05650.JPG"],"seed11":["img/seed11.jpg","Renault Koleos Initiale Paris, IAA 2017, Frankfurt (1Y7A3353).jpg","Matti Blume","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Renault_Koleos_Initiale_Paris,_IAA_2017,_Frankfurt_(1Y7A3353).jpg"],"seed12":["img/seed12.jpg","2019 Volkswagen Jetta au SIAM 2018.jpg","Bull-Doser","Public domain","https://commons.wikimedia.org/wiki/File:2019_Volkswagen_Jetta_au_SIAM_2018.jpg"],"seed13":["img/seed13.jpg","2021 Ford Bronco Wildtrak 4-door soft-top front close-up.jpg","Nathan Dimartino","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2021_Ford_Bronco_Wildtrak_4-door_soft-top_front_close-up.jpg"],"seed14":["img/seed14.jpg","Tesla Model Y Classic-Days 2022 DSC 0118.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Tesla_Model_Y_Classic-Days_2022_DSC_0118.jpg"],"seed15":["img/seed15.jpg","BMW 3 SERIES LWB SEDAN (G28) China (2).jpg","Dinkun Chen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:BMW_3_SERIES_LWB_SEDAN_(G28)_China_(2).jpg"],"seed16":["img/seed16.jpg","Kia K3.jpg","Rutger van der Maar","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Kia_K3.jpg"],"seed17":["img/seed17.jpg","Kia K3.jpg","Rutger van der Maar","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Kia_K3.jpg"],"seed18":["img/seed18.jpg","2015 Ducati Scrambler Icon right.JPG","Dennis Bratland","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2015_Ducati_Scrambler_Icon_right.JPG"],"seed19":["img/seed19.jpg","2018 Volkswagen Tiguan 12.2.17.jpg","Kevauto","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2018_Volkswagen_Tiguan_12.2.17.jpg"],"seed20":["img/seed20.jpg","2018 Volkswagen Tiguan 12.2.17.jpg","Kevauto","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2018_Volkswagen_Tiguan_12.2.17.jpg"],"seed21":["img/seed21.jpg","2020 Ford Explorer au SIAM 2019.jpg","Bull-Doser","Public domain","https://commons.wikimedia.org/wiki/File:2020_Ford_Explorer_au_SIAM_2019.jpg"],"seed22":["img/seed22.jpg","2022 BMW 4-Series M440i Coupé xDrive.jpg","Chanokchon","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2022_BMW_4-Series_M440i_Coup%C3%A9_xDrive.jpg"],"seed23":["img/seed23.jpg","Jeep Gladiator JT 2019 1.jpg","The Wikipeadian guy","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Jeep_Gladiator_JT_2019_1.jpg"],"seed24":["img/seed24.jpg","MERCEDES-BENZ C-CLASS LWB (V206) China.jpg","Dinkun Chen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:MERCEDES-BENZ_C-CLASS_LWB_(V206)_China.jpg"]};
+/* Foto real de la unidad si el lote la subió; si no, imagen de referencia del modelo */
+function fotoDe(c){ if(c.foto) return {src:c.foto, ref:false};
+  const r=IMG_REF[c.id]; return r? {src:r[0], ref:true} : {src:'', ref:false}; }
+
 function logoMarca(m,cls){ const s=MARCA_SLUG[m]; return s? '<svg class="bmark '+(cls||'')+'"><use href="#b-'+s+'"/></svg>' : ''; }
 
 const WIKI={
@@ -1711,7 +1773,7 @@ const AVISO_PRIVACIDAD=`
 Fundamento: Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).</p>`;
 
 const PB={screen:'hero',stepIdx:0,editor:false,bmin:0,bmax:0,uso:null,marcas:null,pago:null,
-  enganche:20,plazo:48,aval:null,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false,detalle:null,detPago:null};
+  enganche:20,plazo:48,aval:null,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false,creditos:false,menu:false,detalle:null,detPago:null};
 
 const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' Km';
 function pbCars(){ return invLoad().filter(c=>c.estado==='disponible'); }
@@ -1783,7 +1845,12 @@ function salirPub(){
   document.getElementById('app').style.display='block';
   irA('simulador');
 }
-function pbGo(s){ PB.screen=s; if(s==='quiz') PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
+function pbWhats(){ window.open('https://wa.me/'+NEGOCIO.telE164,'_blank'); }
+function pbLlamar(){ location.href='tel:+'+NEGOCIO.telE164; }
+function pbMapa(){ window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(NEGOCIO.direccion),'_blank'); }
+function pbMenu(f){ PB.menu = (f===undefined)? !PB.menu : !!f;
+  const m=$('navMenu'); if(m) m.classList.toggle('open', PB.menu); }
+function pbGo(s){ pbMenu(false); PB.screen=s; if(s==='quiz') PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
 function pbStart(){ PB.screen='quiz'; PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
 function pbRestart(){ PB.screen='hero'; PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
 function pbNext(){ if(!pbCanNext())return; const t=pbSteps().length;
@@ -1849,6 +1916,21 @@ function pbWiki(k){ PB.wiki=k; pbOverlay(); }
 function pbVideo(i){ PB.video=i; pbOverlay(); }
 function pbCloseModal(){ PB.wiki=null; PB.video=null; pbOverlay(); }
 function pbLegal(){ PB.legal=true; pbOverlay(); window.scrollTo(0,0); }
+function pbCreditos(){ PB.creditos=true; pbOverlay(); }
+function pbCreditosHTML(){
+  const filas=Object.entries(IMG_REF).map(([id,r])=>
+    `<div class="credRow"><a href="${r[4]}" target="_blank" rel="noopener noreferrer">${esc(r[1])}</a>
+      <span>${esc(r[2])} · ${esc(r[3])}</span></div>`).join('');
+  return `<div class="wikiTop"><span class="wikiTag">${I.info} Créditos de imágenes</span>
+      <button class="closeX" onclick="PB.creditos=false;pbOverlay()">${I.x}</button></div>
+    <div class="legalBody">
+      <p>Las fotografías de los vehículos son <b>imágenes de referencia del modelo</b>, no de la unidad específica en venta.
+        Provienen de <b>Wikimedia Commons</b> bajo licencias libres y fueron redimensionadas.
+        Para ver fotos reales de la unidad, contáctanos.</p>
+      <div class="credList">${filas}</div>
+      <p class="legal-fecha">Cada obra es de su autor. Licencias CC BY / CC BY-SA / CC0 / dominio público.</p>
+    </div>`;
+}
 
 /* ---------- Desglose de la cotización en pantalla (sin salir a un PDF) ---------- */
 function pbDetalle(id){ PB.detalle=id; PB.detPago=PB.pago||'sinburo'; pbOverlay(); }
@@ -1966,6 +2048,11 @@ function pbNosotros(){
 
 function pbOverlay(){
   const o=$('pubOverlay');
+  if(PB.creditos){
+    o.innerHTML=`<div class="overlay" onclick="PB.creditos=false;pbOverlay()">
+      <div class="legalCard" onclick="event.stopPropagation()">${pbCreditosHTML()}</div></div>`;
+    return;
+  }
   if(PB.detalle){
     o.innerHTML=`<div class="overlay" onclick="pbCerrarDetalle()">
       <div class="detCard" onclick="event.stopPropagation()">${pbDetalleHTML()}</div></div>`;
@@ -2184,8 +2271,9 @@ function pbResults(){
     <div class="grid gridCars">${list.map(v=>{
       const men=pbMens(v.precio,PB.pago,PB.enganche,PB.plazo);
       return `<article class="carCard">
-        <div class="carImg">${v.foto?`<img src="${v.foto}" alt="${esc(nombreCoche(v))}">`
-          :`<div class="carImgPh">${I.car}<span>${esc(v.marca||'')}</span></div>`}
+        <div class="carImg">${(()=>{const f=fotoDe(v); return f.src
+            ? `<img src="${f.src}" alt="${esc(nombreCoche(v))}" loading="lazy">${f.ref?'<span class="refTag">Imagen de referencia</span>':''}`
+            : `<div class="carImgPh">${I.car}<span>${esc(v.marca||'')}</span></div>`;})()}
           <span class="carYearTag">${v.anio||''}</span>
           ${logoMarca(v.marca)?`<span class="carBrand">${logoMarca(v.marca)}</span>`:''}</div>
         <div class="carBody">
