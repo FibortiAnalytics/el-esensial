@@ -4,9 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Seguridad: sólo se permite el propio código en línea; nada externo puede cargarse ni inyectarse -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <title>EL ESENSIAL · Simulador y Catálogo</title>
 <style>
   :root{
@@ -281,89 +284,279 @@
   #usrModal{position:fixed;inset:0;z-index:120;background:rgba(13,13,15,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
   #usrModal.show{display:flex}
 
-  /* ===== Cotizador guiado (versión pública) ===== */
-  .pub-header{display:none;align-items:center;gap:14px;justify-content:center;padding:24px 16px;background:var(--negro);margin:-24px -22px 26px}
-  body.modo-publico .pub-header{display:flex}
-  body.modo-publico .ee-sidebar,body.modo-publico .ee-topbar,body.modo-publico .ee-hero,body.modo-publico .ee-backdrop,body.modo-publico .int-only{display:none!important}
-  body.modo-publico .ee-main{margin-left:0;padding-top:0}
-  .pub-header .carlogo{width:104px;height:auto}
-  .pub-header .wordmark{font-size:21px}
-  /* Barra de modo editor */
-  .wz-editbar{background:#fff;border:1px solid #e6e8ec;border-radius:10px;padding:14px 16px;margin-bottom:20px}
-  .eb-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-  .eb-t{font-size:14px;font-weight:600;color:var(--tinta)}
-  .eb-s{font-size:12.5px;color:var(--gris);margin-top:2px}
-  .eb-toggle{height:38px;padding:0 16px;border:1px solid #e6e8ec;background:#fff;color:var(--tinta-2);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
-  .eb-toggle:hover{border-color:#c9ccd2}
-  .eb-toggle.on{background:var(--tinta);border-color:var(--tinta);color:#fff}
-  .eb-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid #eceef1}
-  .eb-tools button{height:36px;padding:0 14px;border:1px solid #e6e8ec;background:#fff;border-radius:8px;font-size:12.5px;font-weight:600;color:var(--tinta-2);cursor:pointer;font-family:inherit;transition:.15s}
-  .eb-tools button:hover{border-color:#c9ccd2;color:var(--tinta)}
-  /* Datos internos visibles solo en modo editor */
-  .ed-row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:9px 14px;margin-top:8px;background:#fffbeb;border:1px dashed #e2cb84;border-radius:8px}
-  .ed-row span{color:#8a6d1f;font-weight:600}
-  .ed-row b{color:#5c4708;font-weight:700}
-  .wz.editor .wz-card{border-color:#e2cb84}
-  .wz-step.clic{cursor:pointer;border:none;padding:0}
-  .wz-step.clic:hover{background:#b9bdc4}
+  /* ===================== EXPERIENCIA PÚBLICA (referencia Le Motors, acento ROJO) ===================== */
+  #pub{position:fixed;inset:0;z-index:90;overflow-y:auto;display:none}
+  #pub.on{display:block}
+  body.pub-open{overflow:hidden}
+  .esn{
+    --acid:#E11D2A; --acid-2:#ff3b48; --acid-dim:rgba(225,29,42,.15); --acid-ink:#fff;
+    --bg:#080908; --panel:#101210; --panel2:#161915;
+    --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.14);
+    --txt:#F3F5F1; --muted:#8A9086;
+    font-family:'Archivo',system-ui,sans-serif;
+    background:var(--bg); color:var(--txt); min-height:100vh; width:100%; -webkit-font-smoothing:antialiased;
+  }
+  .esn *{box-sizing:border-box;margin:0}
+  .esn button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .esn input{font-family:inherit}
+  .esn .acc{color:var(--acid)}
+
+  /* Barra de editor */
+  .esn .edbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 20px;background:#1b1206;border-bottom:1px solid #4a3410}
+  .esn .edbar span{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#f0b429;margin-right:6px}
+  .esn .edbar button{border:1px solid #4a3410;background:#241806;color:#f6d27a;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700}
+  .esn .edbar button:hover{border-color:#f0b429;color:#fff}
+
+  /* NAV */
+  .esn .nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
+    padding:14px 26px;background:rgba(8,9,8,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .esn .logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+  .esn .logoMark{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;background:var(--acid);color:#fff;box-shadow:0 0 16px rgba(225,29,42,.5)}
+  .esn .logoMark svg{width:19px;height:19px}
+  .esn .logoTxt{font-weight:600;letter-spacing:.14em;font-size:14px}
+  .esn .logoTxt b{font-weight:900}
+  .esn .navLinks{display:flex;gap:26px}
+  .esn .navLinks a{font-size:14px;font-weight:600;color:var(--txt);opacity:.85;cursor:pointer;transition:.2s}
+  .esn .navLinks a:hover{color:var(--acid);opacity:1}
+  .esn .navIcons{display:flex;gap:8px}
+  .esn .ni{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;border:1px solid var(--line2);color:var(--txt);transition:.2s;cursor:pointer}
+  .esn .ni:hover{border-color:var(--acid);color:var(--acid)}
+  .esn .ni svg{width:17px;height:17px}
+
+  /* HERO */
+  .esn .hero{position:relative;overflow:hidden;padding:70px 26px 60px;min-height:calc(100vh - 60px)}
+  .esn .heroBg{position:absolute;inset:0;
+    background:radial-gradient(90% 70% at 78% 8%, rgba(225,29,42,.12), transparent 55%),
+      radial-gradient(120% 90% at 10% 100%, rgba(225,29,42,.07), transparent 60%),
+      var(--hero-img, linear-gradient(115deg,#0c0e0c 0%,#0a0b0a 40%,#060706 100%));
+    background-size:cover;background-position:center}
+  .esn .heroBg:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,9,8,.35),rgba(8,9,8,.9))}
+  .esn .heroScan{position:absolute;left:0;right:0;height:2px;top:0;z-index:1;
+    background:linear-gradient(90deg,transparent,rgba(225,29,42,.7),transparent);animation:scan 6s linear infinite;opacity:.5}
+  @keyframes scan{0%{top:8%}50%{top:70%}100%{top:8%}}
+  .esn .heroInner{position:relative;z-index:2;max-width:1120px;margin:0 auto}
+  .esn .eyebrow{color:var(--acid);font-weight:700;letter-spacing:.22em;font-size:13px;margin-bottom:16px}
+  .esn .heroTitle{font-size:clamp(42px,8vw,88px);font-weight:900;line-height:.94;letter-spacing:-.02em;text-transform:uppercase}
+  .esn .heroTitle .acc{position:relative;display:inline-block}
+  .esn .heroTitle .acc:after{content:'';position:absolute;left:0;right:0;bottom:6px;height:6px;background:var(--acid);border-radius:3px;
+    box-shadow:0 0 18px rgba(225,29,42,.7);animation:grow .8s .3s both ease-out;transform-origin:left}
+  @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  .esn .heroSub{max-width:520px;margin-top:22px;color:#cfd4cb;font-size:16px;line-height:1.6}
+  .esn .heroSub b{color:var(--txt);font-weight:700}
+  .esn .heroCtas{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+  .esn .videoLead{margin-top:46px;color:var(--muted);font-size:13px;font-weight:600}
+  .esn .videoRow{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px;max-width:760px}
+  .esn .videoCard{text-align:left;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel);transition:.25s}
+  .esn .videoCard:hover{border-color:var(--acid);transform:translateY(-3px)}
+  .esn .videoThumb{position:relative;aspect-ratio:16/9;
+    background:linear-gradient(135deg,#14171400,#0c0e0c),repeating-linear-gradient(45deg,#0e100e,#0e100e 10px,#111311 10px,#111311 20px);
+    display:grid;place-items:center}
+  .esn .playBtn{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--acid);color:#fff;
+    box-shadow:0 0 22px rgba(225,29,42,.55);transition:.2s}
+  .esn .videoCard:hover .playBtn{transform:scale(1.08)}
+  .esn .videoMeta{padding:11px 13px;display:flex;flex-direction:column;gap:2px}
+  .esn .videoT{font-weight:700;font-size:13.5px}
+  .esn .videoS{font-size:12px;color:var(--muted)}
+
+  /* BOTONES */
+  .esn .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px;
+    padding:12px 20px;border-radius:11px;transition:.2s}
+  .esn .btn svg{width:17px;height:17px}
+  .esn .btn.big{padding:15px 26px;font-size:15px}
+  .esn .btn.full{width:100%}
+  .esn .btnPrimary{background:var(--acid);color:#fff;box-shadow:0 0 0 1px rgba(225,29,42,.4),0 8px 24px rgba(225,29,42,.22)}
+  .esn .btnPrimary:hover{filter:brightness(1.12);transform:translateY(-1px)}
+  .esn .btnPrimary:disabled{opacity:.35;cursor:not-allowed;transform:none;filter:none}
+  .esn .btnGhost{border:1px solid var(--line2);color:var(--txt)}
+  .esn .btnGhost:hover{border-color:var(--acid);color:var(--acid)}
+
+  /* QUIZ */
+  .esn .quizWrap{display:grid;grid-template-columns:1fr 300px;gap:26px;max-width:1120px;margin:0 auto;padding:38px 26px 60px}
+  .esn .quizMain{min-width:0}
+  .esn .progress{margin-bottom:30px}
+  .esn .progressTop{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--muted);
+    font-family:'Space Mono',monospace;letter-spacing:.04em;margin-bottom:9px}
+  .esn .progressPct{color:var(--acid)}
+  .esn .bar{height:5px;background:var(--panel2);border-radius:4px;overflow:hidden}
+  .esn .barFill{height:100%;background:var(--acid);border-radius:4px;box-shadow:0 0 12px rgba(225,29,42,.6);transition:width .45s cubic-bezier(.4,0,.2,1)}
+  .esn .stepIn{animation:fadeUp .45s cubic-bezier(.16,1,.3,1) both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .esn .stepHead{display:flex;gap:16px;margin-bottom:26px}
+  .esn .stepNum{font-family:'Space Mono',monospace;font-size:15px;color:var(--acid);font-weight:700;padding-top:6px}
+  .esn .stepTitle{font-size:clamp(22px,3.4vw,30px);font-weight:800;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .esn .stepSub{color:var(--muted);font-size:14.5px;margin-top:5px;line-height:1.5}
+
+  .esn .grid{display:grid;gap:12px}
+  .esn .grid5{grid-template-columns:repeat(5,1fr)}
+  .esn .grid3{grid-template-columns:repeat(3,1fr)}
+  .esn .gridBrands{grid-template-columns:repeat(4,1fr)}
+  .esn .optBlock{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+    min-height:132px;padding:18px 16px;border:1px solid var(--line);border-radius:15px;background:var(--panel);text-align:left;transition:.2s}
+  .esn .optBlock:hover{border-color:var(--line2);transform:translateY(-3px);background:var(--panel2)}
+  .esn .optOn{border-color:var(--acid);background:linear-gradient(180deg,rgba(225,29,42,.10),rgba(225,29,42,.02));
+    box-shadow:0 0 0 1px var(--acid),0 10px 30px rgba(225,29,42,.14)}
+  .esn .optIcon{display:grid;place-items:center;width:42px;height:42px;border-radius:11px;background:var(--panel2);color:var(--acid);border:1px solid var(--line)}
+  .esn .optIcon svg{width:22px;height:22px}
+  .esn .optOn .optIcon{background:var(--acid);color:#fff;border-color:transparent}
+  .esn .optTitle{font-weight:800;font-size:15px;margin-top:auto}
+  .esn .optSub{font-size:12.5px;color:var(--muted);line-height:1.35}
+  .esn .optCheck{position:absolute;top:12px;right:12px;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--acid);color:#fff}
+  .esn .optCheck svg{width:13px;height:13px}
+  .esn .optInfo{position:absolute;top:12px;right:12px;display:grid;place-items:center;width:24px;height:24px;border-radius:7px;color:var(--muted);border:1px solid var(--line)}
+  .esn .optInfo svg{width:13px;height:13px}
+  .esn .optInfo:hover{color:var(--acid);border-color:var(--acid)}
+  .esn .optOn .optInfo{right:42px}
+
+  /* PRESUPUESTO */
+  .esn .budgetBox{border:1px solid var(--line);border-radius:18px;padding:26px;background:var(--panel);
+    box-shadow:0 0 0 1px rgba(225,29,42,.25),0 0 40px rgba(225,29,42,.10)}
+  .esn .budgetVals{display:flex;align-items:center;gap:18px;margin-bottom:24px}
+  .esn .bVal{display:flex;flex-direction:column}
+  .esn .bVal span{font-size:12px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+  .esn .bVal b{font-size:26px;font-weight:900;font-family:'Space Mono',monospace}
+  .esn .bDash{flex:1;height:1px;background:var(--line2)}
+  .esn .rangeGroup{display:flex;flex-direction:column;gap:6px}
+  .esn .rLabel{font-size:11px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-top:8px}
+  .esn .matchHint{display:inline-flex;align-items:center;gap:7px;margin-top:20px;font-size:13px;font-weight:700;color:var(--acid)}
+  .esn .matchHint svg{width:15px;height:15px}
+  .esn input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:4px;background:var(--panel2);outline:none;border:none;padding:0}
+  .esn input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;
+    background:var(--acid);cursor:pointer;box-shadow:0 0 0 4px rgba(225,29,42,.2),0 0 14px rgba(225,29,42,.5);transition:.15s}
+  .esn input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.12)}
+  .esn input[type=range]::-moz-range-thumb{width:20px;height:20px;border:none;border-radius:50%;background:var(--acid);cursor:pointer}
+
+  /* FINANCIAMIENTO */
+  .esn .finGrid{display:grid;grid-template-columns:1fr 300px;gap:16px}
+  .esn .finControls{border:1px solid var(--line);border-radius:16px;padding:24px;background:var(--panel)}
+  .esn .finRow{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .esn .finLabel{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .esn .finBig{font-family:'Space Mono',monospace;font-size:20px;color:var(--acid)}
+  .esn .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .esn .chip{padding:9px 15px;border:1px solid var(--line2);border-radius:9px;font-weight:700;font-size:13px;color:var(--muted);transition:.15s}
+  .esn .chip:hover{border-color:var(--acid);color:var(--txt)}
+  .esn .chipOn{background:var(--acid);color:#fff;border-color:transparent}
+  .esn .estCard{border:1px solid var(--acid);border-radius:16px;padding:22px;
+    background:linear-gradient(180deg,rgba(225,29,42,.12),rgba(225,29,42,.02));display:flex;flex-direction:column;gap:5px}
+  .esn .estLbl{font-size:12.5px;color:#e6cfcf;font-weight:600;display:flex;align-items:center;gap:6px}
+  .esn .estNum{font-family:'Space Mono',monospace;font-size:38px;font-weight:700;color:var(--acid);line-height:1;margin:6px 0}
+  .esn .estNote{font-size:12px;color:var(--muted)}
+  .esn .estFoot{display:flex;flex-direction:column;gap:3px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--muted)}
+  .esn .link{color:var(--acid);text-decoration:underline;font-weight:700;padding:0}
+
+  /* CONTACTO */
+  .esn .formGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:560px}
+  .esn .field{display:flex;flex-direction:column;gap:7px}
+  .esn .field span{font-size:12.5px;font-weight:700;color:var(--muted)}
+  .esn .field input{padding:13px 15px;border:1px solid var(--line2);border-radius:11px;background:var(--panel);color:var(--txt);font-size:15px;transition:.15s;width:100%}
+  .esn .field input:focus{outline:none;border-color:var(--acid);box-shadow:0 0 0 3px rgba(225,29,42,.15)}
+  .esn .privacy{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:12.5px;color:var(--muted)}
+  .esn .privacy svg{width:14px;height:14px}
+  .esn .stepNav{display:flex;justify-content:space-between;gap:12px;margin-top:34px;padding-top:22px;border-top:1px solid var(--line)}
+
+  /* RESUMEN */
+  .esn .summary{align-self:start;position:sticky;top:88px;border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--panel)}
+  .esn .sumTitle{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .esn .sumRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .esn .sumRow span{color:var(--muted)}
+  .esn .sumRow b{font-weight:700;text-align:right}
+  .esn .sumEst{display:flex;flex-direction:column;gap:2px;margin-top:14px;padding:13px;border-radius:12px;background:var(--acid-dim);border:1px solid rgba(225,29,42,.3)}
+  .esn .sumEst span{font-size:11.5px;color:#e6bfbf}
+  .esn .sumEst b{font-family:'Space Mono',monospace;font-size:22px;color:var(--acid)}
+  .esn .sumMatch{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:13px;font-weight:700;color:var(--acid)}
+  .esn .sumMatch svg{width:16px;height:16px}
+
+  /* RESULTADOS */
+  .esn .results{max-width:1120px;margin:0 auto;padding:44px 26px 60px}
+  .esn .resHead{margin-bottom:28px}
+  .esn .resTitle{font-size:clamp(30px,5vw,46px);font-weight:900;letter-spacing:-.02em;text-transform:uppercase;margin-top:8px}
+  .esn .resSub{color:var(--muted);font-size:14px;margin-top:8px;font-family:'Space Mono',monospace}
+  .esn .gridCars{grid-template-columns:repeat(3,1fr)}
+  .esn .carCard{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);transition:.25s;display:flex;flex-direction:column}
+  .esn .carCard:hover{border-color:var(--acid);transform:translateY(-4px);box-shadow:0 14px 40px rgba(0,0,0,.4)}
+  .esn .carImg{position:relative;aspect-ratio:16/10;overflow:hidden}
+  .esn .carImg img{width:100%;height:100%;object-fit:cover}
+  .esn .carImgPh{width:100%;height:100%;display:grid;place-items:center;align-content:center;gap:6px;color:var(--muted);
+    background:repeating-linear-gradient(45deg,#0e100e,#0e100e 12px,#121412 12px,#121412 24px)}
+  .esn .carImgPh svg{width:44px;height:44px}
+  .esn .carImgPh span{font-weight:800;letter-spacing:.1em;font-size:13px}
+  .esn .carYearTag{position:absolute;top:12px;left:12px;background:var(--acid);color:#fff;font-weight:800;font-size:12px;padding:4px 10px;border-radius:7px}
+  .esn .carBody{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1}
+  .esn .carName{font-size:16px;font-weight:800;letter-spacing:-.01em}
+  .esn .carSpecs{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .esn .carSpecs span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+  .esn .carSpecs svg{width:13px;height:13px;flex:none}
+  .esn .carPriceRow{display:flex;align-items:flex-end;justify-content:space-between;margin-top:auto;padding-top:8px;border-top:1px solid var(--line)}
+  .esn .carPrice{font-family:'Space Mono',monospace;font-size:22px;font-weight:700}
+  .esn .carMonthly{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:var(--acid);text-align:right}
+  .esn .carMonthly small{display:block;font-size:10px;color:var(--muted);font-family:'Archivo'}
+  .esn .carActs{display:grid;grid-template-columns:1fr auto;gap:8px}
+  .esn .carPdf{border:1px solid var(--line2);border-radius:11px;padding:0 14px;color:var(--txt);font-weight:700;font-size:13px}
+  .esn .carPdf:hover{border-color:var(--acid);color:var(--acid)}
+  .esn .resFoot{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
+
+  /* FOOTER */
+  .esn .foot{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:26px;border-top:1px solid var(--line);margin-top:20px}
+  .esn .footBrand{display:flex;align-items:center;gap:8px;font-weight:600;letter-spacing:.1em;font-size:13px}
+  .esn .footBrand b{font-weight:900}
+  .esn .footTxt{font-size:12.5px;color:var(--muted)}
+  .esn .footTxt.dim{opacity:.6;margin-left:auto}
+
+  /* INFO CHIP */
+  .esn .infoChip{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;border:1px solid var(--line2);color:var(--muted);vertical-align:middle}
+  .esn .infoChip svg{width:13px;height:13px}
+  .esn .infoChip:hover{border-color:var(--acid);color:var(--acid)}
+  .esn .infoLight{border-color:rgba(225,29,42,.4);color:var(--acid)}
+
+  /* MODALES */
+  .esn .overlay{position:fixed;inset:0;z-index:100;background:rgba(4,5,4,.75);backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:fade .2s both}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .esn .wikiCard{max-width:420px;width:100%;border:1px solid var(--line2);border-radius:18px;padding:22px;background:var(--panel2);animation:pop .3s cubic-bezier(.16,1,.3,1) both}
+  @keyframes pop{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:none}}
+  .esn .wikiTop{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .esn .wikiTag{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--acid)}
+  .esn .wikiTag svg{width:14px;height:14px}
+  .esn .closeX{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;color:var(--muted)}
+  .esn .closeX svg{width:18px;height:18px}
+  .esn .closeX:hover{background:var(--panel);color:var(--txt)}
+  .esn .wikiT{font-size:19px;font-weight:800;margin-bottom:8px}
+  .esn .wikiD{font-size:14px;line-height:1.6;color:#cfd4cb}
+  .esn .videoModal{max-width:720px;width:100%;border:1px solid var(--line2);border-radius:18px;padding:18px;background:var(--panel2);animation:pop .3s both}
+  .esn .videoFrame{aspect-ratio:16/9;border-radius:12px;overflow:hidden}
+  .esn .videoFrame iframe{width:100%;height:100%;border:none}
+  .esn .videoPh{width:100%;height:100%;display:grid;place-items:center;align-content:center;gap:8px;color:var(--muted);
+    background:repeating-linear-gradient(45deg,#0e100e,#0e100e 14px,#121412 14px,#121412 28px)}
+  .esn .videoPh svg{width:40px;height:40px}
+  .esn .videoPh span{font-weight:700;font-size:14px}
+  .esn .videoPh small{font-size:12px;opacity:.7}
+
+  /* RESPONSIVE */
+  @media(max-width:920px){
+    .esn .quizWrap{grid-template-columns:1fr}
+    .esn .summary{position:relative;top:0;order:-1}
+    .esn .finGrid{grid-template-columns:1fr}
+    .esn .grid5{grid-template-columns:repeat(2,1fr)}
+    .esn .grid3{grid-template-columns:1fr}
+    .esn .gridBrands{grid-template-columns:repeat(2,1fr)}
+    .esn .gridCars{grid-template-columns:1fr 1fr}
+    .esn .videoRow{grid-template-columns:1fr;max-width:none}
+    .esn .navLinks{display:none}
+  }
+  @media(max-width:560px){
+    .esn .gridCars{grid-template-columns:1fr}
+    .esn .formGrid{grid-template-columns:1fr}
+    .esn .budgetVals{flex-direction:column;align-items:flex-start;gap:10px}
+    .esn .bDash{display:none}
+    .esn .heroCtas{flex-direction:column}
+    .esn .heroCtas .btn{width:100%}
+    .esn .hero{padding:44px 18px}
+    .esn .quizWrap,.esn .results{padding:26px 16px 48px}
+  }
+
+  /* Ajustes (modal editor) */
   .cfg-sec{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);font-weight:700;margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid #eceef1}
   #cfgModal{position:fixed;inset:0;z-index:120;background:rgba(13,13,15,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
   #cfgModal.show{display:flex}
 
-  .wz{max-width:720px;margin:0 auto}
-  .wz-steps{display:flex;gap:6px;margin-bottom:10px}
-  .wz-step{flex:1;height:3px;border-radius:2px;background:#e6e8ec}
-  .wz-step.on{background:var(--rojo)}
-  .wz-cnt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris);font-weight:600;margin-bottom:16px}
-  .wz-card{background:#fff;border:1px solid #e6e8ec;border-radius:12px;padding:26px}
-  .wz-h{font-size:21px;font-weight:600;color:var(--tinta);letter-spacing:-.01em}
-  .wz-p{font-size:13.5px;color:var(--gris);margin:5px 0 22px}
-  .wz-nav{display:flex;gap:10px;margin-top:26px;padding-top:20px;border-top:1px solid #e6e8ec}
-  .wz-back{padding:0 20px;height:44px;border:1px solid #e6e8ec;background:#fff;border-radius:8px;font-size:14px;font-weight:600;color:var(--tinta-2);cursor:pointer;font-family:inherit}
-  .wz-back:hover{border-color:#c9ccd2}
-  .wz-next{flex:1;height:44px;border:none;border-radius:8px;background:var(--rojo);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
-  .wz-next:hover{background:var(--rojo-2)}
-  .wz-next:disabled{background:#d8dade;cursor:not-allowed}
-  .wz-cars{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:10px;max-height:430px;overflow-y:auto;padding-right:2px}
-  .wz-car{border:1px solid #e6e8ec;border-radius:10px;padding:13px;cursor:pointer;transition:.15s;background:#fff;text-align:left;font-family:inherit}
-  .wz-car:hover{border-color:#c9ccd2}
-  .wz-car.sel{border-color:var(--rojo);box-shadow:inset 0 0 0 1px var(--rojo)}
-  .wz-car .n{font-size:13.5px;font-weight:600;color:var(--tinta);line-height:1.3}
-  .wz-car .m{font-size:11.5px;color:var(--gris);margin-top:2px}
-  .wz-car .p{font-size:15px;font-weight:700;color:var(--tinta);margin-top:8px}
-  .wz-chips{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
-  .wz-chip{border:1px solid #e6e8ec;background:#fff;border-radius:9px;padding:12px 8px;cursor:pointer;text-align:center;transition:.15s;font-family:inherit}
-  .wz-chip:hover{border-color:#c9ccd2}
-  .wz-chip.sel{border-color:var(--rojo);box-shadow:inset 0 0 0 1px var(--rojo)}
-  .wz-chip .t{font-size:15px;font-weight:700;color:var(--tinta)}
-  .wz-chip .s{font-size:11px;color:var(--gris);margin-top:3px}
-  .wz-info{margin-top:18px;background:#f7f8fa;border:1px solid #e6e8ec;border-radius:9px;padding:6px 14px}
-  .wz-info div{display:flex;justify-content:space-between;font-size:13px;padding:7px 0;border-bottom:1px solid #eceef1}
-  .wz-info div:last-child{border-bottom:none}
-  .wz-info span{color:var(--gris)}
-  .wz-info b{color:var(--tinta);font-weight:600}
-  .wz-opts{display:grid;gap:8px}
-  .wz-opt{border:1px solid #e6e8ec;border-radius:9px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;background:#fff;transition:.15s;text-align:left;font-family:inherit;width:100%}
-  .wz-opt:hover{border-color:#c9ccd2}
-  .wz-opt.sel{border-color:var(--rojo)}
-  .wz-opt .rad{width:18px;height:18px;border-radius:50%;border:1.5px solid #c9ccd2;flex:none;position:relative}
-  .wz-opt.sel .rad{border-color:var(--rojo)}
-  .wz-opt.sel .rad:after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--rojo)}
-  .wz-opt .ot{font-size:13.5px;font-weight:600;color:var(--tinta)}
-  .wz-opt .os{font-size:12px;color:var(--gris);margin-top:1px}
-  .wz-res{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
-  .wz-big{background:var(--tinta);color:#fff;border-radius:10px;padding:20px;text-align:center}
-  .wz-big.g{background:#0f7a53}
-  .wz-big .l{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.8;font-weight:600}
-  .wz-big .v{font-size:27px;font-weight:700;margin-top:6px;letter-spacing:-.02em}
-  .wz-big .s{font-size:12px;opacity:.65;margin-top:3px}
-  .wz-acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
-  .wz-acts button{height:44px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid #e6e8ec;background:#fff;color:var(--tinta-2)}
-  .wz-acts .pdf{background:var(--rojo);border-color:var(--rojo);color:#fff}
-  .wz-acts .pdf:hover{background:var(--rojo-2)}
-  .wz-acts .wa{background:#25d366;border-color:#25d366;color:#0a2e1a}
-  .wz-tab{max-height:280px;overflow-y:auto;border:1px solid #e6e8ec;border-radius:9px;margin-top:16px}
-  @media(max-width:560px){.wz-res,.wz-acts{grid-template-columns:1fr}.wz-card{padding:20px 16px}.pub-header{margin:-18px -14px 20px}}
 
   /* ===== Documento PDF de cotización ===== */
   #printDoc{display:none;color:#111;font-size:12px;padding:0}
@@ -441,7 +634,7 @@
     <nav class="ee-nav">
       <div class="ee-navsec">Herramientas</div>
       <div class="ee-navitem active" data-page="simulador" onclick="irA('simulador')"><span class="ic">🧮</span><span>Simulador interno</span></div>
-      <div class="ee-navitem" data-page="cotizador" onclick="irA('cotizador')"><span class="ic">📄</span><span>Cotizador guiado</span></div>
+      <div class="ee-navitem" onclick="mostrarPub(true)"><span class="ic">📄</span><span>Cotizador público</span></div>
       <div class="ee-navitem" data-page="inventario" onclick="irA('inventario')"><span class="ic">🚗</span><span>Inventario de coches</span></div>
       <div class="ee-navsec">Administración</div>
       <div class="ee-navitem" data-page="usuarios" onclick="irA('usuarios')"><span class="ic">👥</span><span>Usuarios y perfiles</span></div>
@@ -605,39 +798,6 @@
       </div>
     </section>
 
-    <!-- ========== PÁGINA: COTIZADOR GUIADO (público) ========== -->
-    <section id="page-cotizador" class="ee-page" hidden>
-      <div class="pub-header">
-        <svg class="carlogo"><use href="#ee-car"/></svg>
-        <span class="wordmark">EL ESENSIAL</span>
-      </div>
-      <div class="wz">
-        <div class="wz-editbar int-only">
-          <div class="eb-top">
-            <div>
-              <div class="eb-t">Vista del prospecto</div>
-              <div class="eb-s">Así lo ve un cliente. Activa el modo editor para controlar cada sección.</div>
-            </div>
-            <button class="eb-toggle" id="wzEdBtn" onclick="wzToggleEditor()">○ Activar modo editor</button>
-          </div>
-          <div class="eb-tools" id="wzEdTools" style="display:none">
-            <button onclick="cfgAbrir()">⚙ Ajustes del cotizador</button>
-            <button onclick="wzAlSimulador()">🧮 Abrir en simulador interno</button>
-            <button onclick="wzReset()">↺ Reiniciar</button>
-            <button onclick="window.open('?publico=1','_blank')">Ver como prospecto ↗</button>
-          </div>
-        </div>
-        <div class="wz-steps" id="wzSteps"></div>
-        <div class="wz-cnt" id="wzCnt"></div>
-        <div class="wz-card">
-          <div id="wzBody"></div>
-          <div class="wz-nav" id="wzNav">
-            <button class="wz-back" id="wzBack" onclick="wzIr(-1)">Atrás</button>
-            <button class="wz-next" id="wzNext" onclick="wzIr(1)">Continuar</button>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <!-- ========== PÁGINA: INVENTARIO ========== -->
     <section id="page-inventario" class="ee-page" hidden>
@@ -721,6 +881,8 @@
       <div class="campo"><label>Estado</label><select id="fEstado"><option value="disponible">Disponible</option><option value="vendido">Vendido</option><option value="oculto">Oculto</option></select></div>
       <div class="campo"><label>Notas <span class="hint">(opcional)</span></label><input type="text" id="fNotas" placeholder="Ej: único dueño, factura original"></div>
     </div>
+    <div class="campo"><label>Etiquetas de uso <span class="hint">(para el cotizador: familiar, ciudad, pickup, lujo, offroad)</span></label>
+      <input type="text" id="fTags" placeholder="familiar, ciudad"></div>
     <div class="mfoot">
       <button class="m-cancel" onclick="invCerrar()">Cancelar</button>
       <button class="m-save" onclick="invGuardar()">💾 Guardar coche</button>
@@ -728,42 +890,84 @@
   </div>
 </div>
 
+<!-- ===================== EXPERIENCIA PÚBLICA ===================== -->
+<div id="pub" class="esn">
+  <div class="edbar" id="pubEdbar" style="display:none">
+    <span>● Modo editor</span>
+    <button onclick="pbCfg()">⚙ Ajustes</button>
+    <button onclick="pbAlSimulador()">🧮 Abrir en simulador interno</button>
+    <button onclick="window.open('?publico=1','_blank')">Ver como prospecto ↗</button>
+    <button onclick="salirPub()">← Volver al panel</button>
+  </div>
+
+  <header class="nav">
+    <div class="logo" onclick="pbRestart()" role="button">
+      <span class="logoMark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.6-4.2A2 2 0 0 1 8.5 5.5h7a2 2 0 0 1 1.9 1.3L19 11"/><path d="M3.5 11h17a1 1 0 0 1 1 1v4h-2m-14 0h-2v-4a1 1 0 0 1 1-1"/><circle cx="7.5" cy="16.4" r="1.5"/><circle cx="16.5" cy="16.4" r="1.5"/></svg></span>
+      <span class="logoTxt">EL <b>ESENSIAL</b></span>
+    </div>
+    <nav class="navLinks">
+      <a onclick="pbGo('results')">Catálogo</a>
+      <a onclick="pbStart()">Financiamiento</a>
+      <a onclick="pbWiki('seminuevo')">Servicios</a>
+    </nav>
+    <div class="navIcons">
+      <span class="ni" onclick="pbGo('results')" title="Catálogo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.9 8.4 8.4 0 0 1 8.4-9 8.4 8.4 0 0 1 8.6 8.4z"/></svg></span>
+      <span class="ni" title="Llámanos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7A2 2 0 0 1 22 16.9z"/></svg></span>
+      <span class="ni" title="Ubicación"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+    </div>
+  </header>
+
+  <div id="pubScreen"></div>
+
+  <footer class="foot">
+    <div class="footBrand"><span class="logoMark" style="width:26px;height:26px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 11l1.6-4.2A2 2 0 0 1 8.5 5.5h7a2 2 0 0 1 1.9 1.3L19 11"/><path d="M3.5 11h17a1 1 0 0 1 1 1v4h-2m-14 0h-2v-4a1 1 0 0 1 1-1"/></svg></span> EL <b>ESENSIAL</b></div>
+    <span class="footTxt">Seminuevos certificados</span>
+    <span class="footTxt dim">Cifras informativas · sujetas a aprobación de la financiera</span>
+  </footer>
+
+  <div id="pubOverlay"></div>
+</div>
+
 <!-- Ajustes del cotizador (solo editor) -->
 <div id="cfgModal">
   <div class="inv-form">
-    <h3>Ajustes del cotizador</h3>
-    <div class="msub">Controla los valores y los textos que ve el prospecto en cada paso.</div>
+    <h3>Ajustes del cotizador público</h3>
+    <div class="msub">Controla el esquema, las tasas, el presupuesto inicial y los videos.</div>
 
-    <div class="cfg-sec">Valores</div>
+    <div class="cfg-sec">Financiamiento</div>
     <div class="campo"><label>Esquema de interés</label>
       <select id="cEsquema">
         <option value="fijo">Interés fijo (add-on)</option>
         <option value="insoluto">Saldo insoluto (francesa)</option>
       </select></div>
     <div class="fila2">
+      <div class="campo"><label>Tasa crédito bancario</label><div class="inbox"><input type="number" id="cTasaBanc" class="has-suf" min="0" step="0.1"><span class="suf">%</span></div></div>
+      <div class="campo"><label>Tasa sin buró</label><div class="inbox"><input type="number" id="cTasaSB" class="has-suf" min="0" step="0.1"><span class="suf">%</span></div></div>
+    </div>
+    <div class="fila2">
       <div class="campo"><label>Seguro anual</label><div class="inbox"><span class="pre">$</span><input type="number" id="cSeguro" class="has-pre" min="0" step="500"></div></div>
       <div class="campo"><label>GPS mensual</label><div class="inbox"><span class="pre">$</span><input type="number" id="cGps" class="has-pre" min="0" step="10"></div></div>
     </div>
-    <div class="campo"><label>Tasa anual fija <span class="hint">(0 = usar la tasa de cada auto)</span></label>
-      <div class="inbox"><input type="number" id="cTasa" class="has-suf" min="0" step="0.1"><span class="suf">%</span></div></div>
     <div class="fila2">
-      <div class="campo"><label>% de enganche <span class="hint">(separados por coma)</span></label><input type="text" id="cEngPcts" placeholder="10, 20, 30, 40, 50"></div>
-      <div class="campo"><label>% por defecto</label><input type="number" id="cEngDef" min="0" max="100"></div>
-    </div>
-    <div class="fila2">
-      <div class="campo"><label>Plazos <span class="hint">(meses, por coma)</span></label><input type="text" id="cPlazos" placeholder="12, 24, 36, 48, 60, 72"></div>
+      <div class="campo"><label>Enganche por defecto</label><div class="inbox"><input type="number" id="cEngDef" class="has-suf" min="0" max="100"><span class="suf">%</span></div></div>
       <div class="campo"><label>Plazo por defecto</label><input type="number" id="cPlazoDef" min="1"></div>
     </div>
-    <label class="toggle"><input type="checkbox" id="cSegOn"> Mostrar opciones de seguro</label>
-    <label class="toggle"><input type="checkbox" id="cGpsOn"> Mostrar opción de GPS</label>
+    <div class="campo"><label>Plazos disponibles <span class="hint">(meses, separados por coma)</span></label><input type="text" id="cPlazos" placeholder="24, 36, 48, 60, 72"></div>
 
-    <div class="cfg-sec">Textos de cada paso</div>
-    <div class="campo"><label>1 · Auto</label><input type="text" id="cT0"><input type="text" id="cS0" style="margin-top:6px"></div>
-    <div class="campo"><label>2 · Enganche</label><input type="text" id="cT1"><input type="text" id="cS1" style="margin-top:6px"></div>
-    <div class="campo"><label>3 · Plazo</label><input type="text" id="cT2"><input type="text" id="cS2" style="margin-top:6px"></div>
-    <div class="campo"><label>4 · Extras</label><input type="text" id="cT3"><input type="text" id="cS3" style="margin-top:6px"></div>
-    <div class="campo"><label>5 · Confirmar</label><input type="text" id="cT4"><input type="text" id="cS4" style="margin-top:6px"></div>
-    <div class="campo"><label>6 · Cotización</label><input type="text" id="cT5"><input type="text" id="cS5" style="margin-top:6px" placeholder="(subtítulo extra, opcional)"></div>
+    <div class="cfg-sec">Presupuesto inicial del prospecto</div>
+    <div class="fila2">
+      <div class="campo"><label>Desde</label><div class="inbox"><span class="pre">$</span><input type="number" id="cBmin" class="has-pre" min="0" step="10000"></div></div>
+      <div class="campo"><label>Hasta</label><div class="inbox"><span class="pre">$</span><input type="number" id="cBmax" class="has-pre" min="0" step="10000"></div></div>
+    </div>
+
+    <div class="cfg-sec">Contacto y portada</div>
+    <div class="campo"><label>WhatsApp del lote <span class="hint">(solo dígitos con lada, ej. 529991234567)</span></label><input type="text" id="cWhats" placeholder="529991234567"></div>
+    <div class="campo"><label>Foto de portada (URL) <span class="hint">(opcional)</span></label><input type="text" id="cHero" placeholder="https://..."></div>
+
+    <div class="cfg-sec">Videos de la portada</div>
+    <div class="campo"><label>Video 1 · título / URL embed</label><input type="text" id="cVidT0"><input type="text" id="cVidU0" style="margin-top:6px" placeholder="https://www.youtube.com/embed/..."></div>
+    <div class="campo"><label>Video 2 · título / URL embed</label><input type="text" id="cVidT1"><input type="text" id="cVidU1" style="margin-top:6px" placeholder="https://www.youtube.com/embed/..."></div>
+    <div class="campo"><label>Video 3 · título / URL embed</label><input type="text" id="cVidT2"><input type="text" id="cVidU2" style="margin-top:6px" placeholder="https://www.youtube.com/embed/..."></div>
 
     <div class="mfoot">
       <button class="m-cancel" onclick="cfgCerrar()">Cancelar</button>
@@ -837,10 +1041,8 @@ setTimeout(()=>{ if(document.getElementById('gate').style.display!=='none') docu
 function irA(page){
   document.querySelectorAll('.ee-navitem').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   document.getElementById('page-simulador').hidden = page!=='simulador';
-  document.getElementById('page-cotizador').hidden = page!=='cotizador';
   document.getElementById('page-inventario').hidden = page!=='inventario';
   document.getElementById('page-usuarios').hidden = page!=='usuarios';
-  if(page==='cotizador') wzRender();
   window.scrollTo(0,0); toggleMenu(false);
 }
 function toggleMenu(force){
@@ -859,44 +1061,48 @@ const ICO={
 };
 // Catálogo real (Excel "concentrado venta") — 24 unidades
 const SEED_CARS=[
- ['Mercedez-Benz','GLE 450 4Matic',2021,'Gris','','AUT',849000,169800,679200,33960],
- ['Audi','Q3',2021,'Blanca','','AUT',459000,91800,367200,18360],
- ['Audi','Q2',2022,'Azul Obscuro','','AUT',369000,73800,295200,14760],
- ['Seat','Tarraco FR',2024,'Verde','','AUT',479000,95800,383200,19160],
- ['Tesla','Cybertruck',2024,'Negro','','AUT',2100000,420000,1680000,84000],
- ['Volkswaguen','Tiguan',2023,'Blanco','','AUT',435000,87000,348000,17400],
- ['Toyota','Camry',2022,'Café','','AUT',389000,77800,311200,15560],
- ['MINI','Cooper Chili',2029,'Crema','','AUT',269000,53800,215200,10760],
- ['MG','5',2024,'Blanco','','AUT',225000,45000,180000,9000],
- ['Chevrolet','Onix',2023,'Blanco','','AUT',235000,47000,188000,9400],
- ['Renault','Koleos',2023,'Blanco','','AUT',349000,69800,279200,13960],
- ['Volkswaguen','Jetta',2019,'Azul Claro','','AUT',229000,45800,183200,9160],
- ['Ford','Bronco',2021,'Azul Obscuro','Outer Banks','AUT',445000,89000,356000,17800],
- ['Tesla','Y',2025,'Gris','','AUT',849000,169800,679200,33960],
- ['BMW','320i',2020,'Negro','','AUT',425000,85000,340000,17000],
- ['Kia','k3',2027,'N/A','','AUT',369000,73800,295200,14760],
- ['Kia','K3',2027,'N/A','','STD',339000,67800,271200,13560],
- ['Ducati','Scrambler',2021,'Gris','','STD',159000,31800,127200,6360],
- ['Volkswaguen','Tiguan',2018,'Gris','','AUT',299000,59800,239200,11960],
- ['Volkswaguen','Tiguan',2018,'Blanco','','AUT',299000,59800,239200,11960],
- ['Ford','Explorer',2019,'Blanco','','AUT',479000,95800,383200,19160],
- ['BMW','440i',2023,'Azul Obscuro','Serie 4','AUT',969000,193800,775200,38760],
- ['Jeep','Gladiator',2020,'Gris','','AUT',785000,157000,628000,31400],
- ['Mercedez-Benz','C 200 Sport',2024,'Negro','Hybrid','AUT',775000,155000,620000,31000],
+ ['Mercedez-Benz','GLE 450 4Matic',2021,'Gris','','AUT',849000,169800,679200,33960,['lujo','familiar']],
+ ['Audi','Q3',2021,'Blanca','','AUT',459000,91800,367200,18360,['familiar','ciudad']],
+ ['Audi','Q2',2022,'Azul Obscuro','','AUT',369000,73800,295200,14760,['ciudad']],
+ ['Seat','Tarraco FR',2024,'Verde','','AUT',479000,95800,383200,19160,['familiar']],
+ ['Tesla','Cybertruck',2024,'Negro','','AUT',2100000,420000,1680000,84000,['pickup','offroad','lujo']],
+ ['Volkswaguen','Tiguan',2023,'Blanco','','AUT',435000,87000,348000,17400,['familiar']],
+ ['Toyota','Camry',2022,'Café','','AUT',389000,77800,311200,15560,['ciudad','lujo']],
+ ['MINI','Cooper Chili',2029,'Crema','','AUT',269000,53800,215200,10760,['ciudad']],
+ ['MG','5',2024,'Blanco','','AUT',225000,45000,180000,9000,['ciudad']],
+ ['Chevrolet','Onix',2023,'Blanco','','AUT',235000,47000,188000,9400,['ciudad']],
+ ['Renault','Koleos',2023,'Blanco','','AUT',349000,69800,279200,13960,['familiar']],
+ ['Volkswaguen','Jetta',2019,'Azul Claro','','AUT',229000,45800,183200,9160,['ciudad']],
+ ['Ford','Bronco',2021,'Azul Obscuro','Outer Banks','AUT',445000,89000,356000,17800,['offroad']],
+ ['Tesla','Y',2025,'Gris','','AUT',849000,169800,679200,33960,['familiar','lujo']],
+ ['BMW','320i',2020,'Negro','','AUT',425000,85000,340000,17000,['lujo','ciudad']],
+ ['Kia','k3',2027,'N/A','','AUT',369000,73800,295200,14760,['ciudad']],
+ ['Kia','K3',2027,'N/A','','STD',339000,67800,271200,13560,['ciudad']],
+ ['Ducati','Scrambler',2021,'Gris','','STD',159000,31800,127200,6360,['offroad']],
+ ['Volkswaguen','Tiguan',2018,'Gris','','AUT',299000,59800,239200,11960,['familiar']],
+ ['Volkswaguen','Tiguan',2018,'Blanco','','AUT',299000,59800,239200,11960,['familiar']],
+ ['Ford','Explorer',2019,'Blanco','','AUT',479000,95800,383200,19160,['familiar','offroad']],
+ ['BMW','440i',2023,'Azul Obscuro','Serie 4','AUT',969000,193800,775200,38760,['lujo']],
+ ['Jeep','Gladiator',2020,'Gris','','AUT',785000,157000,628000,31400,['pickup','offroad']],
+ ['Mercedez-Benz','C 200 Sport',2024,'Negro','Hybrid','AUT',775000,155000,620000,31000,['lujo']],
 ].map((r,i)=>({ id:'seed'+(i+1), marca:r[0], modelo:r[1], anio:r[2], color:r[3], version:r[4],
   transmision:r[5], km:'', motor:r[4]==='Hybrid'?'4 cil':'', precio:r[6], enganche:r[7], saldo:r[8],
-  comision:r[9], tasa:16.9, plazo:'24', notas:'', foto:'', estado:'disponible' }));
+  comision:r[9], tags:r[10], tasa:16.9, plazo:'24', notas:'', foto:'', estado:'disponible' }));
 
 let editandoId=null, fotoActual='';
 function invLoad(){ try{return JSON.parse(localStorage.getItem('ee_inv')||'[]')}catch(e){return[]} }
 function invSaveAll(a){ localStorage.setItem('ee_inv',JSON.stringify(a)); }
 function nombreCoche(c){ return [c.marca,c.modelo].filter(Boolean).join(' ')||'Sin nombre'; }
 function sig(c){ return (c.marca+'|'+c.modelo+'|'+c.anio+'|'+c.precio+'|'+c.color).toLowerCase(); }
-function invSeed(){ // primera vez: cargar catálogo
-  if(localStorage.getItem('ee_seeded_v1')) return;
-  const arr=invLoad(); const have=new Set(arr.map(sig));
-  SEED_CARS.forEach(c=>{ if(!have.has(sig(c))) arr.push({...c}); });
-  invSaveAll(arr); localStorage.setItem('ee_seeded_v1','1');
+function invSeed(){ // primera vez: cargar catálogo; v2 añade etiquetas de uso
+  if(localStorage.getItem('ee_seeded_v2')) return;
+  const arr=invLoad(); const have=new Map(arr.map(c=>[sig(c),c]));
+  SEED_CARS.forEach(c=>{
+    const ex=have.get(sig(c));
+    if(!ex) arr.push({...c});
+    else if(!ex.tags || !ex.tags.length) ex.tags=c.tags.slice();   // backfill
+  });
+  invSaveAll(arr); localStorage.setItem('ee_seeded_v2','1');
 }
 function invImportar(){ // botón: sincronizar/mezclar catálogo del Excel
   const arr=invLoad(); const have=new Set(arr.map(sig)); let add=0;
@@ -962,7 +1168,7 @@ function invEstado(id,estado){ const arr=invLoad(); const c=arr.find(x=>x.id===i
 }
 function invAbrir(){ editandoId=null; fotoActual='';
   $('invFormTitle').textContent='Agregar coche';
-  ['fMarca','fModelo','fAnio','fColor','fVersion','fKm','fMotor','fPrecio','fEnganche','fNotas'].forEach(id=>$(id).value='');
+  ['fMarca','fModelo','fAnio','fColor','fVersion','fKm','fMotor','fPrecio','fEnganche','fNotas','fTags'].forEach(id=>$(id).value='');
   $('fTrans').value='AUT'; $('fPlazo').value='24'; $('fTasa').value='16.9'; $('fEstado').value='disponible';
   const fp=$('fotoPrev'); fp.style.backgroundImage=''; fp.textContent='📷 Toca para agregar foto (opcional)';
   $('invModal').classList.add('show');
@@ -972,7 +1178,7 @@ function invEditar(id){ const c=invLoad().find(x=>x.id===id); if(!c)return; edit
   $('fMarca').value=c.marca||''; $('fModelo').value=c.modelo||''; $('fAnio').value=c.anio||''; $('fColor').value=c.color||'';
   $('fVersion').value=c.version||''; $('fTrans').value=c.transmision||'AUT'; $('fKm').value=c.km||''; $('fMotor').value=c.motor||'';
   $('fPrecio').value=c.precio||''; $('fEnganche').value=c.enganche||''; $('fPlazo').value=c.plazo||'24'; $('fTasa').value=c.tasa||'16.9';
-  $('fNotas').value=c.notas||''; $('fEstado').value=c.estado||'disponible';
+  $('fNotas').value=c.notas||''; $('fEstado').value=c.estado||'disponible'; $('fTags').value=(c.tags||[]).join(', ');
   const fp=$('fotoPrev'); if(c.foto){ fp.style.backgroundImage=`url('${c.foto}')`; fp.textContent=''; } else { fp.style.backgroundImage=''; fp.textContent='📷 Toca para agregar foto (opcional)'; }
   $('invModal').classList.add('show');
 }
@@ -988,7 +1194,8 @@ function invGuardar(){
   const c={ id:editandoId||('c'+Date.now()), marca, modelo, anio:+$('fAnio').value||'', color:$('fColor').value.trim(),
     version:$('fVersion').value.trim(), transmision:$('fTrans').value, km:$('fKm').value.trim(), motor:$('fMotor').value.trim(),
     precio, enganche, saldo:Math.max(0,precio-enganche), comision:Math.round(precio*0.04),
-    plazo:$('fPlazo').value, tasa:+$('fTasa').value||0, notas:$('fNotas').value.trim(), foto:fotoActual, estado:$('fEstado').value };
+    plazo:$('fPlazo').value, tasa:+$('fTasa').value||0, notas:$('fNotas').value.trim(), foto:fotoActual, estado:$('fEstado').value,
+    tags:$('fTags').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean) };
   const arr=invLoad();
   if(editandoId){ const i=arr.findIndex(x=>x.id===editandoId); if(i>=0)arr[i]=c; } else arr.unshift(c);
   invSaveAll(arr); invCerrar(); invRefreshFiltros(); invRender(); toast('✅ Guardado');
@@ -1014,36 +1221,32 @@ function rellenarSelectorCoches(){ const sel=$('carSelect'); if(!sel)return;
   sel.value=v;
 }
 
-/* ===================== COTIZADOR GUIADO (versión pública) ===================== */
-const PASOS=[{t:'Auto'},{t:'Enganche'},{t:'Plazo'},{t:'Extras'},{t:'Confirmar'},{t:'Cotización'}];
+/* ===================== COTIZADOR PÚBLICO (estilo referencia · acento rojo) ===================== */
 
-// Configuración editable del cotizador público (la controla el editor)
+// Configuración editable
 const CFG_DEF={
-  esquema:'fijo',                                          // 'fijo' (add-on) | 'insoluto' (francesa)
-  seguroAnual:12000, gpsMensual:250, tasaFija:0,          // tasaFija 0 = usar la tasa de cada auto
-  engPcts:[10,20,30,40,50], engDefault:20,
-  plazos:[12,24,36,48,60,72], plazoDefault:24,
-  mostrarSeguro:true, mostrarGps:true,
-  t:[['Elige tu auto','Selecciona la unidad que te interesa.'],
-     ['¿Cuánto darás de enganche?','Entre más enganche des, menor será tu mensualidad.'],
-     ['¿A cuántos meses?','Elige el plazo que mejor te acomode.'],
-     ['Seguro y extras','Opcionales. Puedes dejarlo como está.'],
-     ['Confirma tus datos','Revisa que todo esté correcto.'],
-     ['Tu cotización','']]
+  esquema:'fijo',                       // 'fijo' (add-on) | 'insoluto' (francesa)
+  tasaBancario:13, tasaSinBuro:24,      // tasas de referencia por tipo de pago
+  seguroAnual:12000, gpsMensual:250,
+  engDefault:20, plazos:[24,36,48,60,72], plazoDefault:48,
+  bmin:200000, bmax:1200000,
+  whatsapp:'',                          // número del lote (ej. 529991234567)
+  heroImg:'',
+  videos:[ {t:'Recorrido por el lote', s:'Conoce nuestras unidades', url:''},
+           {t:'Proceso de compra seguro', s:'Paso a paso, sin sorpresas', url:''},
+           {t:'Opciones de financiamiento', s:'Bancario y sin buró', url:''} ]
 };
 function CFG(){ try{ const s=JSON.parse(localStorage.getItem('ee_wzcfg')||'{}'); const c=Object.assign({},CFG_DEF,s);
-  if(!Array.isArray(c.t)||c.t.length!==6) c.t=CFG_DEF.t; return c; }catch(e){ return JSON.parse(JSON.stringify(CFG_DEF)); } }
+  if(!Array.isArray(c.plazos)||!c.plazos.length) c.plazos=CFG_DEF.plazos;
+  if(!Array.isArray(c.videos)||c.videos.length!==3) c.videos=CFG_DEF.videos;
+  return c; }catch(e){ return JSON.parse(JSON.stringify(CFG_DEF)); } }
 function CFGsave(o){ localStorage.setItem('ee_wzcfg',JSON.stringify(o)); }
 
-let wzEditor=false;
-let wz={paso:0,carId:null,engPct:CFG().engDefault,engMonto:null,plazo:CFG().plazoDefault,seguro:'ninguno',gps:false};
-
 /* ===== MOTOR DE AMORTIZACIÓN =====
-   esquema 'fijo'     → interés fijo (add-on): interés y capital constantes cada mes.
-                        El interés se calcula UNA VEZ sobre el monto financiado original.
-   esquema 'insoluto' → francesa: el interés se recalcula sobre el saldo pendiente.
-   Abono a capital: aplica sólo a capital; la mensualidad NO cambia y el interés
-   por pago NO se recalcula. Sólo se acorta el plazo. */
+   'fijo'     → interés fijo (add-on): interés y capital constantes cada mes.
+                El interés se calcula UNA VEZ sobre el monto financiado original.
+   'insoluto' → francesa: el interés se recalcula sobre el saldo pendiente.
+   Abono a capital: aplica sólo a capital; la mensualidad NO cambia. Sólo acorta el plazo. */
 function tasaEfectivaAnual(P,cuota,n){
   if(P<=0||cuota<=0||n<=0||cuota*n<=P) return 0;
   const f=r=> r===0 ? P/n : P*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
@@ -1084,262 +1287,436 @@ function tabla(P, tasaAnual, n, esquema, extrasMes, ivaInt, ab){
     tasaEfectiva: tasaEfectivaAnual(P,cuotaBase,n)};
 }
 
-// Cálculo del cotizador público (usa el mismo motor)
-function planCalc(p){
-  const precio=+p.precio||0, enganche=+p.enganche||0, n=+p.plazo||1;
-  const comision=+p.comision||0;
-  const seguroContado = p.seguroModo==='contado'    ? (+p.seguro||0)    : 0;
-  const seguroFin     = p.seguroModo==='financiado' ? (+p.seguro||0)    : 0;
-  const seguroMes     = p.seguroModo==='mensual'    ? (+p.seguro||0)/12 : 0;
-  const gpsMes=+p.gps||0, extras=gpsMes+seguroMes;
-  const financiar=Math.max(0,(precio-enganche)+seguroFin);
-  const pagoInicial=enganche+comision+seguroContado;
-  const T=tabla(financiar, +p.tasa||0, n, p.esquema||'fijo', extras, false, null);
-  return {financiar,pagoInicial,comision,seguroContado,extras,
-    cuota:T.cuotaBase, mensual:T.mensualidad, filas:T.filas, sumInt:T.sumInt, sumPago:T.sumPago,
-    tasaEfectiva:T.tasaEfectiva, total:pagoInicial+T.sumPago, n};
-}
+/* ---------- Iconos (línea, currentColor) ---------- */
+const SV=(d,extra)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}${extra||''}</svg>`;
+const I={
+  chevR:SV('<path d="M9 18l6-6-6-6"/>'), chevL:SV('<path d="M15 18l-6-6 6-6"/>'),
+  info:SV('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'),
+  car:SV('<path d="M5 11l1.6-4.2A2 2 0 0 1 8.5 5.5h7a2 2 0 0 1 1.9 1.3L19 11"/><path d="M3.5 11h17a1 1 0 0 1 1 1v4h-2m-14 0h-2v-4a1 1 0 0 1 1-1"/><path d="M6 16h12"/><circle cx="7.5" cy="16.4" r="1.5"/><circle cx="16.5" cy="16.4" r="1.5"/>'),
+  fuel:SV('<line x1="3" y1="22" x2="15" y2="22"/><line x1="4" y1="9" x2="14" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/>'),
+  gauge:SV('<path d="M12 14l4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>'),
+  cal:SV('<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'),
+  wallet:SV('<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>'),
+  bank:SV('<line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/>'),
+  key:SV('<circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/>'),
+  users:SV('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
+  mount:SV('<path d="M8 3l4 8 5-5 5 15H2L8 3z"/>'),
+  brief:SV('<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>'),
+  spark:SV('<path d="M12 3l1.9 5.8L20 10l-5.2 2.6L12 21l-2.8-8.4L4 10l6.1-1.2z"/>'),
+  bldg:SV('<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/>'),
+  phone:SV('<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7A2 2 0 0 1 22 16.9z"/>'),
+  msg:SV('<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.9 8.4 8.4 0 0 1 8.4-9 8.4 8.4 0 0 1 8.6 8.4z"/>'),
+  play:SV('<polygon points="6 3 20 12 6 21 6 3"/>'),
+  check:SV('<polyline points="20 6 9 17 4 12"/>'),
+  x:SV('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'),
+  pin:SV('<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'),
+  star:SV('<polygon points="12 2 15.1 8.6 22 9.3 16.9 14 18.3 21 12 17.6 5.7 21 7.1 14 2 9.3 8.9 8.6"/>'),
+  shield:SV('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>'),
+  arrow:SV('<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>'),
+  search:SV('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+  dl:SV('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>')
+};
 
-function wzCar(){ return invLoad().find(c=>c.id===wz.carId)||null; }
-function wzEnganche(){ const c=wzCar(); if(!c)return 0; return wz.engMonto!=null ? wz.engMonto : Math.round((c.precio||0)*wz.engPct/100); }
-function wzTasa(){ const g=CFG(); const c=wzCar(); return (+g.tasaFija>0) ? +g.tasaFija : (c&&c.tasa ? c.tasa : 16.9); }
-function wzPlan(){ const c=wzCar(); if(!c)return null; const g=CFG();
-  return planCalc({precio:c.precio, enganche:wzEnganche(), plazo:wz.plazo, tasa:wzTasa(), esquema:g.esquema,
-    comision:c.comision||Math.round((c.precio||0)*0.04),
-    seguro: wz.seguro==='ninguno'?0:g.seguroAnual, seguroModo:wz.seguro, gps: wz.gps?g.gpsMensual:0 }); }
-function wzFecha(){ const d=new Date(); return d.getDate()+' de '+MESES_L[d.getMonth()]+' de '+d.getFullYear(); }
-function wzTitulo(c){ return [nombreCoche(c), c.anio, c.version].filter(Boolean).join(' '); }
+const WIKI={
+  seminuevo:{t:'Seminuevo certificado',d:'Vehículo usado que pasó por una inspección mecánica, estética y documental antes de venderse. En El Esensial cada unidad se revisa para que lo que ves sea lo que recibes.'},
+  enganche:{t:'Enganche',d:'Pago inicial sobre el precio del auto. Entre más alto, menor es el monto a financiar y más baja tu mensualidad. Se expresa como porcentaje del precio.'},
+  plazo:{t:'Plazo',d:'Número de meses en los que pagas el crédito. Un plazo más largo baja la mensualidad, pero aumenta el total de intereses que pagas.'},
+  mensualidad:{t:'Mensualidad estimada',d:'Cálculo aproximado de tu pago mensual según precio, enganche, plazo y una tasa de referencia. El monto final depende de la aprobación y la institución.'},
+  cat:{t:'CAT',d:'Costo Anual Total. Resume el costo real de un crédito (tasa + comisiones + cargos) en un solo porcentaje anual. Sirve para comparar opciones de forma justa. Pídelo siempre por escrito antes de firmar.'},
+  interesfijo:{t:'Interés fijo',d:'En este esquema el interés se calcula una sola vez sobre el monto financiado y se reparte igual en cada mensualidad, junto con una parte fija de capital. Tu pago nunca cambia. A diferencia del saldo insoluto, el interés no baja conforme amortizas.'},
+  bancario:{t:'Crédito bancario',d:'Financiamiento con instituciones bancarias, tasas preferenciales y plazos de hasta 72 meses. Requiere revisión de buró. Cobertura nacional.'},
+  sinburo:{t:'Sin buró (local)',d:'Financiamiento directo, sin revisión de buró de crédito. Ideal para estrenar sin complicaciones. Suele pedir identificación y comprobante (predial libre de gravamen o aval).'},
+  contado:{t:'Pago de contado',d:'Pagas el total del vehículo en una sola exhibición. Es la vía más rápida y sin intereses.'},
+  km:{t:'Kilometraje',d:'Distancia total recorrida por el vehículo. A menor kilometraje, normalmente mayor vida útil por delante.'}
+};
+const USOS=[
+  {id:'familiar',t:'Familiar',s:'Espacio y seguridad',ic:'users',tag:'familiar'},
+  {id:'ciudad',t:'Ciudad',s:'Ágil y eficiente',ic:'bldg',tag:'ciudad'},
+  {id:'trabajo',t:'Trabajo',s:'Pickups y carga',ic:'brief',tag:'pickup'},
+  {id:'lujo',t:'Lujo / Potencia',s:'Premium y desempeño',ic:'spark',tag:'lujo'},
+  {id:'offroad',t:'Aventura',s:'Off-road y terreno',ic:'mount',tag:'offroad'}
+];
+const PAGOS=[
+  {id:'contado',t:'De contado',s:'Pago en una exhibición, sin intereses',ic:'wallet',wiki:'contado'},
+  {id:'bancario',t:'Crédito bancario',s:'Tasas preferenciales, hasta 72 meses',ic:'bank',wiki:'bancario'},
+  {id:'sinburo',t:'Sin buró (local)',s:'Directo, entrega inmediata',ic:'key',wiki:'sinburo'}
+];
 
-function wzReset(){ const g=CFG();
-  wz={paso:0,carId:null,engPct:g.engDefault,engMonto:null,plazo:g.plazoDefault,seguro:'ninguno',gps:false}; wzRender(); }
-function wzAsegurarCoche(){ if(wz.carId) return true;
-  const f=invLoad().find(x=>x.estado==='disponible'); if(f){ wz.carId=f.id; return true; } return false; }
-function wzGoto(i){ if(!wzEditor) return;
-  if(i>0) wzAsegurarCoche();
-  if(i>0 && !wz.carId) return;
-  wz.paso=Math.max(0,Math.min(PASOS.length-1,i)); wzRender(); window.scrollTo(0,0); }
-function wzToggleEditor(){ wzEditor=!wzEditor;
-  const b=$('wzEdBtn'); if(b){ b.textContent = wzEditor?'● Modo editor activo':'○ Activar modo editor'; b.classList.toggle('on',wzEditor); }
-  $('wzEdTools').style.display = wzEditor?'flex':'none';
-  wzRender();
+const PB={screen:'hero',stepIdx:0,editor:false,bmin:0,bmax:0,uso:null,marca:null,pago:null,
+  enganche:20,plazo:48,nombre:'',whats:'',wiki:null,video:null};
+
+const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' Km';
+function pbCars(){ return invLoad().filter(c=>c.estado==='disponible'); }
+function pbMarcas(){ return [...new Set(pbCars().map(c=>c.marca).filter(Boolean))].sort(); }
+function pbTasa(pago){ const g=CFG(); return pago==='bancario' ? (+g.tasaBancario||13) : (+g.tasaSinBuro||24); }
+function pbMens(precio,pago,engPct,plazo){
+  if(!pago||pago==='contado') return null;
+  const g=CFG(); const P=Math.max(0,(+precio||0)*(1-engPct/100));
+  return tabla(P, pbTasa(pago), plazo, g.esquema||'fijo', 0, false, null).mensualidad;
 }
-function wzAlSimulador(){
-  const c=wzCar(); if(!c){ alert('Elige primero un coche.'); return; }
+function pbMatches(){
+  const usoTag = PB.uso ? (USOS.find(u=>u.id===PB.uso)||{}).tag : null;
+  let list=pbCars().filter(v=>{
+    const inB = v.precio>=PB.bmin*0.85 && v.precio<=PB.bmax*1.15;
+    const okM = !PB.marca || PB.marca==='sin' || v.marca===PB.marca;
+    const okU = !usoTag || (v.tags||[]).includes(usoTag);
+    return inB && okM && okU;
+  });
+  if(!list.length){ const mid=(PB.bmin+PB.bmax)/2;
+    list=[...pbCars()].sort((a,b)=>Math.abs(a.precio-mid)-Math.abs(b.precio-mid)).slice(0,3); }
+  return list.sort((a,b)=>a.precio-b.precio);
+}
+function pbSteps(){ const s=['presupuesto','uso','marca','pago'];
+  if(PB.pago && PB.pago!=='contado') s.push('financiamiento');
+  s.push('contacto'); return s; }
+function pbCanNext(){ const id=pbSteps()[PB.stepIdx];
+  if(id==='uso') return !!PB.uso;
+  if(id==='marca') return !!PB.marca;
+  if(id==='pago') return !!PB.pago;
+  if(id==='contacto') return PB.nombre.trim().length>1 && PB.whats.trim().length>=8;
+  return true; }
+
+/* ---------- Mostrar / salir ---------- */
+function mostrarPub(editor){
   const g=CFG();
-  cargarCoche(c.id,false);
-  $('enganche').value=wzEnganche(); $('plazo').value=String(wz.plazo); $('tasa').value=wzTasa();
-  $('tgl').checked=true;
-  $('seguro').value = wz.seguro==='ninguno' ? 0 : g.seguroAnual;
-  $('seguroModo').value = wz.seguro==='ninguno' ? 'contado' : wz.seguro;
-  $('gps').value = wz.gps ? g.gpsMensual : 0; $('gpsModo').value='mensual';
-  calc(); irA('simulador'); toast('Cargado en el simulador interno');
+  if(!PB.bmin){ PB.bmin=g.bmin; PB.bmax=g.bmax; PB.enganche=g.engDefault; PB.plazo=g.plazoDefault; }
+  PB.editor=!!editor;
+  invSeed();
+  document.getElementById('app').style.display='none';
+  document.getElementById('pub').classList.add('on');
+  document.body.classList.add('pub-open');
+  $('pubEdbar').style.display = PB.editor ? 'flex':'none';
+  if(g.heroImg) document.getElementById('pub').style.setProperty('--hero-img',`url('${g.heroImg}')`);
+  pbRender();
 }
-function wzSelCar(id){ wz.carId=id; wz.engMonto=null; wzRender(); }
-function wzSelPct(p){ wz.engPct=p; wz.engMonto=null; const i=$('wzEngInput'); if(i)i.value=wzEnganche(); wzUpdEng(); }
-function wzEngManual(v){ const c=wzCar(); if(!c)return;
-  wz.engMonto=Math.max(0,Math.min(+v||0, Math.max(0,(c.precio||0)-1000))); wzUpdEng(); }
-function wzUpdEng(){ const c=wzCar(); if(!c)return; const eng=wzEnganche(), fin=Math.max(0,(c.precio||0)-eng);
-  document.querySelectorAll('#wzEngChips .wz-chip').forEach(ch=>ch.classList.toggle('sel', wz.engMonto==null && +ch.dataset.pct===wz.engPct));
-  const inf=$('wzEngInfo'); if(inf) inf.innerHTML=
-    `<div><span>Precio del auto</span><b>${money(c.precio||0)}</b></div>
-     <div><span>Tu enganche</span><b>${money(eng)}</b></div>
-     <div><span>Monto a financiar</span><b>${money(fin)}</b></div>`;
+function salirPub(){
+  document.getElementById('pub').classList.remove('on');
+  document.body.classList.remove('pub-open');
+  document.getElementById('app').style.display='block';
+  irA('simulador');
 }
-function wzSelPlazo(n){ wz.plazo=n; wzRender(); }
-function wzSelSeguro(v){ wz.seguro=v; wzRender(); }
-function wzTogGps(){ wz.gps=!wz.gps; wzRender(); }
-function wzValido(){ return wz.paso!==0 || !!wz.carId; }
-function wzIr(d){
-  if(d>0 && !wzValido()){ if(wzEditor && wzAsegurarCoche()){} else return; }
-  wz.paso=Math.max(0,Math.min(PASOS.length-1,wz.paso+d)); wzRender(); window.scrollTo(0,0); }
+function pbGo(s){ PB.screen=s; if(s==='quiz') PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
+function pbStart(){ PB.screen='quiz'; PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
+function pbRestart(){ PB.screen='hero'; PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
+function pbNext(){ if(!pbCanNext())return; const t=pbSteps().length;
+  if(PB.stepIdx<t-1){ PB.stepIdx++; } else { PB.screen='results'; }
+  pbRender(); window.scrollTo(0,0); }
+function pbBack(){ if(PB.stepIdx>0){ PB.stepIdx--; } else { PB.screen='hero'; } pbRender(); window.scrollTo(0,0); }
 
-function wzRender(){
-  const steps=$('wzSteps'); if(!steps) return;
-  steps.innerHTML=PASOS.map((p,i)=>wzEditor
-    ? `<button class="wz-step clic${i<=wz.paso?' on':''}" title="Ir al paso: ${p.t}" onclick="wzGoto(${i})"></button>`
-    : `<div class="wz-step${i<=wz.paso?' on':''}"></div>`).join('');
-  $('wzCnt').textContent=`Paso ${wz.paso+1} de ${PASOS.length} · ${PASOS[wz.paso].t}`+(wzEditor?' · modo editor':'');
-  document.querySelector('.wz').classList.toggle('editor',wzEditor);
-  $('wzBody').innerHTML=wzPaso();
-  const ultimo = wz.paso===PASOS.length-1;
-  $('wzNav').style.display = ultimo?'none':'flex';
-  if(!ultimo){
-    $('wzBack').style.visibility = wz.paso===0?'hidden':'visible';
-    $('wzNext').disabled = wzEditor ? false : !wzValido();
-    $('wzNext').textContent = wz.paso===PASOS.length-2 ? 'Generar cotización' : 'Continuar';
-  }
+/* ---------- Interacciones en vivo ---------- */
+function pbSetUso(v){ PB.uso=v; pbRender(); }
+function pbSetMarca(v){ PB.marca=v; pbRender(); }
+function pbSetPago(v){ PB.pago=v; pbRender(); }
+function pbSetPlazo(n){ PB.plazo=n; pbRender(); }
+function pbBudget(el,which){
+  const v=+el.value;
+  if(which==='min'){ PB.bmin=Math.min(v,PB.bmax-50000); el.value=PB.bmin; }
+  else { PB.bmax=Math.max(v,PB.bmin+50000); el.value=PB.bmax; }
+  const a=$('pbBmin'), b=$('pbBmax'); if(a)a.textContent=money(PB.bmin); if(b)b.textContent=money(PB.bmax);
+  const m=$('pbMatch'); if(m)m.innerHTML=I.check+' '+pbMatches().length+' unidades dentro de tu rango';
+  pbSummary();
+}
+function pbEng(v){ PB.enganche=+v; const b=$('pbEngVal'); if(b)b.textContent=PB.enganche+'%'; pbEstim(); pbSummary(); }
+function pbEstim(){ const e=$('pbEstNum'); if(!e)return;
+  const m=pbMens((PB.bmin+PB.bmax)/2,PB.pago,PB.enganche,PB.plazo);
+  e.textContent = m? money(m):'—';
+  const n=$('pbEstNote'); if(n)n.textContent='sobre un auto de ~'+money((PB.bmin+PB.bmax)/2); }
+function pbField(k,v){ PB[k]=v; const n=$('pbNext'); if(n)n.disabled=!pbCanNext(); pbSummary(); }
+function pbSummary(){ const el=$('pbSummary'); if(!el)return; el.innerHTML=pbSummaryHTML(); }
+
+/* ---------- Modales ---------- */
+function pbWiki(k){ PB.wiki=k; pbOverlay(); }
+function pbVideo(i){ PB.video=i; pbOverlay(); }
+function pbCloseModal(){ PB.wiki=null; PB.video=null; pbOverlay(); }
+function pbOverlay(){
+  const o=$('pubOverlay');
+  if(PB.wiki!=null && WIKI[PB.wiki]){ const w=WIKI[PB.wiki];
+    o.innerHTML=`<div class="overlay" onclick="pbCloseModal()"><div class="wikiCard" onclick="event.stopPropagation()">
+      <div class="wikiTop"><span class="wikiTag">${I.info} Referencia</span><button class="closeX" onclick="pbCloseModal()">${I.x}</button></div>
+      <h4 class="wikiT">${esc(w.t)}</h4><p class="wikiD">${esc(w.d)}</p></div></div>`; return; }
+  if(PB.video!=null){ const v=CFG().videos[PB.video]||{t:'Video',url:''};
+    o.innerHTML=`<div class="overlay" onclick="pbCloseModal()"><div class="videoModal" onclick="event.stopPropagation()">
+      <div class="wikiTop"><span class="wikiTag">${I.play} ${esc(v.t)}</span><button class="closeX" onclick="pbCloseModal()">${I.x}</button></div>
+      <div class="videoFrame">${v.url
+        ? `<iframe src="${esc(v.url)}" title="${esc(v.t)}" allowfullscreen></iframe>`
+        : `<div class="videoPh">${I.play}<span>Aquí va el video de El Esensial</span><small>Configúralo en ⚙ Ajustes</small></div>`}</div>
+      </div></div>`; return; }
+  o.innerHTML='';
 }
 
-function wzEd(label,val){ return wzEditor?`<div class="ed-row"><span>🔒 ${label}</span><b>${val}</b></div>`:''; }
-
-function wzPaso(){
-  const c=wzCar(), g=CFG(), T=g.t;
-  if(wz.paso===0){
-    const cars=invLoad().filter(x=>x.estado==='disponible');
-    if(!cars.length) return `<div class="wz-h">Sin unidades disponibles</div><div class="wz-p">Vuelve más tarde o consulta con un asesor.</div>`;
-    return `<div class="wz-h">${esc(T[0][0])}</div><div class="wz-p">${esc(T[0][1])}</div>
-      <div class="wz-cars">${cars.map(x=>`<button class="wz-car${wz.carId===x.id?' sel':''}" onclick="wzSelCar('${x.id}')">
-        <div class="n">${esc(nombreCoche(x))}</div>
-        <div class="m">${esc([x.anio,x.version,x.transmision,(x.color&&x.color!=='N/A')?x.color:''].filter(Boolean).join(' · '))}</div>
-        <div class="p">${money(x.precio||0)}</div>
-        ${wzEditor?`<div class="m" style="margin-top:6px">🔒 Comisión ${money(x.comision||0)} · Tasa ${x.tasa||16.9}%</div>`:''}
-        </button>`).join('')}</div>`;
-  }
-  if(wz.paso===1){
-    const eng=wzEnganche(), fin=Math.max(0,(c.precio||0)-eng);
-    return `<div class="wz-h">${esc(T[1][0])}</div><div class="wz-p">${esc(T[1][1])}</div>
-      <div class="wz-chips" id="wzEngChips">${g.engPcts.map(p=>
-        `<button class="wz-chip${(wz.engMonto==null&&wz.engPct===p)?' sel':''}" data-pct="${p}" onclick="wzSelPct(${p})">
-          <div class="t">${p}%</div><div class="s">${money((c.precio||0)*p/100)}</div></button>`).join('')}</div>
-      <div class="campo" style="margin-top:16px"><label>O escribe una cantidad exacta</label>
-        <div class="inbox"><span class="pre">$</span>
-        <input type="number" id="wzEngInput" class="has-pre" value="${eng}" min="0" step="1000" oninput="wzEngManual(this.value)"></div></div>
-      <div class="wz-info" id="wzEngInfo">
-        <div><span>Precio del auto</span><b>${money(c.precio||0)}</b></div>
-        <div><span>Tu enganche</span><b>${money(eng)}</b></div>
-        <div><span>Monto a financiar</span><b>${money(fin)}</b></div>
+/* ---------- Render ---------- */
+function pbRender(){
+  const s=$('pubScreen'); if(!s) return;
+  if(PB.screen==='hero') s.innerHTML=pbHero();
+  else if(PB.screen==='quiz') s.innerHTML=pbQuiz();
+  else s.innerHTML=pbResults();
+  pbOverlay();
+}
+function pbHero(){
+  const g=CFG();
+  return `<main class="hero"><div class="heroBg"></div><div class="heroScan"></div>
+    <div class="heroInner">
+      <p class="eyebrow">CALIDAD Y CONFIANZA</p>
+      <h1 class="heroTitle">TU PRÓXIMO<br>AUTO ESTÁ <span class="acc">AQUÍ</span></h1>
+      <p class="heroSub">Seminuevos <b>certificados</b> para todos los estilos de vida. Desde compactos eficientes
+        hasta unidades de alto rendimiento, con los mejores planes de <b>crédito</b>.</p>
+      <div class="heroCtas">
+        <button class="btn btnPrimary big" onclick="pbStart()">${I.search} Comienza tu cotización</button>
+        <button class="btn btnGhost big" onclick="pbVideo(0)">${I.play} Ver el lote</button>
       </div>
-      ${wzEd('Comisión por apertura (4%)',money(c.comision||0))}`;
-  }
-  if(wz.paso===2){
-    const base={precio:c.precio, enganche:wzEnganche(), tasa:wzTasa(), esquema:g.esquema,
-      comision:c.comision||0, seguro: wz.seguro==='ninguno'?0:g.seguroAnual, seguroModo:wz.seguro, gps: wz.gps?g.gpsMensual:0};
-    return `<div class="wz-h">${esc(T[2][0])}</div><div class="wz-p">${esc(T[2][1])}</div>
-      <div class="wz-chips">${g.plazos.map(n=>{ const m=planCalc({...base,plazo:n}).mensual;
-        return `<button class="wz-chip${wz.plazo===n?' sel':''}" onclick="wzSelPlazo(${n})">
-          <div class="t">${n}</div><div class="s">${money(m)}/mes</div></button>`; }).join('')}</div>
-      <div class="wz-info"><div><span>Plazo elegido</span><b>${wz.plazo} meses</b></div>
-        <div><span>Tu mensualidad</span><b>${money(wzPlan().mensual)}</b></div></div>
-      ${wzEd('Esquema', g.esquema==='fijo'?'Interés fijo (add-on)':'Saldo insoluto')}
-      ${wzEd('Tasa anual nominal',wzTasa()+'%')}
-      ${wzEd('Tasa efectiva anual (costo real)', wzPlan().tasaEfectiva.toFixed(2)+'%')}
-      ${wzEd('Intereses totales del plazo',money(wzPlan().sumInt))}`;
-  }
-  if(wz.paso===3){
-    const op=(v,t,s)=>`<button class="wz-opt${wz.seguro===v?' sel':''}" onclick="wzSelSeguro('${v}')">
-      <span class="rad"></span><span><span class="ot">${t}</span><span class="os" style="display:block">${s}</span></span></button>`;
-    const nada = !g.mostrarSeguro && !g.mostrarGps;
-    return `<div class="wz-h">${esc(T[3][0])}</div><div class="wz-p">${esc(T[3][1])}</div>
-      ${nada?`<div class="wz-info"><div><span>Sin opciones adicionales configuradas</span><b>—</b></div></div>`:''}
-      ${g.mostrarSeguro?`<div class="wz-opts">
-        ${op('ninguno','Sin seguro','Lo contrato por mi cuenta')}
-        ${op('contado','Seguro de contado','Pago '+money(g.seguroAnual)+' al inicio')}
-        ${op('financiado','Seguro financiado','Se suma al crédito, sube la mensualidad')}
-        ${op('mensual','Seguro mensual','+'+money(g.seguroAnual/12)+' cada mes')}
-      </div>`:''}
-      ${g.mostrarGps?`<div class="wz-opts" style="margin-top:14px">
-        <button class="wz-opt${wz.gps?' sel':''}" onclick="wzTogGps()">
-          <span class="rad"></span><span><span class="ot">Rastreo GPS</span>
-          <span class="os" style="display:block">+${money(g.gpsMensual)} cada mes</span></span></button>
-      </div>`:''}`;
-  }
-  if(wz.paso===4){
-    const p=wzPlan();
-    const seg={ninguno:'Sin seguro',contado:'De contado',financiado:'Financiado',mensual:'Mensual'}[wz.seguro];
-    return `<div class="wz-h">${esc(T[4][0])}</div><div class="wz-p">${esc(T[4][1])}</div>
-      <div class="wz-info">
-        <div><span>Auto</span><b>${esc(wzTitulo(c))}</b></div>
-        <div><span>Precio</span><b>${money(c.precio||0)}</b></div>
-        <div><span>Enganche</span><b>${money(wzEnganche())}</b></div>
-        <div><span>Plazo</span><b>${wz.plazo} meses</b></div>
-        <div><span>Seguro</span><b>${seg}</b></div>
-        <div><span>GPS</span><b>${wz.gps?'Sí':'No'}</b></div>
-        <div><span>Pago inicial estimado</span><b>${money(p.pagoInicial)}</b></div>
-        <div><span>Mensualidad estimada</span><b>${money(p.mensual)}</b></div>
+      <p class="videoLead">Míralo antes de venir — recorridos de El Esensial:</p>
+      <div class="videoRow">${g.videos.map((v,i)=>`
+        <button class="videoCard" onclick="pbVideo(${i})">
+          <div class="videoThumb"><span class="playBtn">${I.play}</span></div>
+          <div class="videoMeta"><span class="videoT">${esc(v.t)}</span><span class="videoS">${esc(v.s)}</span></div>
+        </button>`).join('')}</div>
+    </div></main>`;
+}
+function pbSummaryHTML(){
+  const usoL=PB.uso?(USOS.find(u=>u.id===PB.uso)||{}).t:'—';
+  const pagoL=PB.pago?(PAGOS.find(p=>p.id===PB.pago)||{}).t:'—';
+  const est=pbMens((PB.bmin+PB.bmax)/2,PB.pago,PB.enganche,PB.plazo);
+  const row=(k,v)=>`<div class="sumRow"><span>${k}</span><b>${v}</b></div>`;
+  return `<span class="sumTitle">Tu selección</span>
+    ${row('Presupuesto',`${money(PB.bmin)} – ${money(PB.bmax)}`)}
+    ${row('Uso',esc(usoL||'—'))}
+    ${row('Marca',PB.marca==='sin'?'Abierto':esc(PB.marca||'—'))}
+    ${row('Pago',esc(pagoL||'—'))}
+    ${PB.pago&&PB.pago!=='contado'?row('Enganche',PB.enganche+'%'):''}
+    ${PB.pago&&PB.pago!=='contado'?row('Plazo',PB.plazo+' meses'):''}
+    ${est?`<div class="sumEst"><span>Mensualidad estimada</span><b>${money(est)}</b></div>`:''}
+    <div class="sumMatch">${I.car} ${pbMatches().length} unidades hacen match</div>`;
+}
+function stepHead(n,t,s,wiki){
+  return `<div class="stepHead"><span class="stepNum">${n}</span><div>
+    <h2 class="stepTitle">${t}${wiki?`<button class="infoChip" onclick="pbWiki('${wiki}')">${I.info}</button>`:''}</h2>
+    <p class="stepSub">${s}</p></div></div>`;
+}
+function optBlock(active,onclick,icon,title,sub,wiki){
+  return `<button class="optBlock${active?' optOn':''}" onclick="${onclick}">
+    ${active?`<span class="optCheck">${I.check}</span>`:''}
+    ${wiki&&!active?`<span class="optInfo" onclick="event.stopPropagation();pbWiki('${wiki}')">${I.info}</span>`:''}
+    <span class="optIcon">${I[icon]}</span>
+    <span class="optTitle">${esc(title)}</span><span class="optSub">${esc(sub)}</span></button>`;
+}
+function pbQuiz(){
+  const steps=pbSteps(), id=steps[PB.stepIdx], total=steps.length;
+  const pct=Math.round(((PB.stepIdx+1)/total)*100);
+  const g=CFG();
+  let body='';
+  if(id==='presupuesto'){
+    body=stepHead('01','¿Qué presupuesto manejas?','Ajusta el rango. Todos nuestros autos son seminuevos certificados.','seminuevo')+
+    `<div class="budgetBox">
+      <div class="budgetVals">
+        <div class="bVal"><span>Desde</span><b id="pbBmin">${money(PB.bmin)}</b></div><div class="bDash"></div>
+        <div class="bVal"><span>Hasta</span><b id="pbBmax">${money(PB.bmax)}</b></div>
       </div>
-      ${wzEd('Monto a financiar',money(p.financiar))}
-      ${wzEd('Intereses del plazo',money(p.sumInt))}
-      ${wzEd('Total que paga el cliente',money(p.total))}`;
+      <div class="rangeGroup">
+        <label class="rLabel">Mínimo</label>
+        <input type="range" min="100000" max="2500000" step="10000" value="${PB.bmin}" oninput="pbBudget(this,'min')">
+        <label class="rLabel">Máximo</label>
+        <input type="range" min="100000" max="2500000" step="10000" value="${PB.bmax}" oninput="pbBudget(this,'max')">
+      </div>
+      <div class="matchHint" id="pbMatch">${I.check} ${pbMatches().length} unidades dentro de tu rango</div>
+    </div>`;
+  } else if(id==='uso'){
+    body=stepHead('02','¿Para qué lo vas a usar?','Elige el estilo que más se acerque a ti.')+
+    `<div class="grid grid5">${USOS.map(u=>optBlock(PB.uso===u.id,`pbSetUso('${u.id}')`,u.ic,u.t,u.s)).join('')}</div>`;
+  } else if(id==='marca'){
+    const ms=pbMarcas();
+    body=stepHead('03','¿Tienes una marca en mente?','Si no, déjalo abierto y te mostramos lo mejor.')+
+    `<div class="grid gridBrands">${optBlock(PB.marca==='sin',"pbSetMarca('sin')",'star','Sin preferencia','Muéstrame todo')}
+      ${ms.map(m=>optBlock(PB.marca===m,`pbSetMarca(${JSON.stringify(m).replace(/"/g,'&quot;')})`,'car',m,
+        pbCars().filter(v=>v.marca===m).length+' unidad(es)')).join('')}</div>`;
+  } else if(id==='pago'){
+    body=stepHead('04','¿Cómo prefieres pagar?',`Toca la ${'ⓘ'} para entender cada opción.`)+
+    `<div class="grid grid3">${PAGOS.map(p=>optBlock(PB.pago===p.id,`pbSetPago('${p.id}')`,p.ic,p.t,p.s,p.wiki)).join('')}</div>`;
+  } else if(id==='financiamiento'){
+    const est=pbMens((PB.bmin+PB.bmax)/2,PB.pago,PB.enganche,PB.plazo);
+    body=stepHead('05','Arma tu crédito','Ajusta enganche y plazo. La mensualidad se recalcula al instante.')+
+    `<div class="finGrid">
+      <div class="finControls">
+        <div class="finRow"><div class="finLabel">Enganche <button class="infoChip" onclick="pbWiki('enganche')">${I.info}</button></div>
+          <b class="finBig" id="pbEngVal">${PB.enganche}%</b></div>
+        <input type="range" min="10" max="60" step="5" value="${PB.enganche}" oninput="pbEng(this.value)">
+        <div class="finRow" style="margin-top:22px"><div class="finLabel">Plazo <button class="infoChip" onclick="pbWiki('plazo')">${I.info}</button></div>
+          <b class="finBig">${PB.plazo} meses</b></div>
+        <div class="chips">${g.plazos.map(p=>`<button class="chip${PB.plazo===p?' chipOn':''}" onclick="pbSetPlazo(${p})">${p}</button>`).join('')}</div>
+      </div>
+      <div class="estCard">
+        <span class="estLbl">Mensualidad estimada <button class="infoChip infoLight" onclick="pbWiki('mensualidad')">${I.info}</button></span>
+        <b class="estNum" id="pbEstNum">${est?money(est):'—'}</b>
+        <span class="estNote" id="pbEstNote">sobre un auto de ~${money((PB.bmin+PB.bmax)/2)}</span>
+        <div class="estFoot">
+          <span>Tasa de referencia ${pbTasa(PB.pago)}% anual · <button class="link" onclick="pbWiki('interesfijo')">interés fijo</button></span>
+          <span>Consulta el <button class="link" onclick="pbWiki('cat')">CAT</button> final</span>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    body=stepHead(String(total).padStart(2,'0'),'¿A dónde te enviamos tus opciones?','Un asesor de El Esensial te contacta con las unidades que hacen match.')+
+    `<div class="formGrid">
+      <label class="field"><span>Nombre</span><input value="${esc(PB.nombre)}" placeholder="Tu nombre" oninput="pbField('nombre',this.value)"></label>
+      <label class="field"><span>WhatsApp</span><input value="${esc(PB.whats)}" placeholder="10 dígitos" inputmode="tel" oninput="pbField('whats',this.value)"></label>
+    </div>
+    <p class="privacy">${I.shield} Solo lo usamos para enviarte tu cotización.</p>`;
   }
-  // Paso final: cotización
-  const p=wzPlan();
-  const filas=p.filas.map(f=>`<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
-  return `<div class="wz-h">${esc(T[5][0])}</div><div class="wz-p">${esc(wzTitulo(c))}${T[5][1]?' · '+esc(T[5][1]):''}</div>
-    <div class="wz-res">
-      <div class="wz-big g"><div class="l">Pago inicial hoy</div><div class="v">${money(p.pagoInicial)}</div><div class="s">Enganche + gastos iniciales</div></div>
-      <div class="wz-big"><div class="l">Pago mensual</div><div class="v">${money(p.mensual)}</div><div class="s">durante ${p.n} meses</div></div>
+  return `<main class="quizWrap">
+    <section class="quizMain">
+      <div class="progress">
+        <div class="progressTop"><span>Paso ${PB.stepIdx+1} de ${total}</span><span class="progressPct">${pct}%</span></div>
+        <div class="bar"><div class="barFill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="stepIn">${body}</div>
+      <div class="stepNav">
+        <button class="btn btnGhost" onclick="pbBack()">${I.chevL} Atrás</button>
+        <button class="btn btnPrimary" id="pbNext" ${pbCanNext()?'':'disabled'} onclick="pbNext()">
+          ${PB.stepIdx===total-1?'Ver mis autos':'Continuar'} ${I.chevR}</button>
+      </div>
+    </section>
+    <aside class="summary" id="pbSummary">${pbSummaryHTML()}</aside>
+  </main>`;
+}
+function pbResults(){
+  const list=pbMatches();
+  const usoL=PB.uso?(USOS.find(u=>u.id===PB.uso)||{}).t:'';
+  return `<main class="results">
+    <div class="resHead">
+      <p class="eyebrow">${PB.nombre?`Listo, ${esc(PB.nombre.split(' ')[0])}`:'Tus resultados'}</p>
+      <h2 class="resTitle">${list.length} autos hacen <span class="acc">match</span></h2>
+      <p class="resSub">${PB.marca&&PB.marca!=='sin'?esc(PB.marca)+' · ':''}${usoL?esc(usoL)+' · ':''}${money(PB.bmin)}–${money(PB.bmax)}${PB.pago&&PB.pago!=='contado'?' · '+PB.plazo+' meses':''}</p>
     </div>
-    <div class="wz-info">
-      <div><span>Precio del auto</span><b>${money(c.precio||0)}</b></div>
-      <div><span>Enganche</span><b>${money(wzEnganche())}</b></div>
-      <div><span>Comisión por apertura</span><b>${money(p.comision)}</b></div>
-      ${p.seguroContado>0?`<div><span>Seguro (de contado)</span><b>${money(p.seguroContado)}</b></div>`:''}
-      <div><span>Monto a financiar</span><b>${money(p.financiar)}</b></div>
-      <div><span>Intereses del plazo</span><b>${money(p.sumInt)}</b></div>
-      <div><span>Total final estimado</span><b>${money(p.total)}</b></div>
-    </div>
-    <div class="wz-tab"><table><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>${filas}</tbody></table></div>
-    <div class="wz-acts">
-      <button class="pdf" onclick="wzPDF()">Descargar PDF</button>
-      <button class="wa" onclick="wzWA()">Enviar por WhatsApp</button>
-    </div>
-    <div class="wz-acts" style="grid-template-columns:1fr;margin-top:10px"><button onclick="wzReset()">Nueva cotización</button></div>
-    <div class="nota" style="text-align:left;margin-top:16px">Cifras informativas, no constituyen una oferta de crédito. Sujeto a aprobación de la financiera.</div>`;
+    <div class="grid gridCars">${list.map(v=>{
+      const men=pbMens(v.precio,PB.pago,PB.enganche,PB.plazo);
+      return `<article class="carCard">
+        <div class="carImg">${v.foto?`<img src="${v.foto}" alt="${esc(nombreCoche(v))}">`
+          :`<div class="carImgPh">${I.car}<span>${esc(v.marca||'')}</span></div>`}
+          <span class="carYearTag">${v.anio||''}</span></div>
+        <div class="carBody">
+          <h3 class="carName">${esc(nombreCoche(v))} ${v.anio||''}</h3>
+          <div class="carSpecs">
+            <span>${I.cal} ${v.anio||'—'}</span>
+            <span>${I.gauge} ${v.km?fmtKm(String(v.km).replace(/\D/g,'')):'Km n/d'}</span>
+            <span>${I.car} ${v.transmision==='STD'?'Estándar':'Automática'}</span>
+            <span>${I.fuel} ${esc(v.motor||'Gasolina')}</span>
+          </div>
+          <div class="carPriceRow">
+            <div class="carPrice">${money(v.precio||0)}</div>
+            ${men?`<div class="carMonthly">${money(men)}<small>/mes est.</small></div>`:''}
+          </div>
+          <div class="carActs">
+            <button class="btn btnPrimary" onclick="pbWA('${v.id}')">Cotizar por WhatsApp ${I.arrow}</button>
+            <button class="carPdf" onclick="pbPDF('${v.id}')" title="Descargar PDF">${I.dl}</button>
+          </div>
+          ${PB.editor?`<button class="carPdf" style="width:100%;height:34px" onclick="pbAlSim('${v.id}')">🧮 Abrir en simulador interno</button>`:''}
+        </div></article>`;}).join('')}</div>
+    <div class="resFoot">
+      <button class="btn btnGhost" onclick="pbRestart()">${I.chevL} Empezar de nuevo</button>
+      <button class="btn btnPrimary" onclick="pbGo('quiz')">Ajustar mi búsqueda</button>
+    </div></main>`;
 }
 
-function wzPDF(){
-  const c=wzCar(), p=wzPlan(); if(!c||!p) return;
-  const filas=p.filas.map(f=>`<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
-  const specs=[c.version,c.transmision==='AUT'?'Automático':'Estándar',(c.color&&c.color!=='N/A')?c.color:'',c.motor].filter(Boolean).join(' · ')||'—';
+/* ---------- Acciones ---------- */
+function pbPlanCoche(v){
+  const g=CFG(); const eng=(v.precio||0)*PB.enganche/100;
+  const P=Math.max(0,(v.precio||0)-eng);
+  const T=tabla(P, pbTasa(PB.pago||'sinburo'), PB.plazo, g.esquema||'fijo',0,false,null);
+  return {eng,P,T};
+}
+function pbWA(id){
+  const v=pbCars().find(c=>c.id===id); if(!v)return;
+  const g=CFG(); const men=pbMens(v.precio,PB.pago,PB.enganche,PB.plazo);
+  let t=`🚗 *${nombreCoche(v)} ${v.anio||''}*\n`;
+  if(PB.nombre) t+=`Cliente: ${PB.nombre}\n`;
+  t+=`━━━━━━━━━━━━━━━\nPrecio: ${money(v.precio||0)}\n`;
+  if(PB.pago==='contado'){ t+=`Pago: de contado\n`; }
+  else { t+=`Enganche: ${PB.enganche}% (${money((v.precio||0)*PB.enganche/100)})\nPlazo: ${PB.plazo} meses\n`;
+    if(men) t+=`💵 *Mensualidad estimada: ${money(men)}*\n`; }
+  t+=`━━━━━━━━━━━━━━━\n_EL ESENSIAL · Cifras informativas, sujetas a aprobación._`;
+  const num=(g.whatsapp||'').replace(/\D/g,'');
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(t),'_blank');
+}
+function pbPDF(id){
+  const v=pbCars().find(c=>c.id===id); if(!v)return;
+  const g=CFG(); const {eng,T}=pbPlanCoche(v);
+  const contado = PB.pago==='contado';
+  const filas=contado?'':T.filas.map(f=>`<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
+  const specs=[v.version, v.transmision==='STD'?'Estándar':'Automático', (v.color&&v.color!=='N/A')?v.color:'', v.motor].filter(Boolean).join(' · ')||'—';
+  const hoy=new Date(); const fecha=hoy.getDate()+' de '+MESES_L[hoy.getMonth()]+' de '+hoy.getFullYear();
   $('printDoc').innerHTML=`
     <div class="pdf-head">
       <svg class="carlogo" style="width:112px;height:56px"><use href="#ee-car"/></svg>
       <div class="pdf-brand">EL ESENSIAL</div>
-      <div class="pdf-meta">Cotización de financiamiento<br>${wzFecha()}</div>
+      <div class="pdf-meta">Cotización de financiamiento<br>${fecha}</div>
     </div>
+    ${PB.nombre?`<div class="pdf-row"><span>Cliente</span><b>${esc(PB.nombre)}</b></div>`:''}
     <div class="pdf-t">Vehículo</div>
-    <div class="pdf-row"><span>Marca</span><b>${esc(c.marca||'—')}</b></div>
-    <div class="pdf-row"><span>Modelo</span><b>${esc(c.modelo||'—')}</b></div>
-    <div class="pdf-row"><span>Año</span><b>${esc(c.anio||'—')}</b></div>
+    <div class="pdf-row"><span>Marca</span><b>${esc(v.marca||'—')}</b></div>
+    <div class="pdf-row"><span>Modelo</span><b>${esc(v.modelo||'—')}</b></div>
+    <div class="pdf-row"><span>Año</span><b>${esc(v.anio||'—')}</b></div>
     <div class="pdf-row"><span>Versión / especificaciones</span><b>${esc(specs)}</b></div>
-    <div class="pdf-row"><span>Precio</span><b>${money(c.precio||0)}</b></div>
-    <div class="pdf-t">Tu plan de financiamiento</div>
-    <div class="pdf-row"><span>Enganche</span><b>${money(wzEnganche())}</b></div>
-    <div class="pdf-row"><span>Plazo</span><b>${p.n} meses</b></div>
-    <div class="pdf-row"><span>Tasa anual</span><b>${c.tasa||16.9}%</b></div>
-    <div class="pdf-row"><span>Monto a financiar</span><b>${money(p.financiar)}</b></div>
-    <div class="pdf-hi">
-      <div><div class="l">Pago inicial hoy</div><div class="v">${money(p.pagoInicial)}</div></div>
-      <div><div class="l">Mensualidad</div><div class="v">${money(p.mensual)}</div></div>
-      <div><div class="l">Total final estimado</div><div class="v">${money(p.total)}</div></div>
-    </div>
-    <div class="pdf-t">Tabla de amortización</div>
-    <table class="pdf-tab"><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>${filas}</tbody></table>
-    <div class="pdf-foot">Cotización generada el ${wzFecha()} · EL ESENSIAL.<br>
+    <div class="pdf-row"><span>Precio</span><b>${money(v.precio||0)}</b></div>
+    ${contado?`<div class="pdf-hi"><div><div class="l">Pago de contado</div><div class="v">${money(v.precio||0)}</div></div></div>`
+    :`<div class="pdf-t">Tu plan de financiamiento</div>
+      <div class="pdf-row"><span>Enganche (${PB.enganche}%)</span><b>${money(eng)}</b></div>
+      <div class="pdf-row"><span>Plazo</span><b>${PB.plazo} meses</b></div>
+      <div class="pdf-row"><span>Tasa anual de referencia</span><b>${pbTasa(PB.pago||'sinburo')}%</b></div>
+      <div class="pdf-row"><span>Monto a financiar</span><b>${money(Math.max(0,(v.precio||0)-eng))}</b></div>
+      <div class="pdf-hi">
+        <div><div class="l">Enganche</div><div class="v">${money(eng)}</div></div>
+        <div><div class="l">Mensualidad</div><div class="v">${money(T.mensualidad)}</div></div>
+        <div><div class="l">Total final estimado</div><div class="v">${money(eng+T.sumPago)}</div></div>
+      </div>
+      <div class="pdf-t">Tabla de amortización</div>
+      <table class="pdf-tab"><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>${filas}</tbody></table>`}
+    <div class="pdf-foot">Cotización generada el ${fecha} · EL ESENSIAL.<br>
     Cifras informativas. No constituyen una oferta de crédito. Sujeto a aprobación de la institución financiera; los montos pueden variar según la fecha de contratación.</div>`;
   document.body.classList.add('print-cotiza');
   const limpiar=()=>document.body.classList.remove('print-cotiza');
   window.addEventListener('afterprint',limpiar,{once:true});
   setTimeout(()=>{ window.print(); setTimeout(limpiar,1500); },80);
 }
-function wzWA(){
-  const c=wzCar(), p=wzPlan(); if(!c||!p) return;
-  const t=`🚗 *${wzTitulo(c)}*\n━━━━━━━━━━━━━━━\nPrecio: ${money(c.precio||0)}\nEnganche: ${money(wzEnganche())}\nPlazo: ${p.n} meses\n━━━━━━━━━━━━━━━\n💵 *Pago inicial hoy: ${money(p.pagoInicial)}*\n🗓️ *Mensualidad: ${money(p.mensual)}*\nTotal estimado: ${money(p.total)}\n━━━━━━━━━━━━━━━\n_EL ESENSIAL · Cifras informativas, sujetas a aprobación de la financiera._`;
-  window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
+function pbAlSim(id){
+  const v=pbCars().find(c=>c.id===id); if(!v)return;
+  salirPub();
+  cargarCoche(id,false);
+  $('enganche').value=Math.round((v.precio||0)*PB.enganche/100);
+  $('plazo').value=String(PB.plazo);
+  $('tasa').value=pbTasa(PB.pago||'sinburo');
+  $('esquema').value=CFG().esquema||'fijo';
+  calc(); irA('simulador'); toast('Cargado en el simulador interno');
 }
+function pbAlSimulador(){ const l=pbMatches(); if(!l.length){ alert('No hay unidades.'); return; } pbAlSim(l[0].id); }
+function pbCfg(){ cfgAbrir(); }
 
 /* --------- Ajustes del cotizador (solo editor) --------- */
 function cfgAbrir(){ const g=CFG();
   $('cEsquema').value=g.esquema||'fijo';
-  $('cSeguro').value=g.seguroAnual; $('cGps').value=g.gpsMensual; $('cTasa').value=g.tasaFija;
-  $('cEngPcts').value=g.engPcts.join(', '); $('cEngDef').value=g.engDefault;
-  $('cPlazos').value=g.plazos.join(', '); $('cPlazoDef').value=g.plazoDefault;
-  $('cSegOn').checked=!!g.mostrarSeguro; $('cGpsOn').checked=!!g.mostrarGps;
-  for(let i=0;i<6;i++){ $('cT'+i).value=g.t[i][0]; $('cS'+i).value=g.t[i][1]; }
+  $('cTasaBanc').value=g.tasaBancario; $('cTasaSB').value=g.tasaSinBuro;
+  $('cSeguro').value=g.seguroAnual; $('cGps').value=g.gpsMensual;
+  $('cEngDef').value=g.engDefault; $('cPlazos').value=g.plazos.join(', '); $('cPlazoDef').value=g.plazoDefault;
+  $('cBmin').value=g.bmin; $('cBmax').value=g.bmax;
+  $('cWhats').value=g.whatsapp||''; $('cHero').value=g.heroImg||'';
+  for(let i=0;i<3;i++){ $('cVidT'+i).value=g.videos[i].t; $('cVidU'+i).value=g.videos[i].url||''; }
   $('cfgModal').classList.add('show');
 }
 function cfgCerrar(){ $('cfgModal').classList.remove('show'); }
 function numList(s,def){ const a=String(s).split(',').map(x=>parseInt(x.trim(),10)).filter(n=>!isNaN(n)&&n>0); return a.length?a:def.slice(); }
 function cfgGuardar(){
-  const g={ esquema:$('cEsquema').value, seguroAnual:+$('cSeguro').value||0, gpsMensual:+$('cGps').value||0, tasaFija:+$('cTasa').value||0,
-    engPcts:numList($('cEngPcts').value,CFG_DEF.engPcts), engDefault:+$('cEngDef').value||20,
-    plazos:numList($('cPlazos').value,CFG_DEF.plazos), plazoDefault:+$('cPlazoDef').value||24,
-    mostrarSeguro:$('cSegOn').checked, mostrarGps:$('cGpsOn').checked,
-    t:[0,1,2,3,4,5].map(i=>[$('cT'+i).value,$('cS'+i).value]) };
-  CFGsave(g); cfgCerrar(); wzReset(); toast('✅ Configuración guardada');
+  const g={ esquema:$('cEsquema').value,
+    tasaBancario:+$('cTasaBanc').value||13, tasaSinBuro:+$('cTasaSB').value||24,
+    seguroAnual:+$('cSeguro').value||0, gpsMensual:+$('cGps').value||0,
+    engDefault:+$('cEngDef').value||20, plazos:numList($('cPlazos').value,CFG_DEF.plazos), plazoDefault:+$('cPlazoDef').value||48,
+    bmin:+$('cBmin').value||200000, bmax:+$('cBmax').value||1200000,
+    whatsapp:$('cWhats').value.trim(), heroImg:$('cHero').value.trim(),
+    videos:[0,1,2].map(i=>({t:$('cVidT'+i).value, s:CFG_DEF.videos[i].s, url:$('cVidU'+i).value.trim()})) };
+  CFGsave(g); cfgCerrar();
+  PB.bmin=g.bmin; PB.bmax=g.bmax; PB.enganche=g.engDefault; PB.plazo=g.plazoDefault;
+  if(document.getElementById('pub').classList.contains('on')) pbRender();
+  toast('✅ Configuración guardada');
 }
 function cfgRestaurar(){ if(!confirm('¿Restaurar la configuración por defecto del cotizador?')) return;
-  localStorage.removeItem('ee_wzcfg'); cfgCerrar(); wzReset(); toast('Configuración restaurada'); }
+  localStorage.removeItem('ee_wzcfg'); cfgCerrar(); PB.bmin=0; toast('Configuración restaurada'); }
 function cfgCopiar(){ const t=JSON.stringify(CFG(),null,2);
   if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>toast('📋 Configuración copiada'),()=>alert(t)); else alert(t); }
 
@@ -1558,10 +1935,8 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll
   (function(){
     const publico = new URLSearchParams(location.search).get('publico')==='1';
     if(publico){
-      document.body.classList.add('modo-publico');
       document.getElementById('gate').style.display='none';
-      document.getElementById('app').style.display='block';
-      invSeed(); irA('cotizador'); wzReset();
+      mostrarPub(false);
       return;
     }
     if(sessionStorage.getItem('ee_auth')==='1') mostrarApp();
