@@ -527,19 +527,36 @@
   .esn .detRow{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
   .esn .detRow span{color:var(--muted)}
   .esn .detRow b{font-weight:700;text-align:right}
-  .esn .detToggle{display:flex;align-items:center;gap:9px;width:100%;margin-top:18px;padding:13px 15px;
-    border:1px solid var(--line2);border-radius:10px;font-size:13px;font-weight:700;color:var(--txt);transition:.2s}
-  .esn .detToggle:hover{border-color:var(--acid);color:var(--acid)}
-  .esn .detToggle svg{width:15px;height:15px;transition:transform .25s;flex:none}
-  .esn .detToggle.open svg{transform:rotate(90deg)}
-  .esn .detTab{max-height:0;overflow:hidden;transition:max-height .3s ease;border-radius:10px}
-  .esn .detTab.open{max-height:300px;overflow:auto;margin-top:10px;border:1px solid var(--line)}
-  .esn .detTab table{width:100%;border-collapse:collapse;font-size:11.5px;min-width:420px}
-  .esn .detTab th{position:sticky;top:0;background:#000;color:#fff;padding:8px 10px;text-align:right;font-size:9.5px;
+  /* Switch contado / financiado dentro del desglose */
+  .esn .detSeg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--panel);
+    border:1px solid var(--line);border-radius:11px;margin-bottom:18px}
+  .esn .detSeg button{height:38px;border-radius:8px;font-size:13px;font-weight:700;color:var(--muted);transition:.18s}
+  .esn .detSeg button:hover{color:var(--txt)}
+  .esn .detSeg button.on{background:var(--acid);color:#fff}
+  .esn .detEstim{display:flex;align-items:flex-start;gap:9px;font-size:12.5px;line-height:1.5;color:var(--muted);
+    background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:16px}
+  .esn .detEstim svg{width:15px;height:15px;flex:none;margin-top:1px}
+  .esn .detEstim b{color:var(--txt)}
+
+  /* Tabla de amortización: siempre visible y con scroll propio */
+  .esn .detTabTitulo{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:22px;margin-bottom:9px;
+    font-size:13px;font-weight:800;color:var(--txt)}
+  .esn .detTabTitulo svg{width:15px;height:15px;color:var(--acid);flex:none}
+  .esn .detTabTitulo span{font-size:11px;font-weight:600;color:var(--muted);margin-left:auto}
+  .esn .detTab{max-height:330px;overflow:auto;-webkit-overflow-scrolling:touch;
+    border:1px solid var(--line);border-radius:10px;overscroll-behavior:contain}
+  .esn .detTab table{width:100%;border-collapse:collapse;font-size:11.5px;min-width:400px}
+  .esn .detTab th{position:sticky;top:0;z-index:1;background:#000;color:#fff;padding:8px 10px;text-align:right;font-size:9.5px;
     text-transform:uppercase;letter-spacing:.06em;font-weight:700}
   .esn .detTab th:first-child{text-align:center}
   .esn .detTab td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);font-family:'Space Mono',monospace}
   .esn .detTab td:first-child{text-align:center;color:var(--muted)}
+  @media(max-width:640px){
+    .esn .detTab{max-height:58vh}
+    .esn .detTab table{min-width:360px;font-size:10.5px}
+    .esn .detTab th,.esn .detTab td{padding:6px 7px}
+    .esn .detTabTitulo span{margin-left:0;width:100%}
+  }
   .esn .detNota{font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:16px}
   .esn .detActs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:16px 24px;
     border-top:1px solid var(--line);background:var(--panel)}
@@ -1625,7 +1642,7 @@ const AVISO_PRIVACIDAD=`
 Fundamento: Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).</p>`;
 
 const PB={screen:'hero',stepIdx:0,editor:false,bmin:0,bmax:0,uso:null,marca:null,pago:null,
-  enganche:20,plazo:48,aval:null,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false,detalle:null};
+  enganche:20,plazo:48,aval:null,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false,detalle:null,detPago:null};
 
 const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' Km';
 function pbCars(){ return invLoad().filter(c=>c.estado==='disponible'); }
@@ -1752,33 +1769,52 @@ function pbCloseModal(){ PB.wiki=null; PB.video=null; pbOverlay(); }
 function pbLegal(){ PB.legal=true; pbOverlay(); window.scrollTo(0,0); }
 
 /* ---------- Desglose de la cotización en pantalla (sin salir a un PDF) ---------- */
-function pbDetalle(id){ PB.detalle=id; pbOverlay(); }
-function pbCerrarDetalle(){ PB.detalle=null; pbOverlay(); }
+function pbDetalle(id){ PB.detalle=id; PB.detPago=PB.pago||'sinburo'; pbOverlay(); }
+function pbCerrarDetalle(){ PB.detalle=null; PB.detPago=null; pbOverlay(); }
+function pbDetPago(v){ PB.detPago=v; pbOverlay(); }
+/* Forma de pago vigente en el modal (puede diferir de la del cuestionario) */
+function pbPagoDet(){ return PB.detPago || PB.pago || 'sinburo'; }
+
 function pbDetalleHTML(){
   const v=pbCars().find(c=>c.id===PB.detalle); if(!v) return '';
-  const contado = PB.pago==='contado';
+  const pago=pbPagoDet(), contado = pago==='contado';
   const titulo=[nombreCoche(v),v.anio,v.version].filter(Boolean).join(' ');
   const stat=(l,val,sub,cls)=>`<div class="detStat ${cls||''}"><span class="l">${l}</span><b class="v">${val}</b>${sub?`<span class="s">${sub}</span>`:''}</div>`;
   const row=(k,val)=>`<div class="detRow"><span>${k}</span><b>${val}</b></div>`;
+  const credito = (PB.pago && PB.pago!=='contado') ? PB.pago : 'sinburo';
+
+  // Cambiar entre contado y financiado sin salir del desglose
+  const seg=`<div class="detSeg">
+      <button class="${contado?'on':''}" onclick="pbDetPago('contado')">De contado</button>
+      <button class="${contado?'':'on'}" onclick="pbDetPago('${credito}')">Financiado</button>
+    </div>`;
+
+  const head=`<div class="detHead"><div><span class="detEye">Tu cotización</span><h3>${esc(titulo)}</h3></div>
+      <button class="closeX" onclick="pbCerrarDetalle()">${I.x}</button></div>`;
 
   if(contado){
-    return `<div class="detHead"><div><span class="detEye">Tu cotización</span><h3>${esc(titulo)}</h3></div>
-        <button class="closeX" onclick="pbCerrarDetalle()">${I.x}</button></div>
-      <div class="detBody">
+    return head+`<div class="detBody">
+        ${seg}
         <div class="detStats">${stat('Precio de contado',money(v.precio||0),'Pago en una exhibición','acc')}</div>
         ${row('Marca / Modelo',esc(nombreCoche(v)))}
         ${row('Año',v.anio||'—')}
         ${row('Transmisión',v.transmision==='STD'?'Estándar':'Automática')}
-        <p class="detNota">Sin intereses. Al pagar de contado recibes factura, finiquito y responsiva.</p>
+        ${v.km?row('Kilometraje',esc(v.km)):''}
+        <p class="detNota">Sin intereses. Al pagar de contado recibes factura, finiquito y responsiva.
+          Toca <b>Financiado</b> para ver la mensualidad y la tabla de pagos.</p>
       </div>`+pbDetalleActs(v);
   }
 
-  const {eng,T}=pbPlanCoche(v);
-  const fin=Math.max(0,(v.precio||0)-eng);
+  const eng=Math.round((v.precio||0)*PB.enganche/100);
+  const P=Math.max(0,(v.precio||0)-eng);
+  const tasa=pbTasa(pago);
+  const T=tabla(P, tasa, PB.plazo, CFG().esquema||'fijo', 0, false, null);
   const filas=T.filas.map(f=>`<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
-  return `<div class="detHead"><div><span class="detEye">Tu cotización</span><h3>${esc(titulo)}</h3></div>
-      <button class="closeX" onclick="pbCerrarDetalle()">${I.x}</button></div>
-    <div class="detBody">
+  const estimado = PB.pago==='contado';   // llegó desde contado: los valores son sugeridos
+
+  return head+`<div class="detBody">
+      ${seg}
+      ${estimado?`<p class="detEstim">${I.info} Estimación con <b>${PB.enganche}% de enganche</b> a <b>${PB.plazo} meses</b>. Ajusta estos valores en el cuestionario.</p>`:''}
       <div class="detStats">
         ${stat('Pago inicial hoy',money(eng),`Enganche del ${PB.enganche}%`,'ok')}
         ${stat('Pagas cada mes',money(T.mensualidad),`durante ${PB.plazo} meses`,'acc')}
@@ -1786,14 +1822,14 @@ function pbDetalleHTML(){
       </div>
       ${row('Precio del auto',money(v.precio||0))}
       ${row('Enganche',`${money(eng)} (${PB.enganche}%)`)}
-      ${row('Aval',PB.aval?'Sí':'No')}
-      ${row('Monto a financiar',money(fin))}
+      ${PB.aval!==null?row('Aval',PB.aval?'Sí':'No'):''}
+      ${row('Monto a financiar',money(P))}
       ${row('Plazo',`${PB.plazo} meses`)}
-      ${row('Tasa anual de referencia',`${pbTasa(PB.pago||'sinburo')}%`)}
+      ${row('Tasa anual de referencia',`${tasa}%`)}
       ${row('Intereses del plazo',money(T.sumInt))}
 
-      <button class="detToggle" onclick="this.nextElementSibling.classList.toggle('open');this.classList.toggle('open')">
-        ${I.chevR} Ver los ${PB.plazo} pagos, mes a mes</button>
+      <div class="detTabTitulo">${I.cal} Tabla de amortización · los ${T.filas.length} pagos
+        <span>Desliza para verlos todos</span></div>
       <div class="detTab">
         <table><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>${filas}</tbody></table>
       </div>
@@ -2260,11 +2296,12 @@ function pbPlanCoche(v){
 }
 function pbWA(id){
   const v=pbCars().find(c=>c.id===id); if(!v)return;
-  const g=CFG(); const men=pbMens(v.precio,PB.pago,PB.enganche,PB.plazo);
+  const g=CFG(); const pago=(PB.detalle===id && PB.detPago)?PB.detPago:PB.pago;
+  const men=pbMens(v.precio,pago,PB.enganche,PB.plazo);
   let t=`🚗 *${nombreCoche(v)} ${v.anio||''}*\n`;
   if(PB.nombre) t+=`Cliente: ${PB.nombre}\n`;
   t+=`━━━━━━━━━━━━━━━\nPrecio: ${money(v.precio||0)}\n`;
-  if(PB.pago==='contado'){ t+=`Pago: de contado\n`; }
+  if(pago==='contado'){ t+=`Pago: de contado\n`; }
   else { t+=`Enganche: ${PB.enganche}% (${money((v.precio||0)*PB.enganche/100)})\nPlazo: ${PB.plazo} meses\n`;
     if(men) t+=`💵 *Mensualidad estimada: ${money(men)}*\n`; }
   t+=`━━━━━━━━━━━━━━━\n_EL ESENSIAL · Cifras informativas, sujetas a aprobación._`;
@@ -2478,12 +2515,15 @@ async function descargarCotizacionPDF(o){
 /* Público: usa lo que el prospecto eligió en el cotizador */
 function pbPDF(id){
   const v=pbCars().find(c=>c.id===id); if(!v)return;
-  const g=CFG(), contado = PB.pago==='contado';
+  const g=CFG();
+  // si el modal está abierto para este auto, respeta el switch contado/financiado
+  const pago = (PB.detalle===id && PB.detPago) ? PB.detPago : (PB.pago||'sinburo');
+  const contado = pago==='contado';
   descargarCotizacionPDF({ car:v, contado,
     enganche: Math.round((v.precio||0)*PB.enganche/100),
-    plazo: PB.plazo, tasa: pbTasa(PB.pago||'sinburo'), esquema: g.esquema,
+    plazo: PB.plazo, tasa: pbTasa(pago), esquema: g.esquema,
     aval: contado? null : PB.aval, cliente: PB.nombre,
-    pagoLabel: (PAGOS.find(p=>p.id===PB.pago)||{}).t });
+    pagoLabel: (PAGOS.find(p=>p.id===pago)||{}).t });
 }
 
 /* Interno: usa los datos guardados del vehículo en el inventario */
