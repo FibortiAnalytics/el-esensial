@@ -560,6 +560,13 @@
   .esn .notice span{font-size:13px;color:var(--muted)}
   .esn .notice.ok{border-color:rgba(52,214,59,.4);background:rgba(52,214,59,.08)}
   .esn .notice.ok b{color:#4ade80}
+  /* Aviso informativo (búsqueda ampliada): neutro, no alarmante */
+  .esn .notice.info{border-color:var(--line2);background:var(--panel)}
+  .esn .notice.info>div{display:flex;align-items:flex-start;gap:11px;flex:1;min-width:260px}
+  .esn .notice.info svg{width:16px;height:16px;color:var(--muted);flex:none;margin-top:1px}
+  .esn .notice.info span{font-size:13.5px;line-height:1.55;color:var(--muted)}
+  .esn .notice.info b{display:inline;font-size:inherit;font-weight:700;color:var(--txt)}
+  .esn .notice.info .btn{white-space:nowrap;padding:10px 16px;font-size:13px}
   .esn .planBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid var(--line);background:var(--panel);
     border-radius:14px;padding:12px 16px;margin-bottom:20px}
   .esn .planChip{display:flex;flex-direction:column;gap:1px;padding-right:14px;border-right:1px solid var(--line);margin-right:4px}
@@ -1631,23 +1638,35 @@ function pbMens(precio,pago,engPct,plazo){
   const g=CFG(); const P=Math.max(0,(+precio||0)*(1-engPct/100));
   return tabla(P, pbTasa(pago), plazo, g.esquema||'fijo', 0, false, null).mensualidad;
 }
-// Coincidencias EXACTAS (cumplen todos los filtros)
+/* Búsqueda con relajación progresiva: si un filtro deja la lista vacía,
+   se suelta el menos importante (uso → marca → presupuesto) hasta encontrar unidades.
+   Nunca devolvemos cero resultados. */
+function pbBuscar(){
+  const cars=pbCars();
+  const usoTag = PB.uso ? (USOS.find(u=>u.id===PB.uso)||{}).tag : null;
+  const enB = v => v.precio >= PB.bmin*0.85 && v.precio <= PB.bmax*1.15;
+  const okM = v => !PB.marca || PB.marca==='sin' || v.marca===PB.marca;
+  const okU = v => !usoTag || (v.tags||[]).includes(usoTag);
+  const ord = (a,b)=>a.precio-b.precio;
+  let l;
+  l=cars.filter(v=>enB(v)&&okM(v)&&okU(v)); if(l.length) return {lista:l.sort(ord), relajado:[]};
+  l=cars.filter(v=>enB(v)&&okM(v));         if(l.length) return {lista:l.sort(ord), relajado:['uso']};
+  l=cars.filter(v=>enB(v)&&okU(v));         if(l.length) return {lista:l.sort(ord), relajado:['marca']};
+  l=cars.filter(enB);                       if(l.length) return {lista:l.sort(ord), relajado:['uso','marca']};
+  const mid=(PB.bmin+PB.bmax)/2;            // nada en el rango: las más cercanas por precio
+  l=[...cars].sort((a,b)=>Math.abs(a.precio-mid)-Math.abs(b.precio-mid)).slice(0,6);
+  return {lista:l.sort(ord), relajado:['presupuesto']};
+}
+// Coincidencias estrictas (para los contadores)
 function pbExact(){
   const usoTag = PB.uso ? (USOS.find(u=>u.id===PB.uso)||{}).tag : null;
-  return pbCars().filter(v=>{
-    const inB = v.precio>=PB.bmin*0.85 && v.precio<=PB.bmax*1.15;
-    const okM = !PB.marca || PB.marca==='sin' || v.marca===PB.marca;
-    const okU = !usoTag || (v.tags||[]).includes(usoTag);
-    return inB && okM && okU;
-  }).sort((a,b)=>a.precio-b.precio);
+  return pbCars().filter(v =>
+    v.precio>=PB.bmin*0.85 && v.precio<=PB.bmax*1.15 &&
+    (!PB.marca || PB.marca==='sin' || v.marca===PB.marca) &&
+    (!usoTag || (v.tags||[]).includes(usoTag))
+  ).sort((a,b)=>a.precio-b.precio);
 }
-function pbIsFallback(){ return pbExact().length===0; }
-// Lo que se muestra: exactas, o las 3 más cercanas al presupuesto si no hay ninguna
-function pbMatches(){
-  const ex=pbExact(); if(ex.length) return ex;
-  const mid=(PB.bmin+PB.bmax)/2;
-  return [...pbCars()].sort((a,b)=>Math.abs(a.precio-mid)-Math.abs(b.precio-mid)).slice(0,3).sort((a,b)=>a.precio-b.precio);
-}
+function pbMatches(){ return pbBuscar().lista; }
 function pbQuitarFiltros(){ PB.uso=null; PB.marca='sin'; pbRender(); }
 function pbSteps(){ const s=['presupuesto','uso','marca','pago'];
   if(PB.pago && PB.pago!=='contado') s.push('financiamiento');
@@ -1697,7 +1716,7 @@ function pbBudget(el,which){
   if(which==='min'){ PB.bmin=Math.min(v,PB.bmax-50000); el.value=PB.bmin; }
   else { PB.bmax=Math.max(v,PB.bmin+50000); el.value=PB.bmax; }
   const a=$('pbBmin'), b=$('pbBmax'); if(a)a.textContent=money(PB.bmin); if(b)b.textContent=money(PB.bmax);
-  const m=$('pbMatch'); if(m)m.innerHTML=I.check+' '+pbExact().length+' unidades dentro de tu rango';
+  const m=$('pbMatch'); if(m){ const n=pbExact().length; m.innerHTML=I.check+' '+(n? n+' unidades dentro de tu rango' : 'Ajusta el rango para ver unidades'); }
   pbSummary();
 }
 function pbEng(v){ PB.enganche=Math.max(pbEngMin(), +v); const b=$('pbEngVal'); if(b)b.textContent=PB.enganche+'%'; pbEstim(); pbSummary(); }
@@ -1901,7 +1920,7 @@ function pbSummaryHTML(){
     ${PB.pago&&PB.pago!=='contado'?row('Enganche',PB.enganche+'%'):''}
     ${PB.pago&&PB.pago!=='contado'?row('Plazo',PB.plazo+' meses'):''}
     ${est?`<div class="sumEst"><span>Mensualidad estimada</span><b>${money(est)}</b></div>`:''}
-    <div class="sumMatch">${I.car} ${pbExact().length? pbExact().length+' unidades hacen match' : 'Sin coincidencias exactas'}</div>`;
+    <div class="sumMatch">${I.car} ${pbExact().length? pbExact().length+' unidades hacen match' : 'Te mostraremos las mejores opciones'}</div>`;
 }
 function stepHead(n,t,s,wiki){
   return `<div class="stepHead"><span class="stepNum">${n}</span><div>
@@ -1933,7 +1952,7 @@ function pbQuiz(){
         <label class="rLabel">Máximo</label>
         <input type="range" min="100000" max="2500000" step="10000" value="${PB.bmax}" oninput="pbBudget(this,'max')">
       </div>
-      <div class="matchHint" id="pbMatch">${I.check} ${pbExact().length} unidades dentro de tu rango</div>
+      <div class="matchHint" id="pbMatch">${I.check} ${pbExact().length? pbExact().length+' unidades dentro de tu rango' : 'Ajusta el rango para ver unidades'}</div>
     </div>`;
   } else if(id==='uso'){
     body=stepHead('02','¿Para qué lo vas a usar?','Elige el estilo que más se acerque a ti.')+
@@ -1999,20 +2018,31 @@ function pbQuiz(){
   </main>`;
 }
 function pbResults(){
-  const list=pbMatches(), fb=pbIsFallback();
+  const {lista:list, relajado:rel}=pbBuscar();
   const usoL=PB.uso?(USOS.find(u=>u.id===PB.uso)||{}).t:'';
+  const marcaL=(PB.marca&&PB.marca!=='sin')?PB.marca:'';
   const pagoL=PB.pago?(PAGOS.find(p=>p.id===PB.pago)||{}).t:'';
   const chip=(k,v)=>`<span class="planChip"><span>${k}</span><b>${v}</b></span>`;
+
+  let aviso='';
+  if(rel.includes('presupuesto'))
+    aviso=`No tenemos unidades dentro de ${money(PB.bmin)}–${money(PB.bmax)}. Estas son las <b>${list.length} más cercanas</b> a tu presupuesto.`;
+  else if(rel.includes('uso') && rel.includes('marca'))
+    aviso=`Ampliamos tu búsqueda: dentro de tu presupuesto no hay ${marcaL?`<b>${esc(marcaL)}</b> `:''}para uso <b>${esc(usoL||'—')}</b>. Estas sí encajan.`;
+  else if(rel.includes('uso'))
+    aviso=`Dentro de tu presupuesto no hay unidades para uso <b>${esc(usoL)}</b>. Te mostramos ${marcaL?`las <b>${esc(marcaL)}</b> disponibles`:'estas opciones'}.`;
+  else if(rel.includes('marca'))
+    aviso=`No hay <b>${esc(marcaL)}</b> en tu presupuesto. Te mostramos otras marcas para uso <b>${esc(usoL||'—')}</b>.`;
+
   return `<main class="results">
     <div class="resHead">
       <p class="eyebrow">${PB.nombre?`Listo, ${esc(PB.nombre.split(' ')[0])}`:'Tus resultados'}</p>
-      <h2 class="resTitle">${fb?'Opciones <span class="acc">cercanas</span>':`${list.length} autos hacen <span class="acc">match</span>`}</h2>
-      <p class="resSub">${PB.marca&&PB.marca!=='sin'?esc(PB.marca)+' · ':''}${usoL?esc(usoL)+' · ':''}${money(PB.bmin)}–${money(PB.bmax)}${PB.pago&&PB.pago!=='contado'?' · '+PB.plazo+' meses':''}</p>
+      <h2 class="resTitle">${list.length} ${list.length===1?'auto':'autos'} ${rel.length?'para <span class="acc">ti</span>':'hacen <span class="acc">match</span>'}</h2>
+      <p class="resSub">${marcaL?esc(marcaL)+' · ':''}${usoL?esc(usoL)+' · ':''}${money(PB.bmin)}–${money(PB.bmax)}${PB.pago&&PB.pago!=='contado'?' · '+PB.plazo+' meses':''}</p>
     </div>
-    ${fb?`<div class="notice">
-      <div><b>Ninguna unidad cumple todos tus filtros.</b>
-        <span>Te mostramos las ${list.length} más cercanas a tu presupuesto.</span></div>
-      <button class="btn btnGhost" onclick="pbQuitarFiltros()">Ampliar búsqueda</button></div>`:''}
+    ${aviso?`<div class="notice info">
+      <div>${I.info}<span>${aviso}</span></div>
+      <button class="btn btnGhost" onclick="pbGo('quiz')">Ajustar filtros</button></div>`:''}
     <div class="planBar">
       ${chip('Pago',esc(pagoL||'—'))}
       ${PB.pago&&PB.pago!=='contado'&&PB.aval!==null?chip('Aval',PB.aval?'Sí':'No'):''}
@@ -2107,7 +2137,8 @@ function pbLeadPayload(){
     plazo: PB.pago==='contado'? null : PB.plazo,
     tasaRef: PB.pago==='contado'? null : pbTasa(PB.pago),
     esquema: g.esquema,
-    coincidenciaExacta: !pbIsFallback(),
+    coincidenciaExacta: pbBuscar().relajado.length===0,
+    filtrosRelajados: pbBuscar().relajado,
     opciones: list.map(v=>({
       marca:v.marca, modelo:v.modelo, anio:v.anio, version:v.version||'',
       precio:v.precio, mensualidad: Math.round(pbMens(v.precio,PB.pago,PB.enganche,PB.plazo)||0)
