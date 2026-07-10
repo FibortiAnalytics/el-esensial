@@ -546,6 +546,13 @@
   .esn .nosTel svg{width:16px;height:16px;color:var(--acid);flex:none}
   .esn .nosTel b{color:var(--txt);font-family:'Space Mono',monospace}
 
+  /* AVAL */
+  .esn .avalBox{margin-bottom:18px}
+  .esn .avalQ{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:12px}
+  .esn .avalHint{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--acid);font-weight:600;margin-bottom:16px}
+  .esn .avalHint svg{width:15px;height:15px;flex:none}
+  .esn .avalMin{font-size:12px;color:var(--muted);font-weight:600;margin-top:8px;text-align:right;font-family:'Space Mono',monospace}
+
   /* CONSENTIMIENTO */
   .esn .consent{display:flex;align-items:flex-start;gap:11px;margin-top:20px;max-width:600px;cursor:pointer}
   .esn .consent input{appearance:none;-webkit-appearance:none;width:20px;height:20px;flex:none;margin-top:1px;
@@ -1425,6 +1432,9 @@ const I={
   info:SV('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'),
   car:SV('<path d="M5 11l1.6-4.2A2 2 0 0 1 8.5 5.5h7a2 2 0 0 1 1.9 1.3L19 11"/><path d="M3.5 11h17a1 1 0 0 1 1 1v4h-2m-14 0h-2v-4a1 1 0 0 1 1-1"/><path d="M6 16h12"/><circle cx="7.5" cy="16.4" r="1.5"/><circle cx="16.5" cy="16.4" r="1.5"/>'),
   fuel:SV('<line x1="3" y1="22" x2="15" y2="22"/><line x1="4" y1="9" x2="14" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/>'),
+  tag:SV('<path d="M20.6 13.4 11.7 4.5A2 2 0 0 0 10.3 4H5a1 1 0 0 0-1 1v5.3a2 2 0 0 0 .6 1.4l8.9 8.9a2 2 0 0 0 2.8 0l4.3-4.3a2 2 0 0 0 0-2.9z"/><circle cx="8" cy="8" r="1"/>'),
+  cash:SV('<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01"/><path d="M18 12h.01"/>'),
+  userCheck:SV('<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/>'),
   gauge:SV('<path d="M12 14l4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>'),
   cal:SV('<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>'),
   wallet:SV('<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>'),
@@ -1458,6 +1468,7 @@ const WIKI={
   bancario:{t:'Crédito bancario',d:'Financiamiento con instituciones bancarias, tasas preferenciales y plazos de hasta 72 meses. Requiere revisión de buró. Cobertura nacional.'},
   sinburo:{t:'Sin buró (local)',d:'Financiamiento directo, sin revisión de buró de crédito. Ideal para estrenar sin complicaciones. Suele pedir identificación y comprobante (predial libre de gravamen o aval).'},
   contado:{t:'Pago de contado',d:'Pagas el total del vehículo en una sola exhibición. Es la vía más rápida y sin intereses.'},
+  aval:{t:'Aval',d:'Persona que respalda tu crédito y responde por el pago si tú no puedes cubrirlo. Normalmente se pide identificación y un comprobante de propiedad (por ejemplo, predial libre de gravamen). Presentar aval te permite el enganche mínimo del 20%; sin aval, el enganche arranca en 40%.'},
   km:{t:'Kilometraje',d:'Distancia total recorrida por el vehículo. A menor kilometraje, normalmente mayor vida útil por delante.'}
 };
 const USOS=[
@@ -1488,7 +1499,8 @@ const NEGOCIO={
   ],
   financiamiento:[
     'Sin revisión de buró de crédito.',
-    'Enganche desde el 20% del valor del vehículo.',
+    'Con aval: enganche desde el 20% del valor del vehículo.',
+    'Sin aval: el enganche mínimo es del 40% al 50%.',
     'Plazos de 12 a 60 meses, según el año de la unidad.',
     'Interés del 2% mensual.',
     'Si liquidas antes, se eliminan los intereses futuros.',
@@ -1516,11 +1528,13 @@ const AVISO_PRIVACIDAD=`
 Fundamento: Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).</p>`;
 
 const PB={screen:'hero',stepIdx:0,editor:false,bmin:0,bmax:0,uso:null,marca:null,pago:null,
-  enganche:20,plazo:48,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false};
+  enganche:20,plazo:48,aval:null,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false};
 
 const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' Km';
 function pbCars(){ return invLoad().filter(c=>c.estado==='disponible'); }
 function pbMarcas(){ return [...new Set(pbCars().map(c=>c.marca).filter(Boolean))].sort(); }
+function pbEngMin(){ return PB.aval===false ? 40 : 20; }
+function pbSetAval(v){ PB.aval=v; if(PB.enganche<pbEngMin()) PB.enganche=pbEngMin(); pbRender(); }
 function pbTasa(pago){ const g=CFG(); return pago==='bancario' ? (+g.tasaBancario||13) : (+g.tasaSinBuro||24); }
 function pbMens(precio,pago,engPct,plazo){
   if(!pago||pago==='contado') return null;
@@ -1552,6 +1566,7 @@ function pbCanNext(){ const id=pbSteps()[PB.stepIdx];
   if(id==='uso') return !!PB.uso;
   if(id==='marca') return !!PB.marca;
   if(id==='pago') return !!PB.pago;
+  if(id==='financiamiento') return PB.aval!==null;
   if(id==='contacto') return PB.nombre.trim().length>1 && PB.whats.replace(/D/g,'').length>=10 && PB.acepta;
   return true; }
 
@@ -1559,7 +1574,7 @@ function pbCanNext(){ const id=pbSteps()[PB.stepIdx];
 function mostrarPub(editor){
   const g=CFG();
   if(!PB.bmin){ PB.bmin=g.bmin; PB.bmax=g.bmax; PB.enganche=g.engDefault; PB.plazo=g.plazoDefault; }
-  PB.editor=!!editor;
+  PB.editor=!!editor; PB.aval=null;
   invSeed();
   document.getElementById('app').style.display='none';
   document.getElementById('pub').classList.add('on');
@@ -1597,7 +1612,7 @@ function pbBudget(el,which){
   const m=$('pbMatch'); if(m)m.innerHTML=I.check+' '+pbExact().length+' unidades dentro de tu rango';
   pbSummary();
 }
-function pbEng(v){ PB.enganche=+v; const b=$('pbEngVal'); if(b)b.textContent=PB.enganche+'%'; pbEstim(); pbSummary(); }
+function pbEng(v){ PB.enganche=Math.max(pbEngMin(), +v); const b=$('pbEngVal'); if(b)b.textContent=PB.enganche+'%'; pbEstim(); pbSummary(); }
 function pbEstim(){ const e=$('pbEstNum'); if(!e)return;
   const m=pbMens((PB.bmin+PB.bmax)/2,PB.pago,PB.enganche,PB.plazo);
   e.textContent = m? money(m):'—';
@@ -1714,6 +1729,7 @@ function pbSummaryHTML(){
     ${row('Uso',esc(usoL||'—'))}
     ${row('Marca',PB.marca==='sin'?'Abierto':esc(PB.marca||'—'))}
     ${row('Pago',esc(pagoL||'—'))}
+    ${PB.pago&&PB.pago!=='contado'&&PB.aval!==null?row('Aval',PB.aval?'Sí':'No'):''}
     ${PB.pago&&PB.pago!=='contado'?row('Enganche',PB.enganche+'%'):''}
     ${PB.pago&&PB.pago!=='contado'?row('Plazo',PB.plazo+' meses'):''}
     ${est?`<div class="sumEst"><span>Mensualidad estimada</span><b>${money(est)}</b></div>`:''}
@@ -1765,12 +1781,22 @@ function pbQuiz(){
     `<div class="grid grid3">${PAGOS.map(p=>optBlock(PB.pago===p.id,`pbSetPago('${p.id}')`,p.ic,p.t,p.s,p.wiki)).join('')}</div>`;
   } else if(id==='financiamiento'){
     const est=pbMens((PB.bmin+PB.bmax)/2,PB.pago,PB.enganche,PB.plazo);
-    body=stepHead('05','Arma tu crédito','Ajusta enganche y plazo. La mensualidad se recalcula al instante.')+
-    `<div class="finGrid">
+    const eMin=pbEngMin();
+    body=stepHead('05','Arma tu crédito','Primero dinos si cuentas con aval: define tu enganche mínimo.')+
+    `<div class="avalBox">
+      <div class="avalQ">¿Cuentas con un aval? <button class="infoChip" onclick="pbWiki('aval')">${I.info}</button></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        ${optBlock(PB.aval===true,"pbSetAval(true)","userCheck","Sí, tengo aval","Enganche desde el 20%")}
+        ${optBlock(PB.aval===false,"pbSetAval(false)","wallet","No tengo aval","Enganche desde el 40%")}
+      </div>
+    </div>
+    ${PB.aval===null?`<div class="avalHint">${I.info} Elige una opción para continuar.</div>`:""}
+    <div class="finGrid" ${PB.aval===null?'style="opacity:.35;pointer-events:none"':''}>
       <div class="finControls">
         <div class="finRow"><div class="finLabel">Enganche <button class="infoChip" onclick="pbWiki('enganche')">${I.info}</button></div>
           <b class="finBig" id="pbEngVal">${PB.enganche}%</b></div>
-        <input type="range" min="10" max="60" step="5" value="${PB.enganche}" oninput="pbEng(this.value)">
+        <input type="range" min="${eMin}" max="60" step="5" value="${PB.enganche}" oninput="pbEng(this.value)">
+        <div class="avalMin">Mínimo ${eMin}% ${PB.aval===false?"(sin aval)":"(con aval)"}</div>
         <div class="finRow" style="margin-top:22px"><div class="finLabel">Plazo <button class="infoChip" onclick="pbWiki('plazo')">${I.info}</button></div>
           <b class="finBig">${PB.plazo} meses</b></div>
         <div class="chips">${g.plazos.map(p=>`<button class="chip${PB.plazo===p?' chipOn':''}" onclick="pbSetPlazo(${p})">${p}</button>`).join('')}</div>
@@ -1834,6 +1860,7 @@ function pbResults(){
     <div id="pbLeadBox"></div>
     <div class="planBar">
       ${chip('Pago',esc(pagoL||'—'))}
+      ${PB.pago&&PB.pago!=='contado'&&PB.aval!==null?chip('Aval',PB.aval?'Sí':'No'):''}
       ${PB.pago&&PB.pago!=='contado'?chip('Enganche',PB.enganche+'%'):''}
       ${PB.pago&&PB.pago!=='contado'?chip('Plazo',PB.plazo+' meses'):''}
       ${PB.pago&&PB.pago!=='contado'?chip('Tasa ref.',pbTasa(PB.pago)+'%'):''}
@@ -1886,6 +1913,7 @@ function pbLeadPayload(){
     marca: PB.marca==='sin' ? 'Sin preferencia' : PB.marca,
     pago: PB.pago ? (PAGOS.find(p=>p.id===PB.pago)||{}).t : null,
     pagoId: PB.pago,
+    aval: PB.pago==='contado'? null : PB.aval,
     enganchePct: PB.pago==='contado'? null : PB.enganche,
     plazo: PB.pago==='contado'? null : PB.plazo,
     tasaRef: PB.pago==='contado'? null : pbTasa(PB.pago),
@@ -1904,7 +1932,7 @@ function leadTexto(L){
   t+=`Nombre: ${L.nombre}\nWhatsApp: ${L.whatsapp}\n`;
   t+=`Presupuesto: ${money(L.presupuesto.min)} – ${money(L.presupuesto.max)}\n`;
   t+=`Uso: ${L.uso||'—'}\nMarca: ${L.marca||'—'}\nPago: ${L.pago||'—'}\n`;
-  if(L.plazo) t+=`Enganche: ${L.enganchePct}% · Plazo: ${L.plazo} meses · Tasa ${L.tasaRef}%\n`;
+  if(L.plazo) t+=`Aval: ${L.aval?'Sí':'No'} · Enganche: ${L.enganchePct}% · Plazo: ${L.plazo} meses · Tasa ${L.tasaRef}%\n`;
   t+=`━━━━━━━━━━━━━━━\nOpciones que le mostramos${L.coincidenciaExacta?'':' (cercanas)'}:\n`;
   L.opciones.forEach((o,i)=>{ t+=`${i+1}. ${o.marca} ${o.modelo} ${o.anio||''} — ${money(o.precio)}${o.mensualidad?` (${money(o.mensualidad)}/mes)`:''}\n`; });
   return t;
@@ -1968,6 +1996,7 @@ function leadsRender(){
         <div><span>Marca</span>${esc(L.marca||'—')}</div>
         <div><span>Pago</span>${esc(L.pago||'—')}</div>
         <div><span>Plan</span>${L.plazo?`${L.enganchePct}% · ${L.plazo} meses · ${L.tasaRef}%`:'—'}</div>
+        <div><span>Aval</span>${L.aval==null?'—':(L.aval?'Sí':'No')}</div>
       </div>
       <div class="usr-chips-lbl">Opciones que le interesaron${L.coincidenciaExacta?'':' (cercanas)'}</div>
       <div class="lead-ops">${L.opciones.map(o=>`<div class="lead-op">
@@ -1992,9 +2021,9 @@ function leadWA(id){ const L=leadsLoad().find(x=>x.id===id); if(!L)return;
 }
 function leadsCSV(){
   const a=leadsLoad(); if(!a.length){ alert('No hay prospectos.'); return; }
-  const cab=['Fecha','Nombre','WhatsApp','Presup. min','Presup. max','Uso','Marca','Pago','Enganche %','Plazo','Tasa','Exacta','Estado','Opciones'];
+  const cab=['Fecha','Nombre','WhatsApp','Presup. min','Presup. max','Uso','Marca','Pago','Aval','Enganche %','Plazo','Tasa','Exacta','Estado','Opciones'];
   const filas=a.map(L=>[new Date(L.fecha).toLocaleString('es-MX'),L.nombre,L.whatsapp,L.presupuesto.min,L.presupuesto.max,
-    L.uso||'',L.marca||'',L.pago||'',L.enganchePct||'',L.plazo||'',L.tasaRef||'',L.coincidenciaExacta?'Sí':'No',L.estado,
+    L.uso||'',L.marca||'',L.pago||'',(L.aval==null?'':(L.aval?'Sí':'No')),L.enganchePct||'',L.plazo||'',L.tasaRef||'',L.coincidenciaExacta?'Sí':'No',L.estado,
     L.opciones.map(o=>`${o.marca} ${o.modelo} ${o.anio||''} (${o.precio})`).join(' | ')]);
   const csv=[cab,...filas].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
@@ -2043,6 +2072,7 @@ function pbPDF(id){
     <div class="pdf-row"><span>Precio</span><b>${money(v.precio||0)}</b></div>
     ${contado?`<div class="pdf-hi"><div><div class="l">Pago de contado</div><div class="v">${money(v.precio||0)}</div></div></div>`
     :`<div class="pdf-t">Tu plan de financiamiento</div>
+      <div class="pdf-row"><span>Aval</span><b>${PB.aval?'Sí':'No'}</b></div>
       <div class="pdf-row"><span>Enganche (${PB.enganche}%)</span><b>${money(eng)}</b></div>
       <div class="pdf-row"><span>Plazo</span><b>${PB.plazo} meses</b></div>
       <div class="pdf-row"><span>Tasa anual de referencia</span><b>${pbTasa(PB.pago||'sinburo')}%</b></div>
