@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Seguridad: sólo se permite el propio código en línea; nada externo puede cargarse ni inyectarse -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com; connect-src https:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com; connect-src https: blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2753,7 +2753,34 @@ async function descargarCotizacionPDF(o){
     doc.text(`Página ${p} de ${total}`, W-M, H-8, {align:'right'});
   }
 
-  doc.save(nombreArchivo(v)+'.pdf');   // descarga real: sin diálogo de impresión
+  guardarPDF(doc, nombreArchivo(v)+'.pdf');
+}
+
+/* Descarga robusta bajo CSP estricta: intenta blob -> data-uri -> nueva pestaña */
+function guardarPDF(doc, nombre){
+  let ok=false;
+  try{
+    const blob=doc.output('blob');
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=nombre; a.rel='noopener'; a.style.display='none';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 4000);
+    ok=true;
+  }catch(e){ ok=false; }
+  if(ok) return;
+  // Fallback 1: data-uri (funciona aunque blob: esté bloqueado)
+  try{
+    const uri=doc.output('datauristring');
+    const a=document.createElement('a');
+    a.href=uri; a.download=nombre; a.style.display='none';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>document.body.removeChild(a), 2000);
+    return;
+  }catch(e){}
+  // Fallback 2: abrir en pestaña nueva para que el usuario guarde manualmente
+  try{ doc.output('dataurlnewwindow'); }
+  catch(e){ toast && toast('No se pudo generar el PDF en este navegador'); }
 }
 
 /* Público: usa lo que el prospecto eligió en el cotizador */
