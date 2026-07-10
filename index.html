@@ -527,6 +527,47 @@
   .lead-op span{color:var(--tinta-2);font-weight:600}
   .lead-op b{color:var(--rojo);font-weight:700;white-space:nowrap}
 
+  /* NOSOTROS */
+  .esn .nosIntro{max-width:660px;font-size:15px;line-height:1.7;color:#cfd4cb;margin-bottom:28px}
+  .esn .nosIntro b{color:var(--txt);font-weight:700}
+  .esn .nosGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
+  .esn .nosCard{border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:18px;display:flex;flex-direction:column;gap:8px;min-height:132px}
+  .esn .nosT{font-weight:800;font-size:15px;margin-top:auto}
+  .esn .nosS{font-size:12.5px;color:var(--muted);line-height:1.4}
+  .esn .nosCols{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .esn .nosBox{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:24px}
+  .esn .nosBox h3{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;margin-bottom:16px}
+  .esn .nosBox h3 svg{width:19px;height:19px;color:var(--acid);flex:none}
+  .esn .nosList{list-style:none;display:grid;gap:11px}
+  .esn .nosList li{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:#cfd4cb}
+  .esn .nosList svg{width:15px;height:15px;color:var(--acid);flex:none;margin-top:3px}
+  .esn .nosDir{font-size:15px;color:var(--txt);font-weight:600}
+  .esn .nosTel{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);margin-top:8px}
+  .esn .nosTel svg{width:16px;height:16px;color:var(--acid);flex:none}
+  .esn .nosTel b{color:var(--txt);font-family:'Space Mono',monospace}
+
+  /* CONSENTIMIENTO */
+  .esn .consent{display:flex;align-items:flex-start;gap:11px;margin-top:20px;max-width:600px;cursor:pointer}
+  .esn .consent input{appearance:none;-webkit-appearance:none;width:20px;height:20px;flex:none;margin-top:1px;
+    border:1.5px solid var(--line2);border-radius:5px;background:var(--panel);cursor:pointer;position:relative;transition:.15s}
+  .esn .consent input:checked{background:var(--acid);border-color:var(--acid)}
+  .esn .consent input:checked:after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .esn .consent span{font-size:13px;line-height:1.55;color:var(--muted)}
+  .esn .consent .link{font-size:13px}
+
+  /* AVISO DE PRIVACIDAD (modal) */
+  .esn .legalCard{max-width:640px;width:100%;max-height:84vh;display:flex;flex-direction:column;
+    border:1px solid var(--line2);border-radius:18px;padding:24px;background:var(--panel2);animation:pop .3s both}
+  .esn .legalBody{overflow-y:auto;padding-right:6px}
+  .esn .legalBody p{font-size:13.5px;line-height:1.65;color:#cfd4cb;margin-bottom:13px}
+  .esn .legalBody b{color:var(--txt)}
+  .esn .legal-fecha{font-size:11.5px !important;color:var(--muted) !important;border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
+  .esn .footLink{font-size:12.5px;color:var(--muted);text-decoration:underline;padding:0;font-weight:600}
+  .esn .footLink:hover{color:var(--acid)}
+  @media(max-width:920px){ .esn .nosGrid{grid-template-columns:repeat(2,1fr)} .esn .nosCols{grid-template-columns:1fr} }
+  @media(max-width:560px){ .esn .nosGrid{grid-template-columns:1fr} }
+
   /* FOOTER */
   .esn .foot{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:26px;border-top:1px solid var(--line);margin-top:20px}
   .esn .footBrand{display:flex;align-items:center;gap:8px;font-weight:600;letter-spacing:.1em;font-size:13px}
@@ -990,7 +1031,7 @@
     <nav class="navLinks">
       <a onclick="pbGo('results')">Catálogo</a>
       <a onclick="pbStart()">Financiamiento</a>
-      <a onclick="pbWiki('seminuevo')">Servicios</a>
+      <a onclick="pbGo('nosotros')">Nosotros</a>
     </nav>
     <div class="navIcons">
       <span class="ni" onclick="pbGo('results')" title="Catálogo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.9 8.4 8.4 0 0 1 8.4-9 8.4 8.4 0 0 1 8.6 8.4z"/></svg></span>
@@ -1004,7 +1045,9 @@
   <footer class="foot">
     <div class="footBrand"><img src="logo-mark.png" alt="" class="brandmark"><span class="brandtxt">EL ESENSIAL</span></div>
     <span class="footTxt">Seminuevos certificados</span>
-    <span class="footTxt dim">Cifras informativas · sujetas a aprobación de la financiera</span>
+    <button class="footLink" onclick="pbLegal()">Aviso de privacidad</button>
+    <button class="footLink" onclick="pbGo('nosotros')">Nosotros</button>
+    <span class="footTxt dim">Cifras informativas · sujetas a aprobación</span>
   </footer>
 
   <div id="pubOverlay"></div>
@@ -1313,11 +1356,11 @@ function rellenarSelectorCoches(){ const sel=$('carSelect'); if(!sel)return;
 // Configuración editable
 const CFG_DEF={
   esquema:'fijo',                       // 'fijo' (add-on) | 'insoluto' (francesa)
-  tasaBancario:13, tasaSinBuro:24,      // tasas de referencia por tipo de pago
+  tasaBancario:13, tasaSinBuro:24,      // 24% = 2% mensual (dato del formulario del cliente)
   seguroAnual:12000, gpsMensual:250,
-  engDefault:20, plazos:[24,36,48,60,72], plazoDefault:48,
-  bmin:200000, bmax:1200000,
-  whatsapp:'',                          // número del lote (ej. 529991234567)
+  engDefault:20, plazos:[12,24,36,48,60], plazoDefault:48,   // hasta 60 meses según el año del auto
+  bmin:250000, bmax:1200000,            // rangos de venta del lote
+  whatsapp:'529994476667',              // WhatsApp del lote (Diego Jasso)
   leadsUrl:'',                          // endpoint que recibe los prospectos (Google Apps Script / VPS)
   heroImg:'',
   videos:[ {t:'Recorrido por el lote', s:'Conoce nuestras unidades', url:''},
@@ -1430,8 +1473,50 @@ const PAGOS=[
   {id:'sinburo',t:'Sin buró (local)',s:'Directo, entrega inmediata',ic:'key',wiki:'sinburo'}
 ];
 
+/* Datos reales del negocio (fuente: "FORMULARIO/ El Esensial" — Google Drive) */
+const NEGOCIO={
+  direccion:'Prol. Paseo Montejo 338, Benito Juárez Nte., 97119 Mérida, Yuc.',
+  ciudad:'Mérida, Yucatán',
+  telefono:'999 447 66 67',
+  telE164:'529994476667',
+  responsable:'Diego Jasso',
+  lineas:[
+    {t:'Venta de seminuevos',s:'Unidades revisadas, de rango medio y alto.',ic:'car'},
+    {t:'Consignación',s:'Ponemos tu auto a la venta por ti.',ic:'tag'},
+    {t:'Compra directa',s:'Compramos tu vehículo.',ic:'cash'},
+    {t:'Renta de autos',s:'Unidades disponibles para renta.',ic:'cal'}
+  ],
+  financiamiento:[
+    'Sin revisión de buró de crédito.',
+    'Enganche desde el 20% del valor del vehículo.',
+    'Plazos de 12 a 60 meses, según el año de la unidad.',
+    'Interés del 2% mensual.',
+    'Si liquidas antes, se eliminan los intereses futuros.',
+    'Autorización del crédito en 24 a 48 horas.'
+  ],
+  compra:[
+    'Apartado desde $5,000 — válido una semana y se suma a tu enganche.',
+    'Garantía de 30 días sobre motor.',
+    'Factura al liquidar el 100% del vehículo.',
+    'De contado: factura, finiquito y responsiva.'
+  ]
+};
+
+const AVISO_VERSION='2026-07-09';
+const AVISO_PRIVACIDAD=`
+<p><b>Responsable.</b> El Esensial, con domicilio en ${NEGOCIO.direccion}, es responsable del tratamiento de tus datos personales.</p>
+<p><b>Datos que recabamos.</b> Únicamente tu <b>nombre</b> y tu <b>número de WhatsApp</b>, junto con las preferencias que indicas en el cotizador (presupuesto, uso, marca, forma de pago, enganche y plazo). No solicitamos datos financieros, identificaciones ni información sensible en este sitio.</p>
+<p><b>Finalidades.</b> Los usamos exclusivamente para: (i) contactarte y dar seguimiento comercial sobre las unidades que te interesaron, y (ii) elaborar tu cotización. No los vendemos ni los usamos para otra finalidad.</p>
+<p><b>Transferencias.</b> No transferimos tus datos a terceros, salvo obligación legal. Se almacenan en servicios de Google bajo contrato de tratamiento.</p>
+<p><b>Conservación.</b> Conservamos tu información mientras exista interés comercial vigente y hasta 12 meses después del último contacto, salvo que pidas su eliminación antes.</p>
+<p><b>Derechos ARCO.</b> Puedes solicitar el <b>Acceso, Rectificación, Cancelación u Oposición</b> al tratamiento de tus datos, y revocar tu consentimiento, por WhatsApp al <b>${NEGOCIO.telefono}</b> o en nuestro domicilio. Respondemos en un máximo de 20 días hábiles.</p>
+<p><b>Cambios.</b> Cualquier modificación se publicará en esta misma página.</p>
+<p><b>Cotizaciones.</b> Las cifras del cotizador son informativas, no constituyen una oferta de crédito y están sujetas a aprobación.</p>
+<p class="legal-fecha">Última actualización: 9 de julio de 2026 · Versión ${AVISO_VERSION}<br>
+Fundamento: Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).</p>`;
+
 const PB={screen:'hero',stepIdx:0,editor:false,bmin:0,bmax:0,uso:null,marca:null,pago:null,
-  enganche:20,plazo:48,nombre:'',whats:'',wiki:null,video:null};
+  enganche:20,plazo:48,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false};
 
 const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' Km';
 function pbCars(){ return invLoad().filter(c=>c.estado==='disponible'); }
@@ -1467,7 +1552,7 @@ function pbCanNext(){ const id=pbSteps()[PB.stepIdx];
   if(id==='uso') return !!PB.uso;
   if(id==='marca') return !!PB.marca;
   if(id==='pago') return !!PB.pago;
-  if(id==='contacto') return PB.nombre.trim().length>1 && PB.whats.trim().length>=8;
+  if(id==='contacto') return PB.nombre.trim().length>1 && PB.whats.replace(/D/g,'').length>=10 && PB.acepta;
   return true; }
 
 /* ---------- Mostrar / salir ---------- */
@@ -1518,14 +1603,64 @@ function pbEstim(){ const e=$('pbEstNum'); if(!e)return;
   e.textContent = m? money(m):'—';
   const n=$('pbEstNote'); if(n)n.textContent='sobre un auto de ~'+money((PB.bmin+PB.bmax)/2); }
 function pbField(k,v){ PB[k]=v; const n=$('pbNext'); if(n)n.disabled=!pbCanNext(); pbSummary(); }
+function pbAcepta(v){ PB.acepta=!!v; const n=$('pbNext'); if(n)n.disabled=!pbCanNext(); }
 function pbSummary(){ const el=$('pbSummary'); if(!el)return; el.innerHTML=pbSummaryHTML(); }
 
 /* ---------- Modales ---------- */
 function pbWiki(k){ PB.wiki=k; pbOverlay(); }
 function pbVideo(i){ PB.video=i; pbOverlay(); }
 function pbCloseModal(){ PB.wiki=null; PB.video=null; pbOverlay(); }
+function pbLegal(){ PB.legal=true; pbOverlay(); window.scrollTo(0,0); }
+function pbNosotros(){
+  const li=(x)=>`<li>${I.check}<span>${esc(x)}</span></li>`;
+  return `<main class="results">
+    <div class="resHead">
+      <p class="eyebrow">Quiénes somos</p>
+      <h2 class="resTitle">El <span class="acc">Esensial</span></h2>
+      <p class="resSub">Seminuevos y gama alta · ${esc(NEGOCIO.ciudad)}</p>
+    </div>
+    <p class="nosIntro">Somos un lote de coches enfocado en la venta de vehículos <b>seminuevos y de gama alta</b>.
+      Venimos de operar como <b>financiera de vehículos desde 2020</b>, y desde 2026 vendemos también con stock propio.
+      Por eso el financiamiento es lo que mejor sabemos hacer.</p>
+
+    <div class="nosGrid">${NEGOCIO.lineas.map(l=>`
+      <div class="nosCard"><span class="optIcon">${I[l.ic]}</span>
+        <span class="nosT">${esc(l.t)}</span><span class="nosS">${esc(l.s)}</span></div>`).join('')}</div>
+
+    <div class="nosCols">
+      <div class="nosBox">
+        <h3>${I.bank} Cómo funciona el financiamiento</h3>
+        <ul class="nosList">${NEGOCIO.financiamiento.map(li).join('')}</ul>
+      </div>
+      <div class="nosBox">
+        <h3>${I.shield} Tu compra, protegida</h3>
+        <ul class="nosList">${NEGOCIO.compra.map(li).join('')}</ul>
+      </div>
+    </div>
+
+    <div class="nosBox nosContacto">
+      <h3>${I.pin} Visítanos</h3>
+      <p class="nosDir">${esc(NEGOCIO.direccion)}</p>
+      <p class="nosTel">${I.phone} <b>${esc(NEGOCIO.telefono)}</b> · Atiende ${esc(NEGOCIO.responsable)}</p>
+      <div class="heroCtas" style="margin-top:18px">
+        <button class="btn btnPrimary" onclick="pbStart()">${I.search} Cotiza tu auto</button>
+        <button class="btn btnGhost" onclick="window.open('https://wa.me/${NEGOCIO.telE164}','_blank')">${I.msg} Escríbenos por WhatsApp</button>
+      </div>
+    </div>
+  </main>`;
+}
+
 function pbOverlay(){
   const o=$('pubOverlay');
+  if(PB.legal){
+    o.innerHTML=`<div class="overlay" onclick="PB.legal=false;pbOverlay()"><div class="legalCard" onclick="event.stopPropagation()">
+      <div class="wikiTop"><span class="wikiTag">${I.shield} Aviso de privacidad</span>
+        <button class="closeX" onclick="PB.legal=false;pbOverlay()">${I.x}</button></div>
+      <div class="legalBody">${AVISO_PRIVACIDAD}</div>
+      <button class="btn btnPrimary full" style="margin-top:16px" onclick="PB.legal=false;pbOverlay()">Entendido</button>
+    </div></div>`;
+    return;
+  }
   if(PB.wiki!=null && WIKI[PB.wiki]){ const w=WIKI[PB.wiki];
     o.innerHTML=`<div class="overlay" onclick="pbCloseModal()"><div class="wikiCard" onclick="event.stopPropagation()">
       <div class="wikiTop"><span class="wikiTag">${I.info} Referencia</span><button class="closeX" onclick="pbCloseModal()">${I.x}</button></div>
@@ -1545,6 +1680,7 @@ function pbRender(){
   const s=$('pubScreen'); if(!s) return;
   if(PB.screen==='hero') s.innerHTML=pbHero();
   else if(PB.screen==='quiz') s.innerHTML=pbQuiz();
+  else if(PB.screen==='nosotros') s.innerHTML=pbNosotros();
   else s.innerHTML=pbResults();
   pbOverlay();
 }
@@ -1655,7 +1791,14 @@ function pbQuiz(){
       <label class="field"><span>Nombre</span><input value="${esc(PB.nombre)}" placeholder="Tu nombre" oninput="pbField('nombre',this.value)"></label>
       <label class="field"><span>WhatsApp</span><input value="${esc(PB.whats)}" placeholder="10 dígitos" inputmode="tel" oninput="pbField('whats',this.value)"></label>
     </div>
-    <p class="privacy">${I.shield} Solo lo usamos para enviarte tu cotización.</p>`;
+    <input type="text" id="pbTrampa" tabindex="-1" autocomplete="off" aria-hidden="true"
+       style="position:absolute;left:-9999px;opacity:0" oninput="PB.trampa=this.value">
+    <label class="consent">
+      <input type="checkbox" ${PB.acepta?"checked":""} onchange="pbAcepta(this.checked)">
+      <span>He leído y acepto el <button class="link" onclick="event.preventDefault();pbLegal()">Aviso de Privacidad</button>.
+      Autorizo que El Esensial me contacte por WhatsApp con mi cotización.</span>
+    </label>
+    <p class="privacy">${I.shield} Solo guardamos tu nombre y WhatsApp. Puedes pedir que los borremos cuando quieras.</p>`;
   }
   return `<main class="quizWrap">
     <section class="quizMain">
@@ -1752,6 +1895,7 @@ function pbLeadPayload(){
       marca:v.marca, modelo:v.modelo, anio:v.anio, version:v.version||'',
       precio:v.precio, mensualidad: Math.round(pbMens(v.precio,PB.pago,PB.enganche,PB.plazo)||0)
     })),
+    consentimiento:{ aceptado:true, fecha:new Date().toISOString(), aviso:AVISO_VERSION },
     estado:'nuevo', origen:'cotizador-web'
   };
 }
@@ -1766,6 +1910,11 @@ function leadTexto(L){
   return t;
 }
 async function pbEnviarLead(){
+  if(PB.trampa){ console.warn('[lead] descartado: bot'); return; }        // honeypot
+  if(!PB.acepta){ console.warn('[lead] sin consentimiento'); return; }
+  const ultimo=+localStorage.getItem('ee_lead_ts')||0;
+  if(Date.now()-ultimo < 60000){ pbLeadBox(pbLeadPayload(), false, 'espera un minuto'); return; }
+  localStorage.setItem('ee_lead_ts', String(Date.now()));
   const g=CFG(), L=pbLeadPayload();
   // 1) siempre se guarda en este dispositivo
   const arr=leadsLoad(); arr.unshift(L); leadsSave(arr);
