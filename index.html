@@ -24,14 +24,26 @@
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--tinta);line-height:1.45}
 
   /* ===== LOGO ===== */
-  /* Logo oficial (PNG, fondo negro — va sobre superficies negras) */
+  /* ===== Iconos SVG (sin emojis) ===== */
+  .ic{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;
+      stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+  .ic-sm{width:13px;height:13px;stroke-width:2}
+  .ic-lg{width:20px;height:20px}
+
+  /* ===== Logo oficial (PNG transparente) ===== */
   .brandimg{display:block;height:auto;max-width:100%}
-  .gate-box .brandimg{width:255px;margin:0 auto 22px}
-  .ee-brand .brandimg{width:172px;margin:0 auto}
-  .ee-hero .brandimg{width:230px;flex:none;position:relative}
-  .ee-topbar .brandimg{height:30px;width:auto}
-  .esn .nav .brandimg{height:34px;width:auto}
-  .esn .foot .brandimg{height:26px;width:auto}
+  .brandmark{display:block;height:auto;flex:none}
+  .gate-box .brandimg{width:248px;margin:0 auto 24px}
+  .ee-brand .brandimg{width:158px;margin:0 auto}
+  .ee-hero .brandimg{width:210px;flex:none;position:relative}
+  /* Barras horizontales: solo el auto + texto de marca */
+  .ee-topbar .brandmark{height:22px}
+  .esn .nav .brandmark{height:24px}
+  .esn .foot .brandmark{height:18px}
+  .brandtxt{font-family:Georgia,'Times New Roman',serif;font-weight:700;letter-spacing:.13em;
+    color:var(--amarillo);line-height:1;white-space:nowrap;font-size:15px}
+  .esn .nav .brandtxt{font-family:'Archivo',sans-serif;font-weight:800;letter-spacing:.16em;font-size:14px;color:#F3F5F1}
+  .esn .foot .brandtxt{font-family:'Archivo',sans-serif;font-weight:800;letter-spacing:.14em;font-size:12px;color:#F3F5F1}
 
   /* ===== GATE (login) ===== */
   #gate{position:fixed;inset:0;z-index:200;background:radial-gradient(1200px 600px at 50% -10%,#1c1c22,#000);
@@ -59,9 +71,9 @@
     font-size:14px;font-weight:600;cursor:pointer;border-left:3px solid transparent;transition:.15s;margin-bottom:2px}
   .ee-navitem:hover{background:rgba(255,255,255,.06);color:#fff}
   .ee-navitem.active{background:rgba(225,29,42,.14);color:#fff;border-left-color:var(--rojo)}
-  .ee-navitem .ic{width:20px;text-align:center;font-size:16px}
+  .ee-navitem .navic{width:18px;height:18px;flex:none}
   .ee-side-foot{padding:14px;border-top:1px solid rgba(255,255,255,.07)}
-  .ee-logout{width:100%;padding:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);
+  .ee-logout{width:100%;padding:10px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);
     border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
   .ee-logout:hover{border-color:var(--rojo);color:#fff}
   .ee-cred{color:rgba(255,255,255,.28);font-size:10px;text-align:center;margin-top:10px;letter-spacing:.1em}
@@ -612,6 +624,45 @@
 
 <!-- Símbolo del logo (auto rojo) reutilizable -->
 
+<!-- ===================== ICONOS (sprite SVG) ===================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-calc" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="12" y1="15" x2="12" y2="15"/><line x1="16" y1="15" x2="16" y2="18"/><line x1="8" y1="18" x2="12" y2="18"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></symbol>
+<symbol id="i-car" viewBox="0 0 24 24"><path d="M5 11l1.6-4.2A2 2 0 0 1 8.5 5.5h7a2 2 0 0 1 1.9 1.3L19 11"/><path d="M3.5 11h17a1 1 0 0 1 1 1v4h-2m-14 0h-2v-4a1 1 0 0 1 1-1"/><path d="M6 16h12"/><circle cx="7.5" cy="16.4" r="1.5"/><circle cx="16.5" cy="16.4" r="1.5"/></symbol>
+<symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.4 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.4-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.8 1.1z"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5a8.4 8.4 0 0 1-.9-3.9 8.4 8.4 0 0 1 8.4-9 8.4 8.4 0 0 1 8.6 8.4z"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+<symbol id="i-print" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a9 9 0 0 1 14.9-3.4L23 10M1 14l4.6 4.4A9 9 0 0 0 20.5 15"/></symbol>
+<symbol id="i-gift" viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></symbol>
+<symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+<symbol id="i-coins" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></symbol>
+<symbol id="i-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
+<symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+<symbol id="i-cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.8 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7.3 19.6l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3.3 14H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.4 7.3l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4.4V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.8 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.8H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+<symbol id="i-rotate" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></symbol>
+<symbol id="i-clip" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.4 11.7 4.5A2 2 0 0 0 10.3 4H5a1 1 0 0 0-1 1v5.3a2 2 0 0 0 .6 1.4l8.9 8.9a2 2 0 0 0 2.8 0l4.3-4.3a2 2 0 0 0 0-2.9z"/><circle cx="8" cy="8" r="1"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></symbol>
+<symbol id="i-bldg" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"/></symbol>
+<symbol id="i-ext" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+<symbol id="i-archive" viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/></symbol>
+</defs></svg>
+
 <!-- ===================== LOGIN ===================== -->
 <div id="gate">
   <div class="gate-box">
@@ -629,8 +680,9 @@
 <div id="app">
   <!-- Barra superior (solo móvil) -->
   <div class="ee-topbar">
-    <button class="ee-burger" onclick="toggleMenu()" aria-label="Abrir menú">☰</button>
-    <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
+    <button class="ee-burger" onclick="toggleMenu()" aria-label="Abrir menú"><svg class="ic ic-lg"><use href="#i-menu"/></svg></button>
+    <img src="logo-mark.png" alt="" class="brandmark">
+    <span class="brandtxt">EL ESENSIAL</span>
   </div>
   <div class="ee-backdrop" onclick="toggleMenu(false)"></div>
   <!-- Barra izquierda -->
@@ -640,15 +692,15 @@
     </div>
     <nav class="ee-nav">
       <div class="ee-navsec">Herramientas</div>
-      <div class="ee-navitem active" data-page="simulador" onclick="irA('simulador')"><span class="ic">🧮</span><span>Simulador interno</span></div>
-      <div class="ee-navitem" onclick="mostrarPub(true)"><span class="ic">📄</span><span>Cotizador público</span></div>
-      <div class="ee-navitem" data-page="inventario" onclick="irA('inventario')"><span class="ic">🚗</span><span>Inventario de coches</span></div>
+      <div class="ee-navitem active" data-page="simulador" onclick="irA('simulador')"><svg class="ic navic"><use href="#i-calc"/></svg><span>Simulador interno</span></div>
+      <div class="ee-navitem" onclick="mostrarPub(true)"><svg class="ic navic"><use href="#i-doc"/></svg><span>Cotizador público</span></div>
+      <div class="ee-navitem" data-page="inventario" onclick="irA('inventario')"><svg class="ic navic"><use href="#i-car"/></svg><span>Inventario de coches</span></div>
       <div class="ee-navsec">Administración</div>
-      <div class="ee-navitem" data-page="prospectos" onclick="irA('prospectos')"><span class="ic">📥</span><span>Prospectos</span></div>
-      <div class="ee-navitem" data-page="usuarios" onclick="irA('usuarios')"><span class="ic">👥</span><span>Usuarios y perfiles</span></div>
+      <div class="ee-navitem" data-page="prospectos" onclick="irA('prospectos')"><svg class="ic navic"><use href="#i-inbox"/></svg><span>Prospectos</span></div>
+      <div class="ee-navitem" data-page="usuarios" onclick="irA('usuarios')"><svg class="ic navic"><use href="#i-users"/></svg><span>Usuarios y perfiles</span></div>
     </nav>
     <div class="ee-side-foot">
-      <button class="ee-logout" onclick="salir()"><span>🔒 Cerrar sesión</span></button>
+      <button class="ee-logout" onclick="salir()"><svg class="ic ic-sm"><use href="#i-lock"/></svg><span>Cerrar sesión</span></button>
       <div class="ee-cred">by Fiborti Analytics</div>
     </div>
   </aside>
@@ -670,16 +722,16 @@
           <input class="lote" id="lote" value="EL ESENSIAL" placeholder="Nombre / auto" oninput="calc()">
           <div class="sub">Amortización francesa · <b id="fecha">—</b></div>
           <div class="carsel-row">
-            <span class="carsel-lbl">🚗 Cargar coche del inventario</span>
+            <span class="carsel-lbl"><svg class="ic ic-sm"><use href="#i-car"/></svg> Cargar coche del inventario</span>
             <select id="carSelect" onchange="if(this.value)cargarCoche(this.value,false)">
               <option value="">— Elegir coche del inventario —</option>
             </select>
           </div>
           <div class="acciones">
-            <button class="btn btn-wa" onclick="compartirWA()">💬 Compartir por WhatsApp</button>
-            <button class="btn btn-gh" onclick="copiar()">📋 Copiar resumen</button>
-            <button class="btn btn-gh" onclick="window.print()">🖨️ Imprimir / PDF</button>
-            <button class="btn btn-oro" onclick="reset()">🔄 Nuevo cálculo</button>
+            <button class="btn btn-wa" onclick="compartirWA()"><svg class="ic"><use href="#i-chat"/></svg> Compartir por WhatsApp</button>
+            <button class="btn btn-gh" onclick="copiar()"><svg class="ic"><use href="#i-copy"/></svg> Copiar resumen</button>
+            <button class="btn btn-gh" onclick="window.print()"><svg class="ic"><use href="#i-print"/></svg> Imprimir / PDF</button>
+            <button class="btn btn-oro" onclick="reset()"><svg class="ic"><use href="#i-refresh"/></svg> Nuevo cálculo</button>
           </div>
         </header>
 
@@ -692,7 +744,7 @@
               <div class="inbox"><span class="pre">$</span><input type="number" id="precio" class="has-pre" value="280000" min="0" step="1000" oninput="calc()"></div>
             </div>
             <div class="campo">
-              <label>🎁 Bonificación / Descuento <span class="hint">(promoción del lote — se resta del precio)</span></label>
+              <label><svg class="ic ic-sm"><use href="#i-gift"/></svg> Bonificación / Descuento <span class="hint">(promoción del lote — se resta del precio)</span></label>
               <div class="inbox"><span class="pre">$</span><input type="number" id="bonificacion" class="has-pre" value="0" min="0" step="1000" oninput="calc()"></div>
             </div>
             <div class="final-live"><span>Precio final con tu descuento</span><span id="precioFinalLive">$280,000</span></div>
@@ -720,27 +772,27 @@
             <h2 style="margin-top:8px"><span class="dot"></span> Cargos adicionales</h2>
             <label class="toggle"><input type="checkbox" id="tgl" onchange="calc()"> Agregar comisión, seguro, GPS, atraso, IVA…</label>
             <div class="opcionales" id="opc" hidden>
-              <div class="cargo-grupo"><div class="gt">💳 Comisión por apertura</div>
+              <div class="cargo-grupo"><div class="gt"><svg class="ic ic-sm"><use href="#i-card"/></svg> Comisión por apertura</div>
                 <div class="campo" style="margin-bottom:0"><div class="mix">
                   <div class="inbox"><input type="number" id="comision" value="2" min="0" step="0.1" oninput="calc()"></div>
                   <select id="comisionModo" onchange="calc()"><option value="pct">% del precio</option><option value="monto">$ monto fijo</option></select></div>
                   <div class="campo" style="margin:6px 0 0"><span class="hint">Se paga de contado al inicio (entra en el pago inicial).</span></div></div></div>
-              <div class="cargo-grupo"><div class="gt">🛡️ Seguro</div>
+              <div class="cargo-grupo"><div class="gt"><svg class="ic ic-sm"><use href="#i-shield"/></svg> Seguro</div>
                 <div class="campo" style="margin-bottom:0"><div class="mix">
                   <div class="inbox"><span class="pre">$</span><input type="number" id="seguro" class="has-pre" value="12000" min="0" step="500" oninput="calc()"></div>
                   <select id="seguroModo" onchange="calc()"><option value="contado">De contado (al inicio)</option><option value="financiado">Financiado (a meses)</option><option value="mensual">Pago mensual (÷12)</option></select></div>
                   <div class="campo" style="margin:6px 0 0"><span class="hint">Monto anual del seguro. Elige cómo lo cobra el lote.</span></div></div></div>
-              <div class="cargo-grupo"><div class="gt">📍 GPS</div>
+              <div class="cargo-grupo"><div class="gt"><svg class="ic ic-sm"><use href="#i-pin"/></svg> GPS</div>
                 <div class="campo" style="margin-bottom:0"><div class="mix">
                   <div class="inbox"><span class="pre">$</span><input type="number" id="gps" class="has-pre" value="250" min="0" step="10" oninput="calc()"></div>
                   <select id="gpsModo" onchange="calc()"><option value="mensual">Cada mes</option><option value="contado">De contado (instalación)</option></select></div></div></div>
-              <div class="cargo-grupo"><div class="gt">📆 Cargo mensual + atraso</div>
+              <div class="cargo-grupo"><div class="gt"><svg class="ic ic-sm"><use href="#i-cal"/></svg> Cargo mensual + atraso</div>
                 <div class="campo"><label>Cargo administrativo mensual</label>
                   <div class="inbox"><span class="pre">$</span><input type="number" id="admin" class="has-pre" value="150" min="0" step="10" oninput="calc()"></div></div>
                 <div class="campo" style="margin-bottom:0"><label>Cargo por atraso <span class="hint">(si te retrasas en un pago)</span></label>
                   <div class="mix"><div class="inbox"><input type="number" id="atraso" value="0" min="0" step="50" oninput="calc()"></div>
                   <select id="atrasoModo" onchange="calc()"><option value="monto">$ por atraso</option><option value="pct">% de la mensualidad</option></select></div></div></div>
-              <div class="cargo-grupo"><div class="gt">💰 Abono a capital (adelanto)</div>
+              <div class="cargo-grupo"><div class="gt"><svg class="ic ic-sm"><use href="#i-coins"/></svg> Abono a capital (adelanto)</div>
                 <div class="fila2">
                   <div class="campo"><label>Monto del abono</label>
                     <div class="inbox"><span class="pre">$</span><input type="number" id="abonoMonto" class="has-pre" value="0" min="0" step="1000" oninput="calc()"></div></div>
@@ -758,14 +810,14 @@
           <!-- RESULTADOS -->
           <div class="card">
             <h2><span class="dot"></span> Esto es lo que pagarías</h2>
-            <div class="warn" id="warn">⚠️ El enganche no puede ser mayor o igual al precio del auto.</div>
+            <div class="warn" id="warn"><svg class="ic ic-sm"><use href="#i-alert"/></svg> El enganche no puede ser mayor o igual al precio del auto.</div>
             <div class="pasos">
               <div class="paso"><div class="n">1</div><div class="t">Das el inicio</div><div class="s">Un solo pago para llevarte el auto hoy.</div></div>
               <div class="paso"><div class="n">2</div><div class="t">Pagas cada mes</div><div class="s">Una mensualidad fija durante el plazo.</div></div>
               <div class="paso"><div class="n">3</div><div class="t">El auto es tuyo</div><div class="s">Al terminar de pagar, sin deudas.</div></div>
             </div>
             <div class="res-hero inicio">
-              <div class="lbl">💵 Para llevarte el auto HOY necesitas</div>
+              <div class="lbl"><svg class="ic ic-sm"><use href="#i-cash"/></svg> Para llevarte el auto HOY necesitas</div>
               <div class="big" id="rInicial">$0</div>
               <div class="tip" id="rInicialDetalle">Enganche</div>
             </div>
@@ -780,7 +832,7 @@
             <div class="kpis">
               <div class="kpi"><div class="k">Precio de lista</div><div class="v" id="rPrecioLista">$0</div><div class="d">Precio del auto sin descuento.</div></div>
               <div class="kpi"><div class="k">Tasa efectiva anual</div><div class="v oro" id="rTasaEf">—</div><div class="d">Costo real del crédito (interno).</div></div>
-              <div class="kpi bonif"><div class="k">🎁 Tu descuento</div><div class="v" id="rDescuento">$0</div><div class="d">Lo que te ahorras de la promoción.</div></div>
+              <div class="kpi bonif"><div class="k"><svg class="ic ic-sm"><use href="#i-gift"/></svg> Tu descuento</div><div class="v" id="rDescuento">$0</div><div class="d">Lo que te ahorras de la promoción.</div></div>
               <div class="kpi"><div class="k">Precio final</div><div class="v" id="rPrecioFinal">$0</div><div class="d">Precio ya con tu descuento aplicado.</div></div>
               <div class="kpi"><div class="k">Monto que financias</div><div class="v" id="rFinanciar">$0</div><div class="d">Lo que pagas en mensualidades.</div></div>
               <div class="kpi"><div class="k">Intereses del plazo</div><div class="v oro" id="rInteres">$0</div><div class="d">El costo de pagar a meses.</div></div>
@@ -811,17 +863,17 @@
       <div class="wrap">
         <div class="inv-top">
           <div>
-            <h1>🚗 Inventario de coches <span id="invCount" class="inv-count"></span></h1>
+            <h1><svg class="ic ic-lg"><use href="#i-car"/></svg> Inventario de coches <span id="invCount" class="inv-count"></span></h1>
             <p>Busca, filtra y edita las unidades. Toca <b>Simular</b> para llevar el coche al simulador con sus datos.</p>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-imp" onclick="invImportar()" title="Cargar/mezclar el catálogo del Excel">⬇️ Importar catálogo</button>
-            <button class="btn btn-add" onclick="invAbrir()">+ Agregar coche</button>
+            <button class="btn btn-imp" onclick="invImportar()" title="Cargar/mezclar el catálogo del Excel"><svg class="ic"><use href="#i-download"/></svg> Importar catálogo</button>
+            <button class="btn btn-add" onclick="invAbrir()"><svg class="ic"><use href="#i-plus"/></svg> Agregar coche</button>
           </div>
         </div>
 
         <div class="inv-toolbar">
-          <input type="text" id="qSearch" placeholder="🔎 Buscar marca, modelo, color…" oninput="invRender()">
+          <input type="text" id="qSearch" placeholder="Buscar marca, modelo, color…" oninput="invRender()">
           <select id="fltMarca" onchange="invRender()"><option value="">Todas las marcas</option></select>
           <select id="fltAnio" onchange="invRender()"><option value="">Todos los años</option></select>
           <select id="fltTrans" onchange="invRender()"><option value="">Transmisión</option><option value="AUT">Automático</option><option value="STD">Estándar</option></select>
@@ -830,9 +882,9 @@
 
         <div id="invGrid" class="inv-grid"></div>
         <div id="invEmpty" class="inv-empty" style="display:none">
-          <div class="big">🚙</div>
+          <div class="big"><svg class="ic"><use href="#i-car"/></svg></div>
           <div style="font-weight:700;color:var(--tinta-2);font-size:15px">No hay coches con esos filtros</div>
-          <div style="margin-top:6px">Cambia la búsqueda, toca «⬇️ Importar catálogo» o «+ Agregar coche».</div>
+          <div style="margin-top:6px">Cambia la búsqueda, toca «Importar catálogo» o «+ Agregar coche».</div>
         </div>
       </div>
     </section>
@@ -842,18 +894,18 @@
       <div class="wrap">
         <div class="inv-top">
           <div>
-            <h1>📥 Prospectos <span id="leadCount" class="inv-count"></span></h1>
+            <h1><svg class="ic ic-lg"><use href="#i-inbox"/></svg> Prospectos <span id="leadCount" class="inv-count"></span></h1>
             <p>Cada cliente que completa el cotizador queda registrado aquí con lo que llenó y las opciones que vio.</p>
           </div>
-          <button class="btn btn-imp" onclick="leadsCSV()">⬇️ Exportar CSV</button>
+          <button class="btn btn-imp" onclick="leadsCSV()"><svg class="ic"><use href="#i-download"/></svg> Exportar CSV</button>
         </div>
         <div class="warn" id="leadAviso" style="display:block;background:#eff6ff;border-color:#bfdbfe;color:#1e40af">
           Esta lista se guarda <b>en este navegador</b>. Para que los prospectos que llenen el formulario desde <b>su celular</b>
-          te lleguen aquí, configura una <b>base de datos</b> en ⚙ Ajustes del cotizador.
+          te lleguen aquí, configura una <b>base de datos</b> en <b>Ajustes</b> del cotizador.
         </div>
         <div id="leadGrid" class="usr-grid"></div>
         <div id="leadEmpty" class="inv-empty" style="display:none">
-          <div class="big">📭</div>
+          <div class="big"><svg class="ic"><use href="#i-archive"/></svg></div>
           <div style="font-weight:700;color:var(--tinta-2);font-size:15px">Aún no hay prospectos</div>
           <div style="margin-top:6px">Aparecerán cuando alguien complete el cotizador público.</div>
         </div>
@@ -865,10 +917,10 @@
       <div class="wrap">
         <div class="inv-top">
           <div>
-            <h1>👥 Usuarios y perfiles</h1>
+            <h1><svg class="ic ic-lg"><use href="#i-users"/></svg> Usuarios y perfiles</h1>
             <p>Quién usa el sistema, su rol, área, permisos y a qué módulos tiene acceso.</p>
           </div>
-          <button class="btn btn-add" onclick="usrAbrir()">+ Agregar usuario</button>
+          <button class="btn btn-add" onclick="usrAbrir()"><svg class="ic"><use href="#i-plus"/></svg> Agregar usuario</button>
         </div>
         <div id="usrGrid" class="usr-grid"></div>
       </div>
@@ -881,7 +933,7 @@
   <div class="inv-form">
     <h3 id="invFormTitle">Agregar coche</h3>
     <div class="msub">Los datos se guardan en este dispositivo (navegador).</div>
-    <div class="foto-prev" id="fotoPrev" onclick="document.getElementById('fFoto').click()">📷 Toca para agregar foto (opcional)</div>
+    <div class="foto-prev" id="fotoPrev" onclick="document.getElementById('fFoto').click()"><svg class="ic"><use href="#i-camera"/></svg> Toca para agregar foto (opcional)</div>
     <input type="file" id="fFoto" accept="image/*" style="display:none" onchange="fotoElegida(event)">
     <div class="fila2">
       <div class="campo"><label>Marca</label><input type="text" id="fMarca" placeholder="Ej: Audi"></div>
@@ -915,7 +967,7 @@
       <input type="text" id="fTags" placeholder="familiar, ciudad"></div>
     <div class="mfoot">
       <button class="m-cancel" onclick="invCerrar()">Cancelar</button>
-      <button class="m-save" onclick="invGuardar()">💾 Guardar coche</button>
+      <button class="m-save" onclick="invGuardar()"><svg class="ic"><use href="#i-save"/></svg> Guardar coche</button>
     </div>
   </div>
 </div>
@@ -924,15 +976,16 @@
 <div id="pub" class="esn">
   <div class="edbar" id="pubEdbar" style="display:none">
     <span>● Modo editor</span>
-    <button onclick="pbCfg()">⚙ Ajustes</button>
-    <button onclick="pbAlSimulador()">🧮 Abrir en simulador interno</button>
-    <button onclick="window.open('?publico=1','_blank')">Ver como prospecto ↗</button>
-    <button onclick="salirPub()">← Volver al panel</button>
+    <button onclick="pbCfg()"><svg class="ic ic-sm"><use href="#i-cog"/></svg> Ajustes</button>
+    <button onclick="pbAlSimulador()"><svg class="ic ic-sm"><use href="#i-calc"/></svg> Abrir en simulador interno</button>
+    <button onclick="window.open('?publico=1','_blank')"><svg class="ic ic-sm"><use href="#i-ext"/></svg> Ver como prospecto</button>
+    <button onclick="salirPub()"><svg class="ic ic-sm"><use href="#i-back"/></svg> Volver al panel</button>
   </div>
 
   <header class="nav">
     <div class="logo" onclick="pbRestart()" role="button">
-      <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
+      <img src="logo-mark.png" alt="" class="brandmark">
+      <span class="brandtxt">EL ESENSIAL</span>
     </div>
     <nav class="navLinks">
       <a onclick="pbGo('results')">Catálogo</a>
@@ -949,7 +1002,7 @@
   <div id="pubScreen"></div>
 
   <footer class="foot">
-    <div class="footBrand"><img src="logo.png" alt="EL ESENSIAL" class="brandimg"></div>
+    <div class="footBrand"><img src="logo-mark.png" alt="" class="brandmark"><span class="brandtxt">EL ESENSIAL</span></div>
     <span class="footTxt">Seminuevos certificados</span>
     <span class="footTxt dim">Cifras informativas · sujetas a aprobación de la financiera</span>
   </footer>
@@ -1002,11 +1055,11 @@
 
     <div class="mfoot">
       <button class="m-cancel" onclick="cfgCerrar()">Cancelar</button>
-      <button class="m-save" onclick="cfgGuardar()">💾 Guardar</button>
+      <button class="m-save" onclick="cfgGuardar()"><svg class="ic"><use href="#i-save"/></svg> Guardar</button>
     </div>
     <div style="display:flex;gap:10px;margin-top:10px">
-      <button class="m-cancel" style="flex:1;padding:11px;border-radius:11px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px" onclick="cfgCopiar()">📋 Copiar configuración</button>
-      <button class="m-cancel" style="flex:1;padding:11px;border-radius:11px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px" onclick="cfgRestaurar()">↺ Restaurar</button>
+      <button class="m-cancel" style="flex:1;padding:11px;border-radius:11px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px" onclick="cfgCopiar()"><svg class="ic"><use href="#i-clip"/></svg> Copiar configuración</button>
+      <button class="m-cancel" style="flex:1;padding:11px;border-radius:11px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px" onclick="cfgRestaurar()"><svg class="ic"><use href="#i-rotate"/></svg> Restaurar</button>
     </div>
   </div>
 </div>
@@ -1032,7 +1085,7 @@
     <div class="campo"><label>Estado</label><select id="uEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div>
     <div class="mfoot">
       <button class="m-cancel" onclick="usrCerrar()">Cancelar</button>
-      <button class="m-save" onclick="usrGuardar()">💾 Guardar usuario</button>
+      <button class="m-save" onclick="usrGuardar()"><svg class="ic"><use href="#i-save"/></svg> Guardar usuario</button>
     </div>
   </div>
 </div>
@@ -1084,6 +1137,7 @@ function toggleMenu(force){
 }
 
 /* ===================== INVENTARIO ===================== */
+const ico=(n,c)=>'<svg class="ic'+(c?' '+c:'')+'"><use href="#i-'+n+'"/></svg>';
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const ICO={
  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
@@ -1141,7 +1195,7 @@ function invImportar(){ // botón: sincronizar/mezclar catálogo del Excel
   const arr=invLoad(); const have=new Set(arr.map(sig)); let add=0;
   SEED_CARS.forEach(c=>{ if(!have.has(sig(c))){ arr.push({...c,id:'c'+Date.now()+Math.floor(Math.random()*1e4)}); add++; } });
   invSaveAll(arr); invRefreshFiltros(); invRender();
-  toast(add? `✅ ${add} autos importados del catálogo` : 'El catálogo ya está sincronizado');
+  toast(add? `${add} autos importados del catálogo` : 'El catálogo ya está sincronizado');
 }
 
 const ESTADOS={disponible:{t:'Disponible',c:'#0f7a53',b:'#eafaf1'},vendido:{t:'Vendido',c:'#b91c1c',b:'#fee2e2'},oculto:{t:'Oculto',c:'#6b7280',b:'#eef0f3'}};
@@ -1203,7 +1257,7 @@ function invAbrir(){ editandoId=null; fotoActual='';
   $('invFormTitle').textContent='Agregar coche';
   ['fMarca','fModelo','fAnio','fColor','fVersion','fKm','fMotor','fPrecio','fEnganche','fNotas','fTags'].forEach(id=>$(id).value='');
   $('fTrans').value='AUT'; $('fPlazo').value='24'; $('fTasa').value='16.9'; $('fEstado').value='disponible';
-  const fp=$('fotoPrev'); fp.style.backgroundImage=''; fp.textContent='📷 Toca para agregar foto (opcional)';
+  const fp=$('fotoPrev'); fp.style.backgroundImage=''; fp.innerHTML=ico('camera')+' Toca para agregar foto (opcional)';
   $('invModal').classList.add('show');
 }
 function invEditar(id){ const c=invLoad().find(x=>x.id===id); if(!c)return; editandoId=id; fotoActual=c.foto||'';
@@ -1212,12 +1266,12 @@ function invEditar(id){ const c=invLoad().find(x=>x.id===id); if(!c)return; edit
   $('fVersion').value=c.version||''; $('fTrans').value=c.transmision||'AUT'; $('fKm').value=c.km||''; $('fMotor').value=c.motor||'';
   $('fPrecio').value=c.precio||''; $('fEnganche').value=c.enganche||''; $('fPlazo').value=c.plazo||'24'; $('fTasa').value=c.tasa||'16.9';
   $('fNotas').value=c.notas||''; $('fEstado').value=c.estado||'disponible'; $('fTags').value=(c.tags||[]).join(', ');
-  const fp=$('fotoPrev'); if(c.foto){ fp.style.backgroundImage=`url('${c.foto}')`; fp.textContent=''; } else { fp.style.backgroundImage=''; fp.textContent='📷 Toca para agregar foto (opcional)'; }
+  const fp=$('fotoPrev'); if(c.foto){ fp.style.backgroundImage=`url('${c.foto}')`; fp.textContent=''; } else { fp.style.backgroundImage=''; fp.innerHTML=ico('camera')+' Toca para agregar foto (opcional)'; }
   $('invModal').classList.add('show');
 }
 function invCerrar(){ $('invModal').classList.remove('show'); }
 function fotoElegida(ev){ const f=ev.target.files[0]; if(!f)return; const rd=new FileReader();
-  rd.onload=e=>{ fotoActual=e.target.result; const fp=$('fotoPrev'); fp.style.backgroundImage=`url('${fotoActual}')`; fp.textContent=''; };
+  rd.onload=e=>{ fotoActual=e.target.result; const fp=$('fotoPrev'); fp.style.backgroundImage=`url('${fotoActual}')`; fp.innerHTML=''; };
   rd.readAsDataURL(f);
 }
 function invGuardar(){
@@ -1231,7 +1285,7 @@ function invGuardar(){
     tags:$('fTags').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean) };
   const arr=invLoad();
   if(editandoId){ const i=arr.findIndex(x=>x.id===editandoId); if(i>=0)arr[i]=c; } else arr.unshift(c);
-  invSaveAll(arr); invCerrar(); invRefreshFiltros(); invRender(); toast('✅ Guardado');
+  invSaveAll(arr); invCerrar(); invRefreshFiltros(); invRender(); toast('Guardado');
 }
 function invBorrar(id){ if(!confirm('¿Borrar este coche del inventario?'))return; invSaveAll(invLoad().filter(x=>x.id!==id)); invRefreshFiltros(); invRender(); }
 
@@ -1481,7 +1535,7 @@ function pbOverlay(){
       <div class="wikiTop"><span class="wikiTag">${I.play} ${esc(v.t)}</span><button class="closeX" onclick="pbCloseModal()">${I.x}</button></div>
       <div class="videoFrame">${v.url
         ? `<iframe src="${esc(v.url)}" title="${esc(v.t)}" allowfullscreen></iframe>`
-        : `<div class="videoPh">${I.play}<span>Aquí va el video de El Esensial</span><small>Configúralo en ⚙ Ajustes</small></div>`}</div>
+        : `<div class="videoPh">${I.play}<span>Aquí va el video de El Esensial</span><small>Configúralo en Ajustes</small></div>`}</div>
       </div></div>`; return; }
   o.innerHTML='';
 }
@@ -1665,7 +1719,7 @@ function pbResults(){
             <button class="btn btnPrimary" onclick="pbWA('${v.id}')">Cotizar por WhatsApp ${I.arrow}</button>
             <button class="carPdf" onclick="pbPDF('${v.id}')" title="Descargar PDF">${I.dl}</button>
           </div>
-          ${PB.editor?`<button class="carPdf" style="width:100%;height:34px" onclick="pbAlSim('${v.id}')">🧮 Abrir en simulador interno</button>`:''}
+          ${PB.editor?`<button class="carPdf" style="width:100%;height:34px" onclick="pbAlSim('${v.id}')">Abrir en simulador interno</button>`:''}
         </div></article>`;}).join('')}</div>
     <div class="resFoot">
       <button class="btn btnGhost" onclick="pbRestart()">${I.chevL} Empezar de nuevo</button>
@@ -1729,7 +1783,7 @@ function pbLeadBox(L, ok, motivo){
   const box=$('pbLeadBox'); if(!box) return;
   const num=(CFG().whatsapp||'').replace(/\D/g,'');
   box.innerHTML = ok
-    ? `<div class="notice ok"><div><b>✅ Recibimos tus datos, ${esc(L.nombre.split(' ')[0])}.</b>
+    ? `<div class="notice ok"><div><b>${ico('ok','ic-sm')} Recibimos tus datos, ${esc(L.nombre.split(' ')[0])}.</b>
         <span>Un asesor te contacta al ${esc(L.whatsapp)} con estas opciones.</span></div></div>`
     : `<div class="notice"><div><b>Guardamos tu selección.</b>
         <span>Para que un asesor te contacte de inmediato, mándanos tus datos por WhatsApp.</span></div>
@@ -1771,11 +1825,11 @@ function leadsRender(){
         <span>${esc(o.marca)} ${esc(o.modelo)} ${o.anio||''}</span>
         <b>${money(o.precio)}${o.mensualidad?` · ${money(o.mensualidad)}/mes`:''}</b></div>`).join('')||'<div class="lead-op"><span>—</span></div>'}</div>
       <div class="cc-acts" style="margin-top:12px">
-        <button class="cc-sim" onclick="leadWA('${L.id}')">💬 WhatsApp</button>
+        <button class="cc-sim" onclick="leadWA('${L.id}')">${ico('chat','ic-sm')} WhatsApp</button>
         <select class="cc-ed" style="flex:1;padding:0 8px" onchange="leadEstado('${L.id}',this.value)">
           ${Object.keys(LEAD_EST).map(k=>`<option value="${k}" ${L.estado===k?'selected':''}>${LEAD_EST[k].t}</option>`).join('')}
         </select>
-        <button class="cc-del" onclick="leadBorrar('${L.id}')" title="Borrar">🗑</button>
+        <button class="cc-del" onclick="leadBorrar('${L.id}')" title="Borrar">${ico('trash','ic-sm')}</button>
       </div>
     </div>`;}).join('');
 }
@@ -1895,12 +1949,12 @@ function cfgGuardar(){
   CFGsave(g); cfgCerrar();
   PB.bmin=g.bmin; PB.bmax=g.bmax; PB.enganche=g.engDefault; PB.plazo=g.plazoDefault;
   if(document.getElementById('pub').classList.contains('on')) pbRender();
-  toast('✅ Configuración guardada');
+  toast('Configuración guardada');
 }
 function cfgRestaurar(){ if(!confirm('¿Restaurar la configuración por defecto del cotizador?')) return;
   localStorage.removeItem('ee_wzcfg'); cfgCerrar(); PB.bmin=0; toast('Configuración restaurada'); }
 function cfgCopiar(){ const t=JSON.stringify(CFG(),null,2);
-  if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>toast('📋 Configuración copiada'),()=>alert(t)); else alert(t); }
+  if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>toast('Configuración copiada'),()=>alert(t)); else alert(t); }
 
 /* ===================== USUARIOS / PERFILES ===================== */
 const SEED_USERS=[
@@ -1926,16 +1980,16 @@ function usrRender(){ const arr=usrLoad()||[]; const g=$('usrGrid'); if(!g)retur
         <span class="usr-estado ${on?'on':'off'}">${on?'● Activo':'○ Inactivo'}</span>
       </div>
       <div class="usr-info">
-        <div><span>📧 Correo</span>${esc(u.correo||'—')}</div>
-        <div><span>🏢 Área</span>${esc(u.area||'—')}</div>
+        <div><span>Correo</span>${esc(u.correo||'—')}</div>
+        <div><span>Área</span>${esc(u.area||'—')}</div>
       </div>
       <div class="usr-chips-lbl">Permisos</div>
       <div class="usr-chips">${(u.permisos||[]).map(p=>`<span class="chip chip-p">${esc(p)}</span>`).join('')||'<span class="chip">—</span>'}</div>
       <div class="usr-chips-lbl">Módulos con acceso</div>
       <div class="usr-chips">${(u.modulos||[]).map(m=>`<span class="chip chip-m">${esc(m)}</span>`).join('')||'<span class="chip">—</span>'}</div>
       <div class="cc-acts" style="margin-top:12px">
-        <button class="cc-ed" style="flex:1" onclick="usrEditar('${u.id}')">✎ Editar</button>
-        <button class="cc-del" onclick="usrBorrar('${u.id}')" title="Borrar">🗑</button>
+        <button class="cc-ed" style="flex:1" onclick="usrEditar('${u.id}')">${ico('edit','ic-sm')} Editar</button>
+        <button class="cc-del" onclick="usrBorrar('${u.id}')" title="Borrar">${ico('trash','ic-sm')}</button>
       </div>
     </div>`; }).join('');
 }
@@ -1953,7 +2007,7 @@ function usrGuardar(){ const nombre=$('uNombre').value.trim(); if(!nombre){ aler
     permisos:$('uPermisos').value.split(',').map(s=>s.trim()).filter(Boolean),
     modulos:$('uModulos').value.split(',').map(s=>s.trim()).filter(Boolean), estado:$('uEstado').value };
   const arr=usrLoad()||[]; if(editandoUsr){ const i=arr.findIndex(x=>x.id===editandoUsr); if(i>=0)arr[i]=u; } else arr.push(u);
-  usrSaveAll(arr); usrCerrar(); usrRender(); toast('✅ Usuario guardado'); }
+  usrSaveAll(arr); usrCerrar(); usrRender(); toast('Usuario guardado'); }
 function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll((usrLoad()||[]).filter(x=>x.id!==id)); usrRender(); }
 
 /* ===================== SIMULADOR ===================== */
@@ -2032,7 +2086,7 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll
     $('rMensual').textContent=money(mensual1);
     $('rPlazo').textContent='durante '+n+' meses';
     const an=$('atrasoNote');
-    if(cargoAtraso>0){ an.style.display='block'; an.innerHTML='⚠️ Si te atrasas en un pago se cobra <b>'+money(cargoAtraso)+'</b> extra'+(atrasoModo==='pct'?' ('+atrasoVal+'% de la mensualidad)':'')+'.'; }
+    if(cargoAtraso>0){ an.style.display='block'; an.innerHTML=ico('alert','ic-sm')+' Si te atrasas en un pago se cobra <b>'+money(cargoAtraso)+'</b> extra'+(atrasoModo==='pct'?' ('+atrasoVal+'% de la mensualidad)':'')+'.'; }
     else an.style.display='none';
     $('rPrecioLista').textContent=money(precioLista);
     $('rDescuento').textContent=(bonif>0?'− ':'')+money(bonif);
@@ -2057,12 +2111,12 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll
       ao.style.display='block';
       if(T.noCondonado>0){
         ao.style.background='#fff4e5'; ao.style.borderColor='#ffd08a'; ao.style.color='#8a5a00';
-        ao.innerHTML='⚠️ Abono de <b>'+money(T.sumAbono)+'</b> en el mes '+ab.mes+': el plazo baja a <b>'+T.pagos+
+        ao.innerHTML=ico('alert','ic-sm')+' Abono de <b>'+money(T.sumAbono)+'</b> en el mes '+ab.mes+': el plazo baja a <b>'+T.pagos+
           ' meses</b>, pero como el interés <b>no se condona</b>, el cliente igual paga <b>'+money(T.intPleno)+
           '</b> de interés. <b>Abonar no le ahorra nada.</b>';
       } else {
         ao.style.background='#eafaf1'; ao.style.borderColor='#bfe8d1'; ao.style.color='#0f7a53';
-        ao.innerHTML='✅ Abono de <b>'+money(T.sumAbono)+'</b> en el mes '+ab.mes+': liquida en <b>'+T.pagos+
+        ao.innerHTML=ico('ok','ic-sm')+' Abono de <b>'+money(T.sumAbono)+'</b> en el mes '+ab.mes+': liquida en <b>'+T.pagos+
           ' meses</b> (ahorra '+T.mesesAhorrados+') y se ahorra <b>'+money(T.ahorroInt)+'</b> de intereses. La mensualidad no cambia.';
       }
     } else ao.style.display='none';
@@ -2092,9 +2146,9 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll
   }
   function compartirWA(){ window.open('https://wa.me/?text='+encodeURIComponent(resumenTexto()),'_blank'); }
   function copiar(){ const t=resumenTexto();
-    if(navigator.clipboard){ navigator.clipboard.writeText(t).then(()=>toast('✅ Resumen copiado'),()=>fallbackCopy(t)); } else fallbackCopy(t); }
+    if(navigator.clipboard){ navigator.clipboard.writeText(t).then(()=>toast('Resumen copiado'),()=>fallbackCopy(t)); } else fallbackCopy(t); }
   function fallbackCopy(t){ const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);
-    ta.select();try{document.execCommand('copy');toast('✅ Resumen copiado');}catch(e){alert(t);}document.body.removeChild(ta); }
+    ta.select();try{document.execCommand('copy');toast('Resumen copiado');}catch(e){alert(t);}document.body.removeChild(ta); }
   function toast(msg){ const d=document.createElement('div');d.textContent=msg;
     d.style.cssText='position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#0d0d0f;color:#fff;padding:12px 22px;border-radius:12px;font-weight:700;font-size:14px;z-index:150;box-shadow:0 8px 24px rgba(0,0,0,.25)';
     document.body.appendChild(d);setTimeout(()=>{d.style.transition='.3s';d.style.opacity='0';setTimeout(()=>d.remove(),300);},1800); }
