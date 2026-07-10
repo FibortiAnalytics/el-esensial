@@ -24,15 +24,19 @@
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--tinta);line-height:1.45}
 
   /* ===== LOGO ===== */
-  .carlogo{display:block}
-  .wordmark{font-family:Georgia,'Times New Roman',serif;font-weight:700;color:var(--amarillo);letter-spacing:.1em;line-height:1;white-space:nowrap}
+  /* Logo oficial (PNG, fondo negro — va sobre superficies negras) */
+  .brandimg{display:block;height:auto;max-width:100%}
+  .gate-box .brandimg{width:255px;margin:0 auto 22px}
+  .ee-brand .brandimg{width:172px;margin:0 auto}
+  .ee-hero .brandimg{width:230px;flex:none;position:relative}
+  .ee-topbar .brandimg{height:30px;width:auto}
+  .esn .nav .brandimg{height:34px;width:auto}
+  .esn .foot .brandimg{height:26px;width:auto}
 
   /* ===== GATE (login) ===== */
   #gate{position:fixed;inset:0;z-index:200;background:radial-gradient(1200px 600px at 50% -10%,#1c1c22,#000);
     display:flex;align-items:center;justify-content:center;padding:24px}
   .gate-box{width:100%;max-width:380px;text-align:center}
-  .gate-box .carlogo{width:190px;height:auto;margin:0 auto 6px}
-  .gate-box .wordmark{font-size:30px;display:block;margin-bottom:4px}
   .gate-sub{color:rgba(255,255,255,.55);font-size:12px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:30px}
   .gate-lbl{display:block;text-align:left;color:rgba(255,255,255,.6);font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px}
   #claveInput{width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);
@@ -49,8 +53,6 @@
   .ee-sidebar{position:fixed;top:0;left:0;width:230px;height:100vh;background:var(--negro);z-index:60;
     display:flex;flex-direction:column;border-right:1px solid rgba(225,29,42,.25);overflow-y:auto}
   .ee-brand{padding:22px 18px 18px;text-align:center;border-bottom:1px solid rgba(255,255,255,.07)}
-  .ee-brand .carlogo{width:130px;height:auto;margin:0 auto 4px}
-  .ee-brand .wordmark{font-size:18px}
   .ee-nav{padding:14px 10px;flex:1}
   .ee-navsec{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:12px 10px 6px;font-weight:700}
   .ee-navitem{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:10px;color:rgba(255,255,255,.72);
@@ -70,17 +72,13 @@
   .ee-hero{background:var(--negro);color:#fff;padding:26px 32px;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden}
   .ee-hero:before{content:"";position:absolute;right:-40px;top:50%;transform:translateY(-50%);width:280px;height:280px;
     background:radial-gradient(circle,rgba(225,29,42,.22),transparent 70%)}
-  .ee-hero .carlogo{width:160px;height:auto;flex:none;position:relative}
   .ee-hero-txt{position:relative}
-  .ee-hero-txt .wordmark{font-size:30px;display:block}
   .ee-hero-txt .st{color:rgba(255,255,255,.55);font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-top:6px}
   .ee-page{padding:24px 22px 0}
   .wrap{max-width:1040px;margin:0 auto}
   /* Barra superior móvil + backdrop (ocultos en escritorio) */
   .ee-topbar{display:none;align-items:center;gap:12px;height:56px;padding:0 14px;background:var(--negro);
     position:fixed;top:0;left:0;right:0;z-index:70;border-bottom:1px solid rgba(225,29,42,.25)}
-  .ee-topbar .carlogo.tb{width:34px;height:auto}
-  .ee-topbar .wordmark.tb{font-size:16px}
   .ee-burger{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;padding:6px 8px;border-radius:8px}
   .ee-burger:hover{background:rgba(255,255,255,.1)}
   .ee-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:75;opacity:0;pointer-events:none;transition:opacity .2s}
@@ -93,8 +91,7 @@
     body.menu-open .ee-sidebar{transform:none;box-shadow:0 0 40px rgba(0,0,0,.4)}
     .ee-main{margin-left:0;padding-top:56px}
     .ee-hero{padding:20px}
-    .ee-hero .carlogo{width:120px}
-    .ee-hero-txt .wordmark{font-size:24px}
+    .ee-hero .brandimg{width:190px}
     .ee-page{padding:18px 14px 0}
   }
   @media(max-width:560px){
@@ -103,8 +100,7 @@
     .mix{flex-direction:column}
     .mix select{width:100%;min-width:0}
     .ee-hero{gap:14px}
-    .ee-hero .carlogo{width:96px}
-    .ee-hero-txt .wordmark{font-size:20px}
+    .ee-hero .brandimg{width:150px}
     .ee-hero-txt .st{font-size:11px}
     .res-hero .big{font-size:32px}
     header.sim{padding:20px 18px}
@@ -311,10 +307,6 @@
   .esn .nav{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;
     padding:14px 26px;background:rgba(8,9,8,.86);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
   .esn .logo{display:flex;align-items:center;gap:10px;cursor:pointer}
-  .esn .logoMark{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;background:var(--acid);color:#fff;box-shadow:0 0 16px rgba(225,29,42,.5)}
-  .esn .logoMark svg{width:19px;height:19px}
-  .esn .logoTxt{font-weight:600;letter-spacing:.14em;font-size:14px}
-  .esn .logoTxt b{font-weight:900}
   .esn .navLinks{display:flex;gap:26px}
   .esn .navLinks a{font-size:14px;font-weight:600;color:var(--txt);opacity:.85;cursor:pointer;transition:.2s}
   .esn .navLinks a:hover{color:var(--acid);opacity:1}
@@ -560,10 +552,9 @@
 
   /* ===== Documento PDF de cotización ===== */
   #printDoc{display:none;color:#111;font-size:12px;padding:0}
-  .pdf-head{display:flex;align-items:center;gap:18px;border-bottom:2px solid #111;padding-bottom:14px;margin-bottom:18px}
-  .pdf-head .carlogo{width:112px;height:auto}
-  .pdf-brand{font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:22px;letter-spacing:.09em}
-  .pdf-meta{margin-left:auto;text-align:right;font-size:10px;color:#555}
+  .pdf-head{display:flex;align-items:center;gap:18px;background:#000;padding:14px 18px;margin-bottom:18px}
+  .pdf-head .brandimg{height:56px;width:auto}
+  .pdf-meta{margin-left:auto;text-align:right;font-size:10px;color:#c9c9c9}
   .pdf-t{font-size:13px;font-weight:700;margin:16px 0 6px;text-transform:uppercase;letter-spacing:.08em}
   .pdf-row{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:6px 0;font-size:12px}
   .pdf-row span{color:#555}
@@ -591,22 +582,11 @@
 <body>
 
 <!-- Símbolo del logo (auto rojo) reutilizable -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ee-car" viewBox="0 0 260 120">
-  <circle cx="54" cy="86" r="25" fill="#0d0d0f" stroke="#e11d2a" stroke-width="7"/>
-  <circle cx="54" cy="86" r="9" fill="none" stroke="#e11d2a" stroke-width="5"/>
-  <path d="M16 84 C 14 66, 28 59, 46 59 L74 59 C 86 42, 112 36, 138 39 C 178 43, 216 51, 248 60"
-        fill="none" stroke="#e11d2a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M96 72 L242 72" stroke="#e11d2a" stroke-width="7" stroke-linecap="round"/>
-  <path d="M82 88 L228 88" stroke="#e11d2a" stroke-width="7" stroke-linecap="round"/>
-  <path d="M108 102 L214 102" stroke="#e11d2a" stroke-width="7" stroke-linecap="round"/>
-  <path d="M18 86 L30 86 M80 86 L96 86" stroke="#e11d2a" stroke-width="7" stroke-linecap="round"/>
-</symbol></svg>
 
 <!-- ===================== LOGIN ===================== -->
 <div id="gate">
   <div class="gate-box">
-    <svg class="carlogo"><use href="#ee-car"/></svg>
-    <span class="wordmark">EL ESENSIAL</span>
+    <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
     <div class="gate-sub">Acceso privado</div>
     <label class="gate-lbl" for="claveInput">Contraseña</label>
     <input id="claveInput" type="password" placeholder="••••••••" autocomplete="current-password">
@@ -621,15 +601,13 @@
   <!-- Barra superior (solo móvil) -->
   <div class="ee-topbar">
     <button class="ee-burger" onclick="toggleMenu()" aria-label="Abrir menú">☰</button>
-    <svg class="carlogo tb"><use href="#ee-car"/></svg>
-    <span class="wordmark tb">EL ESENSIAL</span>
+    <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
   </div>
   <div class="ee-backdrop" onclick="toggleMenu(false)"></div>
   <!-- Barra izquierda -->
   <aside class="ee-sidebar">
     <div class="ee-brand">
-      <svg class="carlogo"><use href="#ee-car"/></svg>
-      <span class="wordmark">EL ESENSIAL</span>
+      <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
     </div>
     <nav class="ee-nav">
       <div class="ee-navsec">Herramientas</div>
@@ -648,9 +626,8 @@
   <main class="ee-main">
     <!-- Logo al inicio -->
     <div class="ee-hero">
-      <svg class="carlogo"><use href="#ee-car"/></svg>
+      <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
       <div class="ee-hero-txt">
-        <span class="wordmark">EL ESENSIAL</span>
         <div class="st">Simulador de financiamiento · Catálogo</div>
       </div>
     </div>
@@ -902,8 +879,7 @@
 
   <header class="nav">
     <div class="logo" onclick="pbRestart()" role="button">
-      <span class="logoMark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.6-4.2A2 2 0 0 1 8.5 5.5h7a2 2 0 0 1 1.9 1.3L19 11"/><path d="M3.5 11h17a1 1 0 0 1 1 1v4h-2m-14 0h-2v-4a1 1 0 0 1 1-1"/><circle cx="7.5" cy="16.4" r="1.5"/><circle cx="16.5" cy="16.4" r="1.5"/></svg></span>
-      <span class="logoTxt">EL <b>ESENSIAL</b></span>
+      <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
     </div>
     <nav class="navLinks">
       <a onclick="pbGo('results')">Catálogo</a>
@@ -920,7 +896,7 @@
   <div id="pubScreen"></div>
 
   <footer class="foot">
-    <div class="footBrand"><span class="logoMark" style="width:26px;height:26px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 11l1.6-4.2A2 2 0 0 1 8.5 5.5h7a2 2 0 0 1 1.9 1.3L19 11"/><path d="M3.5 11h17a1 1 0 0 1 1 1v4h-2m-14 0h-2v-4a1 1 0 0 1 1-1"/></svg></span> EL <b>ESENSIAL</b></div>
+    <div class="footBrand"><img src="logo.png" alt="EL ESENSIAL" class="brandimg"></div>
     <span class="footTxt">Seminuevos certificados</span>
     <span class="footTxt dim">Cifras informativas · sujetas a aprobación de la financiera</span>
   </footer>
@@ -1645,8 +1621,7 @@ function pbPDF(id){
   const hoy=new Date(); const fecha=hoy.getDate()+' de '+MESES_L[hoy.getMonth()]+' de '+hoy.getFullYear();
   $('printDoc').innerHTML=`
     <div class="pdf-head">
-      <svg class="carlogo" style="width:112px;height:56px"><use href="#ee-car"/></svg>
-      <div class="pdf-brand">EL ESENSIAL</div>
+      <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
       <div class="pdf-meta">Cotización de financiamiento<br>${fecha}</div>
     </div>
     ${PB.nombre?`<div class="pdf-row"><span>Cliente</span><b>${esc(PB.nombre)}</b></div>`:''}
