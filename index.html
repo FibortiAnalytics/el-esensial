@@ -721,6 +721,26 @@
   .cc-ref{position:absolute;bottom:8px;left:8px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
     color:#6b7280;background:rgba(255,255,255,.92);border:1px solid #e6e8ec;padding:2px 7px;border-radius:5px}
 
+  /* Muestra de color del vehículo */
+  .colorDot{display:inline-block;width:13px;height:13px;border-radius:50%;flex:none;vertical-align:-2px;
+    border:1px solid rgba(0,0,0,.28);box-shadow:inset 0 -2px 4px rgba(0,0,0,.18)}
+  .esn .colorDot{border-color:rgba(255,255,255,.35);box-shadow:inset 0 -2px 4px rgba(0,0,0,.3)}
+  .esn .carColor{display:inline-flex;align-items:center;gap:7px}
+  .esn .detRow b .colorDot{margin-right:7px}
+  .cc-dot{width:11px;height:11px;margin-right:5px}
+
+  /* Barra de consentimiento (cookies / almacenamiento) */
+  .esn .cookieBar{position:fixed;bottom:0;left:0;right:0;z-index:95;display:none;align-items:center;gap:20px;
+    flex-wrap:wrap;padding:16px 22px;background:var(--panel2);border-top:1px solid var(--line2);
+    box-shadow:0 -12px 40px rgba(0,0,0,.5)}
+  .esn .cookieBar.show{display:flex}
+  .esn .ckTxt{flex:1;min-width:280px}
+  .esn .ckTxt b{display:block;font-size:14px;font-weight:800;margin-bottom:3px}
+  .esn .ckTxt span{font-size:12.5px;line-height:1.55;color:var(--muted)}
+  .esn .ckBtns{display:flex;gap:9px;flex-wrap:wrap}
+  .esn .ckBtns .btn{padding:11px 18px;font-size:13px}
+  @media(max-width:640px){ .esn .cookieBar{padding:14px 16px} .esn .ckBtns{width:100%} .esn .ckBtns .btn{flex:1} }
+
   /* Lista de créditos de imágenes */
   .esn .credList{display:grid;gap:9px;margin:14px 0}
   .esn .credRow{display:flex;flex-direction:column;gap:2px;padding:9px 11px;background:var(--panel);
@@ -1269,11 +1289,22 @@
     <span class="footTxt">Seminuevos certificados</span>
     <button class="footLink" onclick="pbLegal()">Aviso de privacidad</button>
     <button class="footLink" onclick="pbCreditos()">Créditos de imágenes</button>
+    <button class="footLink" onclick="pbOlvidar()">Borrar mis datos de este dispositivo</button>
     <button class="footLink" onclick="pbGo('nosotros')">Nosotros</button>
     <span class="footTxt dim">Cifras informativas · sujetas a aprobación</span>
   </footer>
 
   <div id="pubOverlay"></div>
+
+  <div class="cookieBar" id="cookieBar">
+    <div class="ckTxt"><b>Guardamos tu avance en este dispositivo.</b>
+      <span>Usamos almacenamiento local para recordar tu presupuesto, marcas y plan, y no volver a preguntártelo.
+      No rastreamos ni compartimos nada. Lee el <button class="link" onclick="pbLegal()">Aviso de Privacidad</button>.</span></div>
+    <div class="ckBtns">
+      <button class="btn btnGhost" onclick="ponerConsent('no')">Solo lo necesario</button>
+      <button class="btn btnPrimary" onclick="ponerConsent('si')">Aceptar</button>
+    </div>
+  </div>
 </div>
 
 <!-- Ajustes del cotizador (solo editor) -->
@@ -1516,13 +1547,14 @@ function invRender(){
   empty.style.display='none';
   g.innerHTML=arr.map(c=>{ const e=ESTADOS[c.estado]||ESTADOS.disponible; const dim=c.estado!=='disponible';
     const sold=c.estado==='vendido', hid=c.estado==='oculto';
-    const meta=[c.anio?('Año '+c.anio):'', (c.color&&c.color!=='N/A')?c.color:'', c.version, c.transmision].filter(Boolean).join(' · ');
+    const meta=[c.anio?('Año '+c.anio):'', c.version, c.transmision].filter(Boolean).join(' · ');
+    const colorTxt=(c.color&&c.color!=='N/A')? ` · ${colorDot(c.color,'cc-dot')}${esc(c.color)}` : '';
     return `<div class="cochecard${dim?' dim':''}">
       <div class="cc-foto" style="${fotoDe(c).src?`background-image:url('${fotoDe(c).src}')`:''}">${fotoDe(c).src?(fotoDe(c).ref?'<span class="cc-ref">Referencia</span>':''):ICO.car}
         <span class="cc-estado"><i style="background:${e.c}"></i>${e.t}</span></div>
       <div class="cc-body">
         <div class="cc-nom">${logoMarca(c.marca,"cc-brand")}${esc(nombreCoche(c))}</div>
-        <div class="cc-meta">${esc(meta)}</div>
+        <div class="cc-meta">${esc(meta)}${colorTxt}</div>
         <div class="cc-precio">${money(c.precio||0)}</div>
         <div class="cc-sub">Enganche ${money(c.enganche||0)} · Financiar ${money(c.saldo||((c.precio||0)-(c.enganche||0)))}</div>
         <div class="cc-actions">
@@ -1700,10 +1732,21 @@ const MARCA_SLUG={"Mercedez-Benz":"mercedes","Audi":"audi","Seat":"seat","Tesla"
   "Toyota":"toyota","MINI":"mini","MG":"mg","Chevrolet":"chevrolet","Renault":"renault","Ford":"ford",
   "BMW":"bmw","Kia":"kia","Ducati":"ducati","Jeep":"jeep"};
 /* Imágenes de referencia (Wikimedia Commons, licencias libres). [archivo,titulo,autor,licencia,fuente] */
-const IMG_REF={"seed1":["img/seed1.jpg","Mercedes-Benz GLE 450 4Matic Genf 2019 1Y7A5103.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Mercedes-Benz_GLE_450_4Matic_Genf_2019_1Y7A5103.jpg"],"seed2":["img/seed2.jpg","Audi Q3 1Y7A4914.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Audi_Q3_1Y7A4914.jpg"],"seed3":["img/seed3.jpg","Audi Q2 IMG 3835.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Audi_Q2_IMG_3835.jpg"],"seed4":["img/seed4.jpg","2019 SEAT Tarraco SE Tech TDi 4Drive SA 2.0 Front.jpg","Vauxford","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2019_SEAT_Tarraco_SE_Tech_TDi_4Drive_SA_2.0_Front.jpg"],"seed5":["img/seed5.jpg","2024 Tesla Cybertruck, Moab 02.jpg","A1C6","CC0","https://commons.wikimedia.org/wiki/File:2024_Tesla_Cybertruck,_Moab_02.jpg"],"seed6":["img/seed6.jpg","Volkswagen Tiguan R 1X7A0362.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Volkswagen_Tiguan_R_1X7A0362.jpg"],"seed7":["img/seed7.jpg","TOYOTA CAMRY (XV70) China.jpg","Dinkun Chen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:TOYOTA_CAMRY_(XV70)_China.jpg"],"seed8":["img/seed8.jpg","2021 Mini Hatch (F56) John Cooper Works 1X7A0150.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2021_Mini_Hatch_(F56)_John_Cooper_Works_1X7A0150.jpg"],"seed9":["img/seed9.jpg","MG 5 II 004.jpg","Jengtingchen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:MG_5_II_004.jpg"],"seed10":["img/seed10.jpg","Chevrolet Onix 20150814-DSC05650.JPG","Matti Blume","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Chevrolet_Onix_20150814-DSC05650.JPG"],"seed11":["img/seed11.jpg","Renault Koleos Initiale Paris, IAA 2017, Frankfurt (1Y7A3353).jpg","Matti Blume","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Renault_Koleos_Initiale_Paris,_IAA_2017,_Frankfurt_(1Y7A3353).jpg"],"seed12":["img/seed12.jpg","2019 Volkswagen Jetta au SIAM 2018.jpg","Bull-Doser","Public domain","https://commons.wikimedia.org/wiki/File:2019_Volkswagen_Jetta_au_SIAM_2018.jpg"],"seed13":["img/seed13.jpg","2021 Ford Bronco Wildtrak 4-door soft-top front close-up.jpg","Nathan Dimartino","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2021_Ford_Bronco_Wildtrak_4-door_soft-top_front_close-up.jpg"],"seed14":["img/seed14.jpg","Tesla Model Y Classic-Days 2022 DSC 0118.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Tesla_Model_Y_Classic-Days_2022_DSC_0118.jpg"],"seed15":["img/seed15.jpg","BMW 3 SERIES LWB SEDAN (G28) China (2).jpg","Dinkun Chen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:BMW_3_SERIES_LWB_SEDAN_(G28)_China_(2).jpg"],"seed16":["img/seed16.jpg","Kia K3.jpg","Rutger van der Maar","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Kia_K3.jpg"],"seed17":["img/seed17.jpg","Kia K3.jpg","Rutger van der Maar","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Kia_K3.jpg"],"seed18":["img/seed18.jpg","2015 Ducati Scrambler Icon right.JPG","Dennis Bratland","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2015_Ducati_Scrambler_Icon_right.JPG"],"seed19":["img/seed19.jpg","2018 Volkswagen Tiguan 12.2.17.jpg","Kevauto","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2018_Volkswagen_Tiguan_12.2.17.jpg"],"seed20":["img/seed20.jpg","2018 Volkswagen Tiguan 12.2.17.jpg","Kevauto","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2018_Volkswagen_Tiguan_12.2.17.jpg"],"seed21":["img/seed21.jpg","2020 Ford Explorer au SIAM 2019.jpg","Bull-Doser","Public domain","https://commons.wikimedia.org/wiki/File:2020_Ford_Explorer_au_SIAM_2019.jpg"],"seed22":["img/seed22.jpg","2022 BMW 4-Series M440i Coupé xDrive.jpg","Chanokchon","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2022_BMW_4-Series_M440i_Coup%C3%A9_xDrive.jpg"],"seed23":["img/seed23.jpg","Jeep Gladiator JT 2019 1.jpg","The Wikipeadian guy","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Jeep_Gladiator_JT_2019_1.jpg"],"seed24":["img/seed24.jpg","MERCEDES-BENZ C-CLASS LWB (V206) China.jpg","Dinkun Chen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:MERCEDES-BENZ_C-CLASS_LWB_(V206)_China.jpg"]};
+const IMG_REF={"seed1":["img/seed1.webp","Mercedes-Benz GLE 450 4Matic Genf 2019 1Y7A5103.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Mercedes-Benz_GLE_450_4Matic_Genf_2019_1Y7A5103.jpg",1],"seed2":["img/seed2.webp","Audi Q3 1Y7A4914.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Audi_Q3_1Y7A4914.jpg",1],"seed3":["img/seed3.webp","Audi Q2 IMG 3835.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Audi_Q2_IMG_3835.jpg",1],"seed4":["img/seed4.webp","2019 SEAT Tarraco SE Tech TDi 4Drive SA 2.0 Front.jpg","Vauxford","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2019_SEAT_Tarraco_SE_Tech_TDi_4Drive_SA_2.0_Front.jpg",1],"seed5":["img/seed5.jpg","2024 Tesla Cybertruck, Moab 02.jpg","A1C6","CC0","https://commons.wikimedia.org/wiki/File:2024_Tesla_Cybertruck,_Moab_02.jpg",0],"seed6":["img/seed6.webp","Volkswagen Tiguan R 1X7A0362.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Volkswagen_Tiguan_R_1X7A0362.jpg",1],"seed7":["img/seed7.jpg","TOYOTA CAMRY (XV70) China.jpg","Dinkun Chen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:TOYOTA_CAMRY_(XV70)_China.jpg",0],"seed8":["img/seed8.webp","2021 Mini Hatch (F56) John Cooper Works 1X7A0150.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2021_Mini_Hatch_(F56)_John_Cooper_Works_1X7A0150.jpg",1],"seed9":["img/seed9.webp","MG 5 II 004.jpg","Jengtingchen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:MG_5_II_004.jpg",1],"seed10":["img/seed10.webp","Chevrolet Onix 20150814-DSC05650.JPG","Matti Blume","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Chevrolet_Onix_20150814-DSC05650.JPG",1],"seed11":["img/seed11.webp","Renault Koleos Initiale Paris, IAA 2017, Frankfurt (1Y7A3353).jpg","Matti Blume","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Renault_Koleos_Initiale_Paris,_IAA_2017,_Frankfurt_(1Y7A3353).jpg",1],"seed12":["img/seed12.jpg","2019 Volkswagen Jetta au SIAM 2018.jpg","Bull-Doser","Public domain","https://commons.wikimedia.org/wiki/File:2019_Volkswagen_Jetta_au_SIAM_2018.jpg",0],"seed13":["img/seed13.jpg","2021 Ford Bronco Wildtrak 4-door soft-top front close-up.jpg","Nathan Dimartino","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2021_Ford_Bronco_Wildtrak_4-door_soft-top_front_close-up.jpg",0],"seed14":["img/seed14.webp","Tesla Model Y Classic-Days 2022 DSC 0118.jpg","Alexander Migl","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Tesla_Model_Y_Classic-Days_2022_DSC_0118.jpg",1],"seed15":["img/seed15.jpg","BMW 3 SERIES LWB SEDAN (G28) China (2).jpg","Dinkun Chen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:BMW_3_SERIES_LWB_SEDAN_(G28)_China_(2).jpg",0],"seed16":["img/seed16.webp","Kia K3.jpg","Rutger van der Maar","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Kia_K3.jpg",1],"seed17":["img/seed17.webp","Kia K3.jpg","Rutger van der Maar","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Kia_K3.jpg",1],"seed18":["img/seed18.jpg","2015 Ducati Scrambler Icon right.JPG","Dennis Bratland","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2015_Ducati_Scrambler_Icon_right.JPG",0],"seed19":["img/seed19.webp","2018 Volkswagen Tiguan 12.2.17.jpg","Kevauto","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2018_Volkswagen_Tiguan_12.2.17.jpg",1],"seed20":["img/seed20.webp","2018 Volkswagen Tiguan 12.2.17.jpg","Kevauto","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2018_Volkswagen_Tiguan_12.2.17.jpg",1],"seed21":["img/seed21.webp","2020 Ford Explorer au SIAM 2019.jpg","Bull-Doser","Public domain","https://commons.wikimedia.org/wiki/File:2020_Ford_Explorer_au_SIAM_2019.jpg",1],"seed22":["img/seed22.webp","2022 BMW 4-Series M440i Coupé xDrive.jpg","Chanokchon","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:2022_BMW_4-Series_M440i_Coup%C3%A9_xDrive.jpg",1],"seed23":["img/seed23.jpg","Jeep Gladiator JT 2019 1.jpg","The Wikipeadian guy","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Jeep_Gladiator_JT_2019_1.jpg",0],"seed24":["img/seed24.webp","MERCEDES-BENZ C-CLASS LWB (V206) China.jpg","Dinkun Chen","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:MERCEDES-BENZ_C-CLASS_LWB_(V206)_China.jpg",1]};
 /* Foto real de la unidad si el lote la subió; si no, imagen de referencia del modelo */
-function fotoDe(c){ if(c.foto) return {src:c.foto, ref:false};
-  const r=IMG_REF[c.id]; return r? {src:r[0], ref:true} : {src:'', ref:false}; }
+function fotoDe(c){ if(c.foto) return {src:c.foto, ref:false, corte:true};
+  const r=IMG_REF[c.id]; return r? {src:r[0], ref:true, corte:!!r[5]} : {src:'', ref:false, corte:false}; }
+
+/* Color del vehículo -> muestra de color */
+const COLORES={'gris':'#9AA0A6','blanco':'#F1F2F4','blanca':'#F1F2F4','negro':'#17181A',
+ 'azul obscuro':'#1E3A8A','azul oscuro':'#1E3A8A','azul claro':'#60A5FA','azul':'#2563EB',
+ 'verde':'#166534','cafe':'#6B4226','crema':'#EFE3C8','rojo':'#DC2626','plata':'#C0C4C8',
+ 'plateado':'#C0C4C8','n/a':'#C9CCD2'};
+function colorHex(c){ if(!c) return null;
+  const k=c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  return COLORES[k]||null; }
+function colorDot(c,cls){ const hx=colorHex(c); if(!hx) return '';
+  return '<span class="colorDot '+(cls||'')+'" style="background:'+hx+'" title="'+esc(c)+'"></span>'; }
 
 function logoMarca(m,cls){ const s=MARCA_SLUG[m]; return s? '<svg class="bmark '+(cls||'')+'"><use href="#b-'+s+'"/></svg>' : ''; }
 
@@ -1771,6 +1814,7 @@ const AVISO_PRIVACIDAD=`
 <p><b>Transferencias.</b> No transferimos tus datos a terceros, salvo obligación legal. Se almacenan en servicios de Google bajo contrato de tratamiento.</p>
 <p><b>Conservación.</b> Conservamos tu información mientras exista interés comercial vigente y hasta 12 meses después del último contacto, salvo que pidas su eliminación antes.</p>
 <p><b>Derechos ARCO.</b> Puedes solicitar el <b>Acceso, Rectificación, Cancelación u Oposición</b> al tratamiento de tus datos, y revocar tu consentimiento, por WhatsApp al <b>${NEGOCIO.telefono}</b> o en nuestro domicilio. Respondemos en un máximo de 20 días hábiles.</p>
+<p><b>Cookies y almacenamiento local.</b> Guardamos en tu navegador (almacenamiento local, no cookies de rastreo) las respuestas del cotizador —presupuesto, uso, marcas, forma de pago, enganche y plazo— para no volver a pedírtelas. Solo se guardan si aceptas; puedes borrarlas cuando quieras desde <b>“Borrar mis datos de este dispositivo”</b> al pie de la página. No usamos analítica, publicidad ni rastreo de terceros.</p>
 <p><b>Cambios.</b> Cualquier modificación se publicará en esta misma página.</p>
 <p><b>Cotizaciones.</b> Las cifras del cotizador son informativas, no constituyen una oferta de crédito y están sujetas a aprobación.</p>
 <p class="legal-fecha">Última actualización: 9 de julio de 2026 · Versión ${AVISO_VERSION}<br>
@@ -1841,7 +1885,9 @@ function mostrarPub(editor){
   document.body.classList.add('pub-open');
   $('pubEdbar').style.display = PB.editor ? 'flex':'none';
   if(g.heroImg) document.getElementById('pub').style.setProperty('--hero-img',`url('${g.heroImg}')`);
+  if(!PB.editor) pbRestaurar();
   pbRender();
+  mostrarCookieBar();
 }
 function salirPub(){
   document.getElementById('pub').classList.remove('on');
@@ -1849,6 +1895,27 @@ function salirPub(){
   document.getElementById('app').style.display='block';
   irA('simulador');
 }
+/* ---------- Consentimiento de almacenamiento (cookies) ---------- */
+function consentimiento(){ try{ return localStorage.getItem('ee_consent'); }catch(e){ return null; } }
+function ponerConsent(v){ try{ localStorage.setItem('ee_consent',v); }catch(e){}
+  const b=$('cookieBar'); if(b) b.classList.remove('show');
+  if(v==='si') pbGuardar(); else { try{ localStorage.removeItem('ee_pb'); }catch(e){} } }
+function mostrarCookieBar(){ if(consentimiento()) return; const b=$('cookieBar'); if(b) b.classList.add('show'); }
+
+/* Guarda y restaura lo que el prospecto ya llenó */
+const PB_GUARDA=['bmin','bmax','uso','marcas','pago','enganche','plazo','aval','screen','stepIdx'];
+function pbGuardar(){ if(consentimiento()!=='si') return;
+  try{ const o={}; PB_GUARDA.forEach(k=>o[k]=PB[k]); localStorage.setItem('ee_pb',JSON.stringify(o)); }catch(e){} }
+function pbRestaurar(){ if(consentimiento()!=='si') return false;
+  try{ const o=JSON.parse(localStorage.getItem('ee_pb')||'null'); if(!o) return false;
+    PB_GUARDA.forEach(k=>{ if(o[k]!==undefined) PB[k]=o[k]; });
+    if(PB.screen==='results' && !pbCars().length) PB.screen='hero';
+    return true;
+  }catch(e){ return false; } }
+function pbOlvidar(){ try{ localStorage.removeItem('ee_pb'); }catch(e){}
+  PB.uso=null; PB.marcas=null; PB.pago=null; PB.aval=null; PB.screen='hero'; PB.stepIdx=0;
+  pbRender(); }
+
 function pbWhats(){ window.open('https://wa.me/'+NEGOCIO.telE164,'_blank'); }
 function pbLlamar(){ location.href='tel:+'+NEGOCIO.telE164; }
 function pbMapa(){ window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(NEGOCIO.direccion),'_blank'); }
@@ -1966,6 +2033,7 @@ function pbDetalleHTML(){
         <div class="detStats">${stat('Precio de contado',money(v.precio||0),'Pago en una exhibición','acc')}</div>
         ${row('Marca / Modelo',esc(nombreCoche(v)))}
         ${row('Año',v.anio||'—')}
+        ${(v.color&&v.color!=='N/A')?row('Color',`${colorDot(v.color)} ${esc(v.color)}`):''}
         ${row('Transmisión',v.transmision==='STD'?'Estándar':'Automática')}
         ${v.km?row('Kilometraje',esc(v.km)):''}
         <p class="detNota">Sin intereses. Al pagar de contado recibes factura, finiquito y responsiva.
@@ -1989,6 +2057,7 @@ function pbDetalleHTML(){
         ${stat('Total estimado',money(eng+T.sumPago),'Inicial + mensualidades')}
       </div>
       ${row('Precio del auto',money(v.precio||0))}
+      ${(v.color&&v.color!=='N/A')?row('Color de la unidad',`${colorDot(v.color)} ${esc(v.color)}`):''}
       ${row('Enganche',`${money(eng)} (${PB.enganche}%)`)}
       ${PB.aval!==null?row('Aval',PB.aval?'Sí':'No'):''}
       ${row('Monto a financiar',money(P))}
@@ -2001,7 +2070,7 @@ function pbDetalleHTML(){
       <div class="detTab">
         <table><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>${filas}</tbody></table>
       </div>
-      <p class="detNota">Cifras informativas. No constituyen una oferta de crédito; están sujetas a aprobación.</p>
+      <p class="detNota">La fotografía es <b>ilustrativa del modelo</b>; el color real de esta unidad es <b>${esc(v.color||'—')}</b>. Cifras informativas. No constituyen una oferta de crédito; están sujetas a aprobación.</p>
     </div>`+pbDetalleActs(v);
 }
 function pbDetalleActs(v){
@@ -2093,6 +2162,7 @@ function pbRender(){
   else if(PB.screen==='nosotros') s.innerHTML=pbNosotros();
   else s.innerHTML=pbResults();
   if(PB.screen!=='results') PB.detalle=null;
+  pbGuardar();
   pbOverlay();
 }
 function pbHero(){
@@ -2276,7 +2346,7 @@ function pbResults(){
       const men=pbMens(v.precio,PB.pago,PB.enganche,PB.plazo);
       return `<article class="carCard">
         <div class="carImg">${(()=>{const f=fotoDe(v); return f.src
-            ? `<img src="${f.src}" alt="${esc(nombreCoche(v))}" loading="lazy">${f.ref?'<span class="refTag">Imagen de referencia</span>':''}`
+            ? `<img src="${f.src}" alt="${esc(nombreCoche(v))}" loading="lazy">${f.ref?'<span class="refTag">Imagen ilustrativa</span>':''}`
             : `<div class="carImgPh">${I.car}<span>${esc(v.marca||'')}</span></div>`;})()}
           <span class="carYearTag">${v.anio||''}</span>
           ${logoMarca(v.marca)?`<span class="carBrand">${logoMarca(v.marca)}</span>`:''}</div>
@@ -2287,6 +2357,7 @@ function pbResults(){
             <span>${I.gauge} ${v.km?fmtKm(String(v.km).replace(/\D/g,'')):'Km n/d'}</span>
             <span>${I.car} ${v.transmision==='STD'?'Estándar':'Automática'}</span>
             <span>${I.fuel} ${esc(v.motor||'Gasolina')}</span>
+            ${(v.color&&v.color!=='N/A')?`<span class="carColor">${colorDot(v.color)} ${esc(v.color)}</span>`:''}
           </div>
           <div class="carPriceRow">
             <div class="carPrice">${money(v.precio||0)}</div>
