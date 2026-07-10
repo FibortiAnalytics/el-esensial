@@ -546,6 +546,33 @@
   .esn .nosTel svg{width:16px;height:16px;color:var(--acid);flex:none}
   .esn .nosTel b{color:var(--txt);font-family:'Space Mono',monospace}
 
+  /* CTA FINAL: WhatsApp directo (principal) + datos opcionales */
+  .esn .ctaBlock{display:grid;grid-template-columns:1.15fr auto 1fr;gap:26px;align-items:center;
+    border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:28px;margin-top:34px}
+  .esn .ctaMain h3{font-size:22px;font-weight:900;letter-spacing:-.01em;margin-bottom:8px}
+  .esn .ctaMain p{font-size:14px;line-height:1.6;color:var(--muted);margin-bottom:20px;max-width:400px}
+  .esn .ctaMain p b{color:var(--txt)}
+  .esn .btnWa{background:#25D366;color:#04331a;box-shadow:0 8px 24px rgba(37,211,102,.22)}
+  .esn .btnWa:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .esn .ctaTel{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:12.5px;color:var(--muted);font-family:'Space Mono',monospace}
+  .esn .ctaTel svg{width:14px;height:14px;color:var(--acid);flex:none}
+  .esn .ctaSep{display:flex;flex-direction:column;align-items:center;align-self:stretch;gap:10px}
+  .esn .ctaSep:before,.esn .ctaSep:after{content:"";flex:1;width:1px;background:var(--line)}
+  .esn .ctaSep span{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .esn .ctaForm{border-left:0}
+  .esn .ctaForm h4{font-size:15px;font-weight:800;margin-bottom:4px}
+  .esn .ctaFormSub{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+  .esn .ctaForm .formGrid{gap:11px;max-width:none}
+  .esn .ctaForm .consent{margin-top:14px}
+  .esn .ctaForm .consent span{font-size:12px}
+  .esn .btn.full:disabled{opacity:.35;cursor:not-allowed}
+  @media(max-width:920px){
+    .esn .ctaBlock{grid-template-columns:1fr;gap:20px;padding:22px}
+    .esn .ctaSep{flex-direction:row;width:100%}
+    .esn .ctaSep:before,.esn .ctaSep:after{width:auto;height:1px}
+    .esn .ctaMain p{max-width:none}
+  }
+
   /* AVAL */
   .esn .avalBox{margin-bottom:18px}
   .esn .avalQ{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;margin-bottom:12px}
@@ -1561,13 +1588,12 @@ function pbMatches(){
 function pbQuitarFiltros(){ PB.uso=null; PB.marca='sin'; pbRender(); }
 function pbSteps(){ const s=['presupuesto','uso','marca','pago'];
   if(PB.pago && PB.pago!=='contado') s.push('financiamiento');
-  s.push('contacto'); return s; }
+  return s; }
 function pbCanNext(){ const id=pbSteps()[PB.stepIdx];
   if(id==='uso') return !!PB.uso;
   if(id==='marca') return !!PB.marca;
   if(id==='pago') return !!PB.pago;
   if(id==='financiamiento') return PB.aval!==null;
-  if(id==='contacto') return PB.nombre.trim().length>1 && PB.whats.replace(/D/g,'').length>=10 && PB.acepta;
   return true; }
 
 /* ---------- Mostrar / salir ---------- */
@@ -1595,7 +1621,6 @@ function pbRestart(){ PB.screen='hero'; PB.stepIdx=0; pbRender(); window.scrollT
 function pbNext(){ if(!pbCanNext())return; const t=pbSteps().length;
   if(PB.stepIdx<t-1){ PB.stepIdx++; pbRender(); window.scrollTo(0,0); return; }
   PB.screen='results'; pbRender(); window.scrollTo(0,0);
-  pbEnviarLead();   // guarda + envía a la base de datos
 }
 function pbBack(){ if(PB.stepIdx>0){ PB.stepIdx--; } else { PB.screen='hero'; } pbRender(); window.scrollTo(0,0); }
 
@@ -1617,8 +1642,25 @@ function pbEstim(){ const e=$('pbEstNum'); if(!e)return;
   const m=pbMens((PB.bmin+PB.bmax)/2,PB.pago,PB.enganche,PB.plazo);
   e.textContent = m? money(m):'—';
   const n=$('pbEstNote'); if(n)n.textContent='sobre un auto de ~'+money((PB.bmin+PB.bmax)/2); }
-function pbField(k,v){ PB[k]=v; const n=$('pbNext'); if(n)n.disabled=!pbCanNext(); pbSummary(); }
-function pbAcepta(v){ PB.acepta=!!v; const n=$('pbNext'); if(n)n.disabled=!pbCanNext(); }
+function pbField(k,v){ PB[k]=v; pbSendState(); }
+function pbAcepta(v){ PB.acepta=!!v; pbSendState(); }
+function pbDatosOk(){ return PB.nombre.trim().length>1 && PB.whats.replace(/\D/g,'').length>=10 && PB.acepta; }
+function pbSendState(){ const b=$('pbSendBtn'); if(b) b.disabled=!pbDatosOk(); }
+function pbEnviarDatos(){ if(!pbDatosOk()) return; pbEnviarLead(); }
+/* WhatsApp con el plan completo y las opciones — sin registrarse */
+function pbWAGlobal(){
+  const list=pbMatches().slice(0,3);
+  let t='Hola, vengo del cotizador de *EL ESENSIAL*.\n' + '━'.repeat(15) + '\n';
+  t+='Presupuesto: '+money(PB.bmin)+' – '+money(PB.bmax)+'\n';
+  if(PB.pago) t+='Pago: '+((PAGOS.find(p=>p.id===PB.pago)||{}).t||'')+'\n';
+  if(PB.pago && PB.pago!=='contado'){
+    t+='Aval: '+(PB.aval?'Sí':'No')+' · Enganche: '+PB.enganche+'% · Plazo: '+PB.plazo+' meses\n';
+  }
+  t+='━'.repeat(15) + '\nMe interesan:\n';
+  list.forEach((v,i)=>{ const m=pbMens(v.precio,PB.pago,PB.enganche,PB.plazo);
+    t+=(i+1)+'. '+nombreCoche(v)+' '+(v.anio||'')+' — '+money(v.precio)+(m?' ('+money(m)+'/mes)':'')+'\n'; });
+  window.open('https://wa.me/'+NEGOCIO.telE164+'?text='+encodeURIComponent(t),'_blank');
+}
 function pbSummary(){ const el=$('pbSummary'); if(!el)return; el.innerHTML=pbSummaryHTML(); }
 
 /* ---------- Modales ---------- */
@@ -1812,19 +1854,7 @@ function pbQuiz(){
       </div>
     </div>`;
   } else {
-    body=stepHead(String(total).padStart(2,'0'),'¿A dónde te enviamos tus opciones?','Un asesor de El Esensial te contacta con las unidades que hacen match.')+
-    `<div class="formGrid">
-      <label class="field"><span>Nombre</span><input value="${esc(PB.nombre)}" placeholder="Tu nombre" oninput="pbField('nombre',this.value)"></label>
-      <label class="field"><span>WhatsApp</span><input value="${esc(PB.whats)}" placeholder="10 dígitos" inputmode="tel" oninput="pbField('whats',this.value)"></label>
-    </div>
-    <input type="text" id="pbTrampa" tabindex="-1" autocomplete="off" aria-hidden="true"
-       style="position:absolute;left:-9999px;opacity:0" oninput="PB.trampa=this.value">
-    <label class="consent">
-      <input type="checkbox" ${PB.acepta?"checked":""} onchange="pbAcepta(this.checked)">
-      <span>He leído y acepto el <button class="link" onclick="event.preventDefault();pbLegal()">Aviso de Privacidad</button>.
-      Autorizo que El Esensial me contacte por WhatsApp con mi cotización.</span>
-    </label>
-    <p class="privacy">${I.shield} Solo guardamos tu nombre y WhatsApp. Puedes pedir que los borremos cuando quieras.</p>`;
+    body='';
   }
   return `<main class="quizWrap">
     <section class="quizMain">
@@ -1857,7 +1887,6 @@ function pbResults(){
       <div><b>Ninguna unidad cumple todos tus filtros.</b>
         <span>Te mostramos las ${list.length} más cercanas a tu presupuesto.</span></div>
       <button class="btn btnGhost" onclick="pbQuitarFiltros()">Ampliar búsqueda</button></div>`:''}
-    <div id="pbLeadBox"></div>
     <div class="planBar">
       ${chip('Pago',esc(pagoL||'—'))}
       ${PB.pago&&PB.pago!=='contado'&&PB.aval!==null?chip('Aval',PB.aval?'Sí':'No'):''}
@@ -1891,6 +1920,39 @@ function pbResults(){
           </div>
           ${PB.editor?`<button class="carPdf" style="width:100%;height:34px" onclick="pbAlSim('${v.id}')">Abrir en simulador interno</button>`:''}
         </div></article>`;}).join('')}</div>
+    <div class="ctaBlock">
+      <div class="ctaMain">
+        <h3>¿Te interesa alguno?</h3>
+        <p>Escríbenos por WhatsApp y te atendemos al momento. <b>No necesitas registrarte.</b>
+           Te llega tu cotización con las unidades que elegiste.</p>
+        <button class="btn btnWa big" onclick="pbWAGlobal()">${I.msg} Cotizar por WhatsApp</button>
+        <span class="ctaTel">${I.phone} ${esc(NEGOCIO.telefono)} · ${esc(NEGOCIO.responsable)}</span>
+      </div>
+
+      <div class="ctaSep"><span>o</span></div>
+
+      <div class="ctaForm">
+        <h4>Prefiero que me contacten</h4>
+        <p class="ctaFormSub">Déjanos tus datos y un asesor te busca. Es opcional.</p>
+        <div class="formGrid" style="grid-template-columns:1fr">
+          <label class="field"><span>Nombre</span>
+            <input value="${esc(PB.nombre)}" placeholder="Tu nombre" oninput="pbField('nombre',this.value)"></label>
+          <label class="field"><span>WhatsApp</span>
+            <input value="${esc(PB.whats)}" placeholder="10 dígitos" inputmode="tel" oninput="pbField('whats',this.value)"></label>
+        </div>
+        <input type="text" id="pbTrampa" tabindex="-1" autocomplete="off" aria-hidden="true"
+          style="position:absolute;left:-9999px;opacity:0" oninput="PB.trampa=this.value">
+        <label class="consent">
+          <input type="checkbox" ${PB.acepta?"checked":""} onchange="pbAcepta(this.checked)">
+          <span>Acepto el <button class="link" onclick="event.preventDefault();pbLegal()">Aviso de Privacidad</button>
+            y que El Esensial me contacte por WhatsApp.</span>
+        </label>
+        <button class="btn btnGhost full" id="pbSendBtn" ${pbDatosOk()?'':'disabled'}
+          onclick="pbEnviarDatos()" style="margin-top:14px">Enviar mis datos</button>
+        <div id="pbLeadBox"></div>
+      </div>
+    </div>
+
     <div class="resFoot">
       <button class="btn btnGhost" onclick="pbRestart()">${I.chevL} Empezar de nuevo</button>
       <button class="btn btnPrimary" onclick="pbGo('quiz')">Ajustar mi búsqueda</button>
@@ -1939,7 +2001,7 @@ function leadTexto(L){
 }
 async function pbEnviarLead(){
   if(PB.trampa){ console.warn('[lead] descartado: bot'); return; }        // honeypot
-  if(!PB.acepta){ console.warn('[lead] sin consentimiento'); return; }
+  if(!pbDatosOk()){ console.warn('[lead] datos incompletos o sin consentimiento'); return; }
   const ultimo=+localStorage.getItem('ee_lead_ts')||0;
   if(Date.now()-ultimo < 60000){ pbLeadBox(pbLeadPayload(), false, 'espera un minuto'); return; }
   localStorage.setItem('ee_lead_ts', String(Date.now()));
