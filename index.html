@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Seguridad: sólo se permite el propio código en línea; nada externo puede cargarse ni inyectarse -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com; connect-src https:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -486,6 +486,35 @@
   .esn .carPdf:hover{border-color:var(--acid);color:var(--acid)}
   .esn .resFoot{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
 
+  /* AVISOS Y BARRA DE PLAN (resultados) */
+  .esn .notice{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    border:1px solid rgba(225,29,42,.35);background:rgba(225,29,42,.08);border-radius:14px;padding:16px 18px;margin-bottom:18px}
+  .esn .notice b{display:block;font-size:14.5px;font-weight:800}
+  .esn .notice span{font-size:13px;color:var(--muted)}
+  .esn .notice.ok{border-color:rgba(52,214,59,.4);background:rgba(52,214,59,.08)}
+  .esn .notice.ok b{color:#4ade80}
+  .esn .planBar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid var(--line);background:var(--panel);
+    border-radius:14px;padding:12px 16px;margin-bottom:20px}
+  .esn .planChip{display:flex;flex-direction:column;gap:1px;padding-right:14px;border-right:1px solid var(--line);margin-right:4px}
+  .esn .planChip:last-of-type{border-right:none}
+  .esn .planChip span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .esn .planChip b{font-size:13.5px;font-weight:700;font-family:'Space Mono',monospace}
+  .esn .planBar .btn{margin-left:auto;padding:9px 16px;font-size:13px}
+
+  /* PROSPECTOS (panel interno) */
+  .leadcard{background:var(--card);border:1px solid var(--linea);border-radius:14px;padding:18px;box-shadow:var(--sombra)}
+  .lead-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .lead-nom{font-size:16px;font-weight:800;color:var(--tinta);line-height:1.2}
+  .lead-fecha{font-size:11.5px;color:var(--gris);font-weight:600;margin-top:3px}
+  .lead-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .lead-info>div{font-size:12.5px;color:var(--tinta-2);font-weight:600;word-break:break-word}
+  .lead-info span{display:block;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris);font-weight:700;margin-bottom:1px}
+  .lead-ops{display:grid;gap:5px}
+  .lead-op{display:flex;justify-content:space-between;gap:10px;font-size:12px;background:#f7f8fa;border:1px solid var(--linea);
+    border-radius:7px;padding:7px 10px}
+  .lead-op span{color:var(--tinta-2);font-weight:600}
+  .lead-op b{color:var(--rojo);font-weight:700;white-space:nowrap}
+
   /* FOOTER */
   .esn .foot{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:26px;border-top:1px solid var(--line);margin-top:20px}
   .esn .footBrand{display:flex;align-items:center;gap:8px;font-weight:600;letter-spacing:.1em;font-size:13px}
@@ -615,6 +644,7 @@
       <div class="ee-navitem" onclick="mostrarPub(true)"><span class="ic">📄</span><span>Cotizador público</span></div>
       <div class="ee-navitem" data-page="inventario" onclick="irA('inventario')"><span class="ic">🚗</span><span>Inventario de coches</span></div>
       <div class="ee-navsec">Administración</div>
+      <div class="ee-navitem" data-page="prospectos" onclick="irA('prospectos')"><span class="ic">📥</span><span>Prospectos</span></div>
       <div class="ee-navitem" data-page="usuarios" onclick="irA('usuarios')"><span class="ic">👥</span><span>Usuarios y perfiles</span></div>
     </nav>
     <div class="ee-side-foot">
@@ -807,6 +837,29 @@
       </div>
     </section>
 
+    <!-- ========== PÁGINA: PROSPECTOS ========== -->
+    <section id="page-prospectos" class="ee-page" hidden>
+      <div class="wrap">
+        <div class="inv-top">
+          <div>
+            <h1>📥 Prospectos <span id="leadCount" class="inv-count"></span></h1>
+            <p>Cada cliente que completa el cotizador queda registrado aquí con lo que llenó y las opciones que vio.</p>
+          </div>
+          <button class="btn btn-imp" onclick="leadsCSV()">⬇️ Exportar CSV</button>
+        </div>
+        <div class="warn" id="leadAviso" style="display:block;background:#eff6ff;border-color:#bfdbfe;color:#1e40af">
+          Esta lista se guarda <b>en este navegador</b>. Para que los prospectos que llenen el formulario desde <b>su celular</b>
+          te lleguen aquí, configura una <b>base de datos</b> en ⚙ Ajustes del cotizador.
+        </div>
+        <div id="leadGrid" class="usr-grid"></div>
+        <div id="leadEmpty" class="inv-empty" style="display:none">
+          <div class="big">📭</div>
+          <div style="font-weight:700;color:var(--tinta-2);font-size:15px">Aún no hay prospectos</div>
+          <div style="margin-top:6px">Aparecerán cuando alguien complete el cotizador público.</div>
+        </div>
+      </div>
+    </section>
+
     <!-- ========== PÁGINA: USUARIOS ========== -->
     <section id="page-usuarios" class="ee-page" hidden>
       <div class="wrap">
@@ -939,6 +992,8 @@
     <div class="cfg-sec">Contacto y portada</div>
     <div class="campo"><label>WhatsApp del lote <span class="hint">(solo dígitos con lada, ej. 529991234567)</span></label><input type="text" id="cWhats" placeholder="529991234567"></div>
     <div class="campo"><label>Foto de portada (URL) <span class="hint">(opcional)</span></label><input type="text" id="cHero" placeholder="https://..."></div>
+    <div class="campo"><label>Base de datos de prospectos (URL) <span class="hint">(Google Apps Script o tu servidor — recibe POST con el JSON del prospecto)</span></label>
+      <input type="text" id="cLeads" placeholder="https://script.google.com/macros/s/.../exec"></div>
 
     <div class="cfg-sec">Videos de la portada</div>
     <div class="campo"><label>Video 1 · título / URL embed</label><input type="text" id="cVidT0"><input type="text" id="cVidU0" style="margin-top:6px" placeholder="https://www.youtube.com/embed/..."></div>
@@ -1018,7 +1073,9 @@ function irA(page){
   document.querySelectorAll('.ee-navitem').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   document.getElementById('page-simulador').hidden = page!=='simulador';
   document.getElementById('page-inventario').hidden = page!=='inventario';
+  document.getElementById('page-prospectos').hidden = page!=='prospectos';
   document.getElementById('page-usuarios').hidden = page!=='usuarios';
+  if(page==='prospectos') leadsRender();
   window.scrollTo(0,0); toggleMenu(false);
 }
 function toggleMenu(force){
@@ -1207,6 +1264,7 @@ const CFG_DEF={
   engDefault:20, plazos:[24,36,48,60,72], plazoDefault:48,
   bmin:200000, bmax:1200000,
   whatsapp:'',                          // número del lote (ej. 529991234567)
+  leadsUrl:'',                          // endpoint que recibe los prospectos (Google Apps Script / VPS)
   heroImg:'',
   videos:[ {t:'Recorrido por el lote', s:'Conoce nuestras unidades', url:''},
            {t:'Proceso de compra seguro', s:'Paso a paso, sin sorpresas', url:''},
@@ -1330,18 +1388,24 @@ function pbMens(precio,pago,engPct,plazo){
   const g=CFG(); const P=Math.max(0,(+precio||0)*(1-engPct/100));
   return tabla(P, pbTasa(pago), plazo, g.esquema||'fijo', 0, false, null).mensualidad;
 }
-function pbMatches(){
+// Coincidencias EXACTAS (cumplen todos los filtros)
+function pbExact(){
   const usoTag = PB.uso ? (USOS.find(u=>u.id===PB.uso)||{}).tag : null;
-  let list=pbCars().filter(v=>{
+  return pbCars().filter(v=>{
     const inB = v.precio>=PB.bmin*0.85 && v.precio<=PB.bmax*1.15;
     const okM = !PB.marca || PB.marca==='sin' || v.marca===PB.marca;
     const okU = !usoTag || (v.tags||[]).includes(usoTag);
     return inB && okM && okU;
-  });
-  if(!list.length){ const mid=(PB.bmin+PB.bmax)/2;
-    list=[...pbCars()].sort((a,b)=>Math.abs(a.precio-mid)-Math.abs(b.precio-mid)).slice(0,3); }
-  return list.sort((a,b)=>a.precio-b.precio);
+  }).sort((a,b)=>a.precio-b.precio);
 }
+function pbIsFallback(){ return pbExact().length===0; }
+// Lo que se muestra: exactas, o las 3 más cercanas al presupuesto si no hay ninguna
+function pbMatches(){
+  const ex=pbExact(); if(ex.length) return ex;
+  const mid=(PB.bmin+PB.bmax)/2;
+  return [...pbCars()].sort((a,b)=>Math.abs(a.precio-mid)-Math.abs(b.precio-mid)).slice(0,3).sort((a,b)=>a.precio-b.precio);
+}
+function pbQuitarFiltros(){ PB.uso=null; PB.marca='sin'; pbRender(); }
 function pbSteps(){ const s=['presupuesto','uso','marca','pago'];
   if(PB.pago && PB.pago!=='contado') s.push('financiamiento');
   s.push('contacto'); return s; }
@@ -1375,8 +1439,10 @@ function pbGo(s){ PB.screen=s; if(s==='quiz') PB.stepIdx=0; pbRender(); window.s
 function pbStart(){ PB.screen='quiz'; PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
 function pbRestart(){ PB.screen='hero'; PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
 function pbNext(){ if(!pbCanNext())return; const t=pbSteps().length;
-  if(PB.stepIdx<t-1){ PB.stepIdx++; } else { PB.screen='results'; }
-  pbRender(); window.scrollTo(0,0); }
+  if(PB.stepIdx<t-1){ PB.stepIdx++; pbRender(); window.scrollTo(0,0); return; }
+  PB.screen='results'; pbRender(); window.scrollTo(0,0);
+  pbEnviarLead();   // guarda + envía a la base de datos
+}
 function pbBack(){ if(PB.stepIdx>0){ PB.stepIdx--; } else { PB.screen='hero'; } pbRender(); window.scrollTo(0,0); }
 
 /* ---------- Interacciones en vivo ---------- */
@@ -1389,7 +1455,7 @@ function pbBudget(el,which){
   if(which==='min'){ PB.bmin=Math.min(v,PB.bmax-50000); el.value=PB.bmin; }
   else { PB.bmax=Math.max(v,PB.bmin+50000); el.value=PB.bmax; }
   const a=$('pbBmin'), b=$('pbBmax'); if(a)a.textContent=money(PB.bmin); if(b)b.textContent=money(PB.bmax);
-  const m=$('pbMatch'); if(m)m.innerHTML=I.check+' '+pbMatches().length+' unidades dentro de tu rango';
+  const m=$('pbMatch'); if(m)m.innerHTML=I.check+' '+pbExact().length+' unidades dentro de tu rango';
   pbSummary();
 }
 function pbEng(v){ PB.enganche=+v; const b=$('pbEngVal'); if(b)b.textContent=PB.enganche+'%'; pbEstim(); pbSummary(); }
@@ -1461,7 +1527,7 @@ function pbSummaryHTML(){
     ${PB.pago&&PB.pago!=='contado'?row('Enganche',PB.enganche+'%'):''}
     ${PB.pago&&PB.pago!=='contado'?row('Plazo',PB.plazo+' meses'):''}
     ${est?`<div class="sumEst"><span>Mensualidad estimada</span><b>${money(est)}</b></div>`:''}
-    <div class="sumMatch">${I.car} ${pbMatches().length} unidades hacen match</div>`;
+    <div class="sumMatch">${I.car} ${pbExact().length? pbExact().length+' unidades hacen match' : 'Sin coincidencias exactas'}</div>`;
 }
 function stepHead(n,t,s,wiki){
   return `<div class="stepHead"><span class="stepNum">${n}</span><div>
@@ -1493,7 +1559,7 @@ function pbQuiz(){
         <label class="rLabel">Máximo</label>
         <input type="range" min="100000" max="2500000" step="10000" value="${PB.bmax}" oninput="pbBudget(this,'max')">
       </div>
-      <div class="matchHint" id="pbMatch">${I.check} ${pbMatches().length} unidades dentro de tu rango</div>
+      <div class="matchHint" id="pbMatch">${I.check} ${pbExact().length} unidades dentro de tu rango</div>
     </div>`;
   } else if(id==='uso'){
     body=stepHead('02','¿Para qué lo vas a usar?','Elige el estilo que más se acerque a ti.')+
@@ -1554,13 +1620,28 @@ function pbQuiz(){
   </main>`;
 }
 function pbResults(){
-  const list=pbMatches();
+  const list=pbMatches(), fb=pbIsFallback();
   const usoL=PB.uso?(USOS.find(u=>u.id===PB.uso)||{}).t:'';
+  const pagoL=PB.pago?(PAGOS.find(p=>p.id===PB.pago)||{}).t:'';
+  const chip=(k,v)=>`<span class="planChip"><span>${k}</span><b>${v}</b></span>`;
   return `<main class="results">
     <div class="resHead">
       <p class="eyebrow">${PB.nombre?`Listo, ${esc(PB.nombre.split(' ')[0])}`:'Tus resultados'}</p>
-      <h2 class="resTitle">${list.length} autos hacen <span class="acc">match</span></h2>
+      <h2 class="resTitle">${fb?'Opciones <span class="acc">cercanas</span>':`${list.length} autos hacen <span class="acc">match</span>`}</h2>
       <p class="resSub">${PB.marca&&PB.marca!=='sin'?esc(PB.marca)+' · ':''}${usoL?esc(usoL)+' · ':''}${money(PB.bmin)}–${money(PB.bmax)}${PB.pago&&PB.pago!=='contado'?' · '+PB.plazo+' meses':''}</p>
+    </div>
+    ${fb?`<div class="notice">
+      <div><b>Ninguna unidad cumple todos tus filtros.</b>
+        <span>Te mostramos las ${list.length} más cercanas a tu presupuesto.</span></div>
+      <button class="btn btnGhost" onclick="pbQuitarFiltros()">Ampliar búsqueda</button></div>`:''}
+    <div id="pbLeadBox"></div>
+    <div class="planBar">
+      ${chip('Pago',esc(pagoL||'—'))}
+      ${PB.pago&&PB.pago!=='contado'?chip('Enganche',PB.enganche+'%'):''}
+      ${PB.pago&&PB.pago!=='contado'?chip('Plazo',PB.plazo+' meses'):''}
+      ${PB.pago&&PB.pago!=='contado'?chip('Tasa ref.',pbTasa(PB.pago)+'%'):''}
+      ${chip('Presupuesto',money(PB.bmin)+'–'+money(PB.bmax))}
+      <button class="btn btnGhost" onclick="pbGo('quiz')">Ajustar</button>
     </div>
     <div class="grid gridCars">${list.map(v=>{
       const men=pbMens(v.precio,PB.pago,PB.enganche,PB.plazo);
@@ -1590,6 +1671,132 @@ function pbResults(){
       <button class="btn btnGhost" onclick="pbRestart()">${I.chevL} Empezar de nuevo</button>
       <button class="btn btnPrimary" onclick="pbGo('quiz')">Ajustar mi búsqueda</button>
     </div></main>`;
+}
+
+/* ===================== PROSPECTOS (leads) ===================== */
+function leadsLoad(){ try{return JSON.parse(localStorage.getItem('ee_leads')||'[]')}catch(e){return[]} }
+function leadsSave(a){ localStorage.setItem('ee_leads',JSON.stringify(a)); }
+
+function pbLeadPayload(){
+  const g=CFG(), list=pbMatches();
+  return {
+    id:'L'+Date.now(),
+    fecha:new Date().toISOString(),
+    nombre:PB.nombre.trim(),
+    whatsapp:PB.whats.replace(/\D/g,''),
+    presupuesto:{min:PB.bmin,max:PB.bmax},
+    uso: PB.uso ? (USOS.find(u=>u.id===PB.uso)||{}).t : null,
+    marca: PB.marca==='sin' ? 'Sin preferencia' : PB.marca,
+    pago: PB.pago ? (PAGOS.find(p=>p.id===PB.pago)||{}).t : null,
+    pagoId: PB.pago,
+    enganchePct: PB.pago==='contado'? null : PB.enganche,
+    plazo: PB.pago==='contado'? null : PB.plazo,
+    tasaRef: PB.pago==='contado'? null : pbTasa(PB.pago),
+    esquema: g.esquema,
+    coincidenciaExacta: !pbIsFallback(),
+    opciones: list.map(v=>({
+      marca:v.marca, modelo:v.modelo, anio:v.anio, version:v.version||'',
+      precio:v.precio, mensualidad: Math.round(pbMens(v.precio,PB.pago,PB.enganche,PB.plazo)||0)
+    })),
+    estado:'nuevo', origen:'cotizador-web'
+  };
+}
+function leadTexto(L){
+  let t=`🆕 *Nuevo prospecto — EL ESENSIAL*\n━━━━━━━━━━━━━━━\n`;
+  t+=`Nombre: ${L.nombre}\nWhatsApp: ${L.whatsapp}\n`;
+  t+=`Presupuesto: ${money(L.presupuesto.min)} – ${money(L.presupuesto.max)}\n`;
+  t+=`Uso: ${L.uso||'—'}\nMarca: ${L.marca||'—'}\nPago: ${L.pago||'—'}\n`;
+  if(L.plazo) t+=`Enganche: ${L.enganchePct}% · Plazo: ${L.plazo} meses · Tasa ${L.tasaRef}%\n`;
+  t+=`━━━━━━━━━━━━━━━\nOpciones que le mostramos${L.coincidenciaExacta?'':' (cercanas)'}:\n`;
+  L.opciones.forEach((o,i)=>{ t+=`${i+1}. ${o.marca} ${o.modelo} ${o.anio||''} — ${money(o.precio)}${o.mensualidad?` (${money(o.mensualidad)}/mes)`:''}\n`; });
+  return t;
+}
+async function pbEnviarLead(){
+  const g=CFG(), L=pbLeadPayload();
+  // 1) siempre se guarda en este dispositivo
+  const arr=leadsLoad(); arr.unshift(L); leadsSave(arr);
+  // 2) intentar enviarlo a la base de datos configurada
+  let ok=false, motivo='';
+  if(g.leadsUrl){
+    try{
+      const r=await fetch(g.leadsUrl,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(L)});
+      ok = r.ok || r.type==='opaque';
+    }catch(e){ motivo=e.message||'sin conexión'; }
+  } else motivo='no hay base de datos configurada';
+  pbLeadBox(L, ok, motivo);
+}
+function pbLeadBox(L, ok, motivo){
+  const box=$('pbLeadBox'); if(!box) return;
+  const num=(CFG().whatsapp||'').replace(/\D/g,'');
+  box.innerHTML = ok
+    ? `<div class="notice ok"><div><b>✅ Recibimos tus datos, ${esc(L.nombre.split(' ')[0])}.</b>
+        <span>Un asesor te contacta al ${esc(L.whatsapp)} con estas opciones.</span></div></div>`
+    : `<div class="notice"><div><b>Guardamos tu selección.</b>
+        <span>Para que un asesor te contacte de inmediato, mándanos tus datos por WhatsApp.</span></div>
+        <button class="btn btnPrimary" onclick="pbLeadWA('${L.id}')">Enviar por WhatsApp</button></div>`;
+  if(!ok && motivo) console.warn('[lead] no enviado:', motivo);
+}
+function pbLeadWA(id){
+  const L=leadsLoad().find(x=>x.id===id); if(!L) return;
+  const num=(CFG().whatsapp||'').replace(/\D/g,'');
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(leadTexto(L)),'_blank');
+}
+
+/* --- Panel interno: lista de prospectos --- */
+const LEAD_EST={nuevo:{t:'Nuevo',c:'#0f7a53',b:'#eafaf1'},contactado:{t:'Contactado',c:'#1e40af',b:'#eff6ff'},cerrado:{t:'Cerrado',c:'#6b7280',b:'#eef0f3'}};
+function leadsRender(){
+  const g=$('leadGrid'), empty=$('leadEmpty'), cnt=$('leadCount'); if(!g) return;
+  const arr=leadsLoad();
+  if(cnt) cnt.textContent = arr.length? arr.length+' prospectos' : '';
+  if(!arr.length){ g.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  g.innerHTML=arr.map(L=>{ const e=LEAD_EST[L.estado]||LEAD_EST.nuevo;
+    const f=new Date(L.fecha);
+    return `<div class="leadcard">
+      <div class="lead-top">
+        <div><div class="lead-nom">${esc(L.nombre||'Sin nombre')}</div>
+          <div class="lead-fecha">${f.getDate()} ${MESES[f.getMonth()]} ${f.getFullYear()} · ${String(f.getHours()).padStart(2,'0')}:${String(f.getMinutes()).padStart(2,'0')}</div></div>
+        <span class="cc-estado" style="position:static;color:${e.c};background:${e.b};border-color:${e.b}"><i style="background:${e.c}"></i>${e.t}</span>
+      </div>
+      <div class="lead-info">
+        <div><span>WhatsApp</span>${esc(L.whatsapp||'—')}</div>
+        <div><span>Presupuesto</span>${money(L.presupuesto.min)} – ${money(L.presupuesto.max)}</div>
+        <div><span>Uso</span>${esc(L.uso||'—')}</div>
+        <div><span>Marca</span>${esc(L.marca||'—')}</div>
+        <div><span>Pago</span>${esc(L.pago||'—')}</div>
+        <div><span>Plan</span>${L.plazo?`${L.enganchePct}% · ${L.plazo} meses · ${L.tasaRef}%`:'—'}</div>
+      </div>
+      <div class="usr-chips-lbl">Opciones que le interesaron${L.coincidenciaExacta?'':' (cercanas)'}</div>
+      <div class="lead-ops">${L.opciones.map(o=>`<div class="lead-op">
+        <span>${esc(o.marca)} ${esc(o.modelo)} ${o.anio||''}</span>
+        <b>${money(o.precio)}${o.mensualidad?` · ${money(o.mensualidad)}/mes`:''}</b></div>`).join('')||'<div class="lead-op"><span>—</span></div>'}</div>
+      <div class="cc-acts" style="margin-top:12px">
+        <button class="cc-sim" onclick="leadWA('${L.id}')">💬 WhatsApp</button>
+        <select class="cc-ed" style="flex:1;padding:0 8px" onchange="leadEstado('${L.id}',this.value)">
+          ${Object.keys(LEAD_EST).map(k=>`<option value="${k}" ${L.estado===k?'selected':''}>${LEAD_EST[k].t}</option>`).join('')}
+        </select>
+        <button class="cc-del" onclick="leadBorrar('${L.id}')" title="Borrar">🗑</button>
+      </div>
+    </div>`;}).join('');
+}
+function leadEstado(id,v){ const a=leadsLoad(); const L=a.find(x=>x.id===id); if(!L)return; L.estado=v; leadsSave(a); leadsRender(); }
+function leadBorrar(id){ if(!confirm('¿Borrar este prospecto?'))return; leadsSave(leadsLoad().filter(x=>x.id!==id)); leadsRender(); }
+function leadWA(id){ const L=leadsLoad().find(x=>x.id===id); if(!L)return;
+  const num=(L.whatsapp||'').replace(/\D/g,'');
+  const t=`Hola ${L.nombre.split(' ')[0]}, te escribimos de *EL ESENSIAL* sobre las opciones que viste:\n\n`+
+    L.opciones.map((o,i)=>`${i+1}. ${o.marca} ${o.modelo} ${o.anio||''} — ${money(o.precio)}${o.mensualidad?` (${money(o.mensualidad)}/mes)`:''}`).join('\n');
+  window.open('https://wa.me/'+(num.length>=10?('52'+num).slice(-12):num)+'?text='+encodeURIComponent(t),'_blank');
+}
+function leadsCSV(){
+  const a=leadsLoad(); if(!a.length){ alert('No hay prospectos.'); return; }
+  const cab=['Fecha','Nombre','WhatsApp','Presup. min','Presup. max','Uso','Marca','Pago','Enganche %','Plazo','Tasa','Exacta','Estado','Opciones'];
+  const filas=a.map(L=>[new Date(L.fecha).toLocaleString('es-MX'),L.nombre,L.whatsapp,L.presupuesto.min,L.presupuesto.max,
+    L.uso||'',L.marca||'',L.pago||'',L.enganchePct||'',L.plazo||'',L.tasaRef||'',L.coincidenciaExacta?'Sí':'No',L.estado,
+    L.opciones.map(o=>`${o.marca} ${o.modelo} ${o.anio||''} (${o.precio})`).join(' | ')]);
+  const csv=[cab,...filas].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a2=document.createElement('a'); a2.href=URL.createObjectURL(blob);
+  a2.download='prospectos-el-esensial.csv'; a2.click(); URL.revokeObjectURL(a2.href);
 }
 
 /* ---------- Acciones ---------- */
@@ -1671,7 +1878,7 @@ function cfgAbrir(){ const g=CFG();
   $('cSeguro').value=g.seguroAnual; $('cGps').value=g.gpsMensual;
   $('cEngDef').value=g.engDefault; $('cPlazos').value=g.plazos.join(', '); $('cPlazoDef').value=g.plazoDefault;
   $('cBmin').value=g.bmin; $('cBmax').value=g.bmax;
-  $('cWhats').value=g.whatsapp||''; $('cHero').value=g.heroImg||'';
+  $('cWhats').value=g.whatsapp||''; $('cHero').value=g.heroImg||''; $('cLeads').value=g.leadsUrl||'';
   for(let i=0;i<3;i++){ $('cVidT'+i).value=g.videos[i].t; $('cVidU'+i).value=g.videos[i].url||''; }
   $('cfgModal').classList.add('show');
 }
@@ -1683,7 +1890,7 @@ function cfgGuardar(){
     seguroAnual:+$('cSeguro').value||0, gpsMensual:+$('cGps').value||0,
     engDefault:+$('cEngDef').value||20, plazos:numList($('cPlazos').value,CFG_DEF.plazos), plazoDefault:+$('cPlazoDef').value||48,
     bmin:+$('cBmin').value||200000, bmax:+$('cBmax').value||1200000,
-    whatsapp:$('cWhats').value.trim(), heroImg:$('cHero').value.trim(),
+    whatsapp:$('cWhats').value.trim(), heroImg:$('cHero').value.trim(), leadsUrl:$('cLeads').value.trim(),
     videos:[0,1,2].map(i=>({t:$('cVidT'+i).value, s:CFG_DEF.videos[i].s, url:$('cVidU'+i).value.trim()})) };
   CFGsave(g); cfgCerrar();
   PB.bmin=g.bmin; PB.bmax=g.bmax; PB.enganche=g.engDefault; PB.plazo=g.plazoDefault;
