@@ -235,6 +235,10 @@
   .cc-actions{margin-top:15px;display:flex;flex-direction:column;gap:7px}
   .cc-sim{height:38px;border:none;border-radius:8px;background:var(--rojo);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
   .cc-sim:hover{background:var(--rojo-2)}
+  .cc-pdf{display:flex;align-items:center;justify-content:center;gap:7px;height:34px;border:1px solid #e6e8ec;
+    background:#fff;border-radius:8px;color:var(--tinta-2);font-size:12.5px;font-weight:600;cursor:pointer;
+    font-family:inherit;transition:.15s}
+  .cc-pdf:hover{border-color:var(--rojo);color:var(--rojo);background:#fff6f6}
   .cc-icons{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
   .cc-icons button{height:34px;border:1px solid #e6e8ec;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#6b7280;cursor:pointer;transition:.15s;padding:0}
   .cc-icons button svg{width:16px;height:16px}
@@ -493,9 +497,11 @@
   .esn .carPrice{font-family:'Space Mono',monospace;font-size:22px;font-weight:700}
   .esn .carMonthly{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:var(--acid);text-align:right}
   .esn .carMonthly small{display:block;font-size:10px;color:var(--muted);font-family:'Archivo'}
-  .esn .carActs{display:grid;grid-template-columns:1fr auto;gap:8px}
-  .esn .carPdf{border:1px solid var(--line2);border-radius:11px;padding:0 14px;color:var(--txt);font-weight:700;font-size:13px}
-  .esn .carPdf:hover{border-color:var(--acid);color:var(--acid)}
+  .esn .carActs{display:grid;grid-template-columns:1fr;gap:8px}
+  .esn .carPdf{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;
+    border:1px solid var(--line2);border-radius:11px;color:var(--txt);font-weight:700;font-size:13px;transition:.2s}
+  .esn .carPdf svg{width:16px;height:16px}
+  .esn .carPdf:hover{border-color:var(--acid);color:var(--acid);background:rgba(225,29,42,.06)}
   .esn .resFoot{display:flex;justify-content:space-between;gap:12px;margin-top:34px;flex-wrap:wrap}
 
   /* AVISOS Y BARRA DE PLAN (resultados) */
@@ -686,10 +692,16 @@
   table.pdf-tab td:first-child{text-align:center;color:#666}
   .pdf-foot{margin-top:16px;font-size:9px;color:#666;border-top:1px solid #ddd;padding-top:10px;line-height:1.5}
   @media print{
-    body.print-cotiza #gate,body.print-cotiza #app{display:none!important}
+    @page{ size:A4; margin:12mm; }
+    body.print-cotiza #gate,body.print-cotiza #app,body.print-cotiza #pub{display:none!important}
     body.print-cotiza #printDoc{display:block!important}
     body.print-cotiza{background:#fff;padding:0}
     .pdf-head,.pdf-hi div,table.pdf-tab th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .pdf-head,.pdf-hi,.pdf-foot{break-inside:avoid;page-break-inside:avoid}
+    table.pdf-tab thead{display:table-header-group}   /* repite encabezado en cada hoja */
+    table.pdf-tab tr{break-inside:avoid;page-break-inside:avoid}
+    .pdf-t{break-after:avoid;page-break-after:avoid}
+    .pdf-foot{margin-top:14px}
   }
 
   @media print{.ee-sidebar,.ee-hero,.acciones,.carsel-row,.no-print{display:none!important}.ee-main{margin-left:0}.card,header.sim,.res-hero{box-shadow:none;border:1px solid #ddd;break-inside:avoid}header.sim,.res-hero{-webkit-print-color-adjust:exact;print-color-adjust:exact}.scroll{overflow:visible}table{min-width:0}}
@@ -1317,6 +1329,7 @@ function invRender(){
         <div class="cc-sub">Enganche ${money(c.enganche||0)} · Financiar ${money(c.saldo||((c.precio||0)-(c.enganche||0)))}</div>
         <div class="cc-actions">
           <button class="cc-sim" onclick="invSimular('${c.id}')">Simular</button>
+          <button class="cc-pdf" onclick="invPDF('${c.id}')">${ico('download','ic-sm')} Cotización PDF</button>
           <div class="cc-icons">
             <button onclick="invEditar('${c.id}')" title="Editar">${ICO.edit}</button>
             <button class="${sold?'act':''}" onclick="invEstado('${c.id}','vendido')" title="${sold?'Marcar disponible':'Marcar vendido'}">${ICO.tag}</button>
@@ -1916,7 +1929,7 @@ function pbResults(){
           </div>
           <div class="carActs">
             <button class="btn btnPrimary" onclick="pbWA('${v.id}')">Cotizar por WhatsApp ${I.arrow}</button>
-            <button class="carPdf" onclick="pbPDF('${v.id}')" title="Descargar PDF">${I.dl}</button>
+            <button class="carPdf" onclick="pbPDF('${v.id}')">${I.dl} Descargar cotización PDF</button>
           </div>
           ${PB.editor?`<button class="carPdf" style="width:100%;height:34px" onclick="pbAlSim('${v.id}')">Abrir en simulador interno</button>`:''}
         </div></article>`;}).join('')}</div>
@@ -2113,45 +2126,101 @@ function pbWA(id){
   const num=(g.whatsapp||'').replace(/\D/g,'');
   window.open('https://wa.me/'+num+'?text='+encodeURIComponent(t),'_blank');
 }
-function pbPDF(id){
-  const v=pbCars().find(c=>c.id===id); if(!v)return;
-  const g=CFG(); const {eng,T}=pbPlanCoche(v);
-  const contado = PB.pago==='contado';
-  const filas=contado?'':T.filas.map(f=>`<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
-  const specs=[v.version, v.transmision==='STD'?'Estándar':'Automático', (v.color&&v.color!=='N/A')?v.color:'', v.motor].filter(Boolean).join(' · ')||'—';
-  const hoy=new Date(); const fecha=hoy.getDate()+' de '+MESES_L[hoy.getMonth()]+' de '+hoy.getFullYear();
+/* ===================== COTIZACIÓN EN PDF =====================
+   Se genera 100% en el navegador del usuario. Ningún dato del cliente
+   ni del vehículo sale del dispositivo: no hay servidor ni librería externa
+   (la CSP bloquea cualquier script de terceros). El navegador lo guarda
+   como PDF desde su propio diálogo de impresión. */
+
+function pdfFolio(car){
+  const d=new Date();
+  const ymd=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const suf=String(car.id||'').replace(/\W/g,'').slice(-4).toUpperCase().padStart(4,'0');
+  return `EE-${ymd}-${suf}`;
+}
+function nombreArchivo(car){
+  const base=['Cotizacion','EL-ESENSIAL',car.marca,car.modelo,car.anio].filter(Boolean).join('_');
+  return base.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w-]+/g,'_').replace(/_+/g,'_');
+}
+function imprimirDoc(titulo){
+  const previo=document.title;
+  document.title=titulo;                       // el navegador usa esto como nombre del PDF
+  document.body.classList.add('print-cotiza');
+  const limpiar=()=>{ document.body.classList.remove('print-cotiza'); document.title=previo; };
+  window.addEventListener('afterprint',limpiar,{once:true});
+  setTimeout(()=>{ window.print(); setTimeout(limpiar,1800); },100);
+}
+
+/* o = {car, enganche(monto), plazo, tasa, esquema, contado, aval, cliente, pagoLabel} */
+function pdfCotizacion(o){
+  const v=o.car, eng=+o.enganche||0, contado=!!o.contado;
+  const P=Math.max(0,(v.precio||0)-eng);
+  const T=contado? null : tabla(P, o.tasa, o.plazo, o.esquema||'fijo', 0, false, null);
+  const filas=contado?'':T.filas.map(f=>
+    `<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
+  const specs=[v.version, v.transmision==='STD'?'Estándar':'Automático', (v.color&&v.color!=='N/A')?v.color:'', v.motor]
+    .filter(Boolean).join(' · ')||'—';
+  const d=new Date(); const fecha=d.getDate()+' de '+MESES_L[d.getMonth()]+' de '+d.getFullYear();
+  const folio=pdfFolio(v);
+
   $('printDoc').innerHTML=`
     <div class="pdf-head">
       <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
-      <div class="pdf-meta">Cotización de financiamiento<br>${fecha}</div>
+      <div class="pdf-meta">Cotización de financiamiento<br>${fecha}<br><b>Folio ${folio}</b></div>
     </div>
-    ${PB.nombre?`<div class="pdf-row"><span>Cliente</span><b>${esc(PB.nombre)}</b></div>`:''}
+    ${o.cliente?`<div class="pdf-row"><span>Cliente</span><b>${esc(o.cliente)}</b></div>`:''}
     <div class="pdf-t">Vehículo</div>
     <div class="pdf-row"><span>Marca</span><b>${esc(v.marca||'—')}</b></div>
     <div class="pdf-row"><span>Modelo</span><b>${esc(v.modelo||'—')}</b></div>
     <div class="pdf-row"><span>Año</span><b>${esc(v.anio||'—')}</b></div>
     <div class="pdf-row"><span>Versión / especificaciones</span><b>${esc(specs)}</b></div>
+    ${v.km?`<div class="pdf-row"><span>Kilometraje</span><b>${esc(v.km)}</b></div>`:''}
     <div class="pdf-row"><span>Precio</span><b>${money(v.precio||0)}</b></div>
-    ${contado?`<div class="pdf-hi"><div><div class="l">Pago de contado</div><div class="v">${money(v.precio||0)}</div></div></div>`
-    :`<div class="pdf-t">Tu plan de financiamiento</div>
-      <div class="pdf-row"><span>Aval</span><b>${PB.aval?'Sí':'No'}</b></div>
-      <div class="pdf-row"><span>Enganche (${PB.enganche}%)</span><b>${money(eng)}</b></div>
-      <div class="pdf-row"><span>Plazo</span><b>${PB.plazo} meses</b></div>
-      <div class="pdf-row"><span>Tasa anual de referencia</span><b>${pbTasa(PB.pago||'sinburo')}%</b></div>
-      <div class="pdf-row"><span>Monto a financiar</span><b>${money(Math.max(0,(v.precio||0)-eng))}</b></div>
-      <div class="pdf-hi">
-        <div><div class="l">Enganche</div><div class="v">${money(eng)}</div></div>
-        <div><div class="l">Mensualidad</div><div class="v">${money(T.mensualidad)}</div></div>
-        <div><div class="l">Total final estimado</div><div class="v">${money(eng+T.sumPago)}</div></div>
-      </div>
-      <div class="pdf-t">Tabla de amortización</div>
-      <table class="pdf-tab"><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead><tbody>${filas}</tbody></table>`}
-    <div class="pdf-foot">Cotización generada el ${fecha} · EL ESENSIAL.<br>
-    Cifras informativas. No constituyen una oferta de crédito. Sujeto a aprobación de la institución financiera; los montos pueden variar según la fecha de contratación.</div>`;
-  document.body.classList.add('print-cotiza');
-  const limpiar=()=>document.body.classList.remove('print-cotiza');
-  window.addEventListener('afterprint',limpiar,{once:true});
-  setTimeout(()=>{ window.print(); setTimeout(limpiar,1500); },80);
+    ${contado
+      ? `<div class="pdf-hi"><div><div class="l">Pago de contado</div><div class="v">${money(v.precio||0)}</div></div></div>`
+      : `<div class="pdf-t">Plan de financiamiento${o.pagoLabel?' · '+esc(o.pagoLabel):''}</div>
+        ${o.aval!=null?`<div class="pdf-row"><span>Aval</span><b>${o.aval?'Sí':'No'}</b></div>`:''}
+        <div class="pdf-row"><span>Enganche</span><b>${money(eng)}${v.precio?` (${Math.round(eng/v.precio*100)}%)`:''}</b></div>
+        <div class="pdf-row"><span>Plazo</span><b>${o.plazo} meses</b></div>
+        <div class="pdf-row"><span>Tasa anual de referencia</span><b>${o.tasa}%</b></div>
+        <div class="pdf-row"><span>Monto a financiar</span><b>${money(P)}</b></div>
+        <div class="pdf-row"><span>Intereses del plazo</span><b>${money(T.sumInt)}</b></div>
+        <div class="pdf-hi">
+          <div><div class="l">Enganche</div><div class="v">${money(eng)}</div></div>
+          <div><div class="l">Mensualidad</div><div class="v">${money(T.mensualidad)}</div></div>
+          <div><div class="l">Total final estimado</div><div class="v">${money(eng+T.sumPago)}</div></div>
+        </div>
+        <div class="pdf-t">Tabla de amortización</div>
+        <table class="pdf-tab"><thead><tr><th>#</th><th>Pago</th><th>Interés</th><th>Capital</th><th>Saldo</th></tr></thead>
+        <tbody>${filas}</tbody></table>`}
+    <div class="pdf-foot">
+      Folio ${folio} · Generada el ${fecha} · EL ESENSIAL · ${esc(NEGOCIO.direccion)} · Tel. ${esc(NEGOCIO.telefono)}<br>
+      Cifras informativas. <b>No constituyen una oferta de crédito.</b> Sujeto a aprobación de la institución financiera;
+      los montos pueden variar según la fecha de contratación.<br>
+      Documento generado en tu dispositivo; ningún dato se envió por internet.
+    </div>`;
+  imprimirDoc(nombreArchivo(v));
+}
+
+/* Público: usa lo que el prospecto eligió en el cotizador */
+function pbPDF(id){
+  const v=pbCars().find(c=>c.id===id); if(!v)return;
+  const g=CFG(), contado = PB.pago==='contado';
+  pdfCotizacion({ car:v, contado,
+    enganche: Math.round((v.precio||0)*PB.enganche/100),
+    plazo: PB.plazo, tasa: pbTasa(PB.pago||'sinburo'), esquema: g.esquema,
+    aval: contado? null : PB.aval, cliente: PB.nombre,
+    pagoLabel: (PAGOS.find(p=>p.id===PB.pago)||{}).t });
+}
+
+/* Interno: usa los datos guardados del vehículo en el inventario */
+function invPDF(id){
+  const v=invLoad().find(c=>c.id===id); if(!v)return;
+  const g=CFG();
+  pdfCotizacion({ car:v, contado:false,
+    enganche: v.enganche||Math.round((v.precio||0)*0.2),
+    plazo: parseInt(v.plazo)||48, tasa: v.tasa||16.9, esquema: g.esquema,
+    aval: null, cliente:'', pagoLabel:'' });
 }
 function pbAlSim(id){
   const v=pbCars().find(c=>c.id===id); if(!v)return;
