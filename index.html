@@ -2477,7 +2477,10 @@ async function descargarCotizacionPDF(o){
 
     // ---- Tabla de amortización completa, con saltos de página ----
     seccion('Tabla de amortización · los '+T.filas.length+' pagos');
-    const colX=[M+9, M+16+41.5, M+16+83, M+16+124.5, M+16+166];
+    // Columnas: "#" centrada + 4 numéricas alineadas a la derecha, con 3mm de respiro
+    // en el borde (si no, la última columna queda pegada al filo y se ve cortada).
+    const PAD=3, XNUM=M+18, COLW=(W-2*M-18-PAD)/4;
+    const colX=[M+9, XNUM+COLW, XNUM+COLW*2, XNUM+COLW*3, XNUM+COLW*4];
     const cabTabla=()=>{
       doc.setFillColor(0,0,0); doc.rect(M,y-4.5,W-2*M,7,'F');
       doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(255,255,255);
