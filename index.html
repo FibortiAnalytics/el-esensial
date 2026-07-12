@@ -76,6 +76,9 @@
 
   /* ===== APP LAYOUT ===== */
   #app{display:none;min-height:100vh}
+  /* Evita el parpadeo del login: si arranca en público o ya autenticado, el gate no se pinta */
+  html.boot-public #gate,html.boot-app #gate{display:none!important}
+  html.boot-public #app{display:none!important}
   .ee-sidebar{position:fixed;top:0;left:0;width:230px;height:100vh;background:var(--negro);z-index:60;
     display:flex;flex-direction:column;border-right:1px solid rgba(225,29,42,.25);overflow-y:auto}
   .ee-brand{padding:22px 18px 18px;text-align:center;border-bottom:1px solid rgba(255,255,255,.07)}
@@ -877,6 +880,16 @@
 </style>
 </head>
 <body>
+<script>
+/* Decide el modo ANTES de pintar, para no mostrar el login (interno) en la vista pública */
+(function(){ try{
+  var pub = new URLSearchParams(location.search).get('publico')==='1';
+  var authed = false; try{ authed = sessionStorage.getItem('ee_auth')==='1'; }catch(e){}
+  var cl = document.documentElement.classList;
+  if(pub) cl.add('boot-public');
+  else if(authed) cl.add('boot-app');
+}catch(e){} })();
+</script>
 
 <!-- Símbolo del logo (auto rojo) reutilizable -->
 
@@ -1906,14 +1919,15 @@ function ponerConsent(v){ try{ localStorage.setItem('ee_consent',v); }catch(e){}
   if(v==='si') pbGuardar(); else { try{ localStorage.removeItem('ee_pb'); }catch(e){} } }
 function mostrarCookieBar(){ if(consentimiento()) return; const b=$('cookieBar'); if(b) b.classList.add('show'); }
 
-/* Guarda y restaura lo que el prospecto ya llenó */
-const PB_GUARDA=['bmin','bmax','uso','marcas','pago','enganche','plazo','aval','screen','stepIdx'];
+/* Guardamos SOLO las respuestas, no la pantalla ni el paso: al volver se conservan
+   tus datos pero siempre entras al inicio, con libertad de moverte. */
+const PB_GUARDA=['bmin','bmax','uso','marcas','pago','enganche','plazo','aval'];
 function pbGuardar(){ if(consentimiento()!=='si') return;
   try{ const o={}; PB_GUARDA.forEach(k=>o[k]=PB[k]); localStorage.setItem('ee_pb',JSON.stringify(o)); }catch(e){} }
 function pbRestaurar(){ if(consentimiento()!=='si') return false;
   try{ const o=JSON.parse(localStorage.getItem('ee_pb')||'null'); if(!o) return false;
     PB_GUARDA.forEach(k=>{ if(o[k]!==undefined) PB[k]=o[k]; });
-    if(PB.screen==='results' && !pbCars().length) PB.screen='hero';
+    PB.screen='hero'; PB.stepIdx=0;   // nunca forzar una pantalla
     return true;
   }catch(e){ return false; } }
 function pbOlvidar(){ try{ localStorage.removeItem('ee_pb'); }catch(e){}
