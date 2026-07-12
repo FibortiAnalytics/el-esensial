@@ -1495,7 +1495,15 @@ const SEED_CARS=[
 
 let editandoId=null, fotoActual='';
 function invLoad(){ try{return JSON.parse(localStorage.getItem('ee_inv')||'[]')}catch(e){return[]} }
-function invSaveAll(a){ localStorage.setItem('ee_inv',JSON.stringify(a)); }
+function invSaveAll(a){
+  try{ localStorage.setItem('ee_inv',JSON.stringify(a)); return true; }
+  catch(e){
+    alert('No se pudo guardar: el almacenamiento del navegador está lleno. '+
+          'Las fotos ocupan espacio; usa fotos ligeras o borra unidades que ya no vendes.\n\n'+
+          'Sugerencia: guarda esta unidad sin foto por ahora.');
+    return false;
+  }
+}
 function nombreCoche(c){ return [c.marca,c.modelo].filter(Boolean).join(' ')||'Sin nombre'; }
 function sig(c){ return (c.marca+'|'+c.modelo+'|'+c.anio+'|'+c.precio+'|'+c.color).toLowerCase(); }
 function invSeed(){ // primera vez: cargar catálogo; v2 añade etiquetas de uso
@@ -1609,9 +1617,42 @@ function invEditar(id){ const c=invLoad().find(x=>x.id===id); if(!c)return; edit
   $('invModal').classList.add('show');
 }
 function invCerrar(){ $('invModal').classList.remove('show'); }
-function fotoElegida(ev){ const f=ev.target.files[0]; if(!f)return; const rd=new FileReader();
-  rd.onload=e=>{ fotoActual=e.target.result; const fp=$('fotoPrev'); fp.style.backgroundImage=`url('${fotoActual}')`; fp.innerHTML=''; };
-  rd.readAsDataURL(f);
+/* Comprime la foto ANTES de guardar: una foto de celular (4-8MB) queda en ~120KB,
+   así entra sin problema en el almacenamiento del navegador. */
+function comprimirFoto(file, maxLado, calidad){
+  return new Promise((res,rej)=>{
+    const rd=new FileReader();
+    rd.onerror=()=>rej(new Error('lectura'));
+    rd.onload=e=>{
+      const img=new Image();
+      img.onerror=()=>rej(new Error('imagen'));
+      img.onload=()=>{
+        let {width:w,height:h}=img;
+        const esc=Math.min(1, maxLado/Math.max(w,h));
+        w=Math.round(w*esc); h=Math.round(h*esc);
+        const c=document.createElement('canvas'); c.width=w; c.height=h;
+        const ctx=c.getContext('2d');
+        ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h);          // fondo blanco para PNG transparentes
+        ctx.drawImage(img,0,0,w,h);
+        res(c.toDataURL('image/jpeg', calidad));
+      };
+      img.src=e.target.result;
+    };
+    rd.readAsDataURL(file);
+  });
+}
+async function fotoElegida(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const fp=$('fotoPrev'); fp.innerHTML='Procesando…'; fp.style.backgroundImage='';
+  try{
+    fotoActual=await comprimirFoto(f, 1100, 0.82);
+    const kb=Math.round(fotoActual.length*0.75/1024);
+    if(kb>900) fotoActual=await comprimirFoto(f, 900, 0.72);   // segunda pasada si sigue pesada
+    fp.style.backgroundImage=`url('${fotoActual}')`; fp.innerHTML='';
+  }catch(e){
+    fotoActual=''; fp.innerHTML=ico('camera')+' No se pudo procesar la imagen';
+  }
+  ev.target.value='';   // permite volver a elegir el mismo archivo
 }
 function invGuardar(){
   const marca=$('fMarca').value.trim(), modelo=$('fModelo').value.trim();
@@ -1624,7 +1665,8 @@ function invGuardar(){
     tags:$('fTags').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean) };
   const arr=invLoad();
   if(editandoId){ const i=arr.findIndex(x=>x.id===editandoId); if(i>=0)arr[i]=c; } else arr.unshift(c);
-  invSaveAll(arr); invCerrar(); invRefreshFiltros(); invRender(); toast('Guardado');
+  if(!invSaveAll(arr)) return;
+  invCerrar(); invRefreshFiltros(); invRender(); toast('Guardado');
 }
 function invBorrar(id){ if(!confirm('¿Borrar este coche del inventario?'))return; invSaveAll(invLoad().filter(x=>x.id!==id)); invRefreshFiltros(); invRender(); }
 
@@ -2865,16 +2907,32 @@ function cfgCopiar(){ const t=JSON.stringify(CFG(),null,2);
   if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>toast('Configuración copiada'),()=>alert(t)); else alert(t); }
 
 /* ===================== USUARIOS / PERFILES ===================== */
+const ADMIN=(id,nombre)=>({id,nombre,rol:'Administrador',correo:'',area:'Dirección',
+  permisos:['Ver','Editar','Administrar'],modulos:['Simulador','Inventario','Prospectos','Usuarios'],estado:'activo'});
 const SEED_USERS=[
- {id:'u1',nombre:'Administrador',rol:'Dirección',correo:'agencia@fiborti.com',area:'Administración',
-  permisos:['Ver','Editar','Administrar'],modulos:['Simulador','Inventario','Usuarios'],estado:'activo'},
- {id:'u2',nombre:'Vendedor (ejemplo)',rol:'Ventas',correo:'ventas@elesensial.com',area:'Piso de ventas',
-  permisos:['Ver','Simular'],modulos:['Simulador','Inventario'],estado:'activo'},
+ ADMIN('u_carlos','Carlos Jasso'),
+ ADMIN('u_diego','Diego Jasso'),
+ ADMIN('u_tono','Toño'),
 ];
 let editandoUsr=null;
 function usrLoad(){ try{return JSON.parse(localStorage.getItem('ee_usr')||'null')}catch(e){return null} }
 function usrSaveAll(a){ localStorage.setItem('ee_usr',JSON.stringify(a)); }
-function usrSeed(){ if(!usrLoad()) usrSaveAll(SEED_USERS); }
+function usrSeed(){
+  let arr=usrLoad();
+  if(!arr){ usrSaveAll(SEED_USERS); return; }
+  let cambio=false;
+  // Una sola vez: quita los usuarios de ejemplo que venían sembrados
+  if(!localStorage.getItem('ee_usr_admins_v1')){
+    const antes=arr.length;
+    arr=arr.filter(u=>!(u.correo==='agencia@fiborti.com' && u.nombre==='Administrador')
+                    && !(u.nombre==='Vendedor (ejemplo)'));
+    if(arr.length!==antes) cambio=true;
+    localStorage.setItem('ee_usr_admins_v1','1');
+  }
+  // Asegura que los 3 admins existan (no duplica, no borra los que tú agregues)
+  SEED_USERS.forEach(a=>{ if(!arr.some(u=>u.nombre.toLowerCase()===a.nombre.toLowerCase())){ arr.push(a); cambio=true; } });
+  if(cambio) usrSaveAll(arr);
+}
 function iniciales(n){ return (n||'?').split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase(); }
 function usrRender(){ const arr=usrLoad()||[]; const g=$('usrGrid'); if(!g)return;
   g.innerHTML=arr.map(u=>{ const on=u.estado==='activo';
