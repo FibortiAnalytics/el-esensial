@@ -89,6 +89,15 @@
   .ee-navitem:hover{background:rgba(255,255,255,.06);color:#fff}
   .ee-navitem.active{background:rgba(225,29,42,.14);color:#fff;border-left-color:var(--rojo)}
   .ee-navitem .navic{width:18px;height:18px;flex:none}
+  /* Usuario activo (arriba de la barra lateral) */
+  .ee-user{display:flex;align-items:center;gap:11px;margin:0 12px 6px;padding:11px 12px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:11px}
+  .ee-user:empty{display:none}
+  .ee-user .uav{width:34px;height:34px;flex:none;border-radius:9px;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:13px;color:#fff;background:var(--rojo)}
+  .ee-user .umeta{display:flex;flex-direction:column;min-width:0}
+  .ee-user .unom{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ee-user .urol{font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ee-side-foot{padding:14px;border-top:1px solid rgba(255,255,255,.07)}
   .ee-logout{width:100%;padding:10px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:rgba(255,255,255,.6);
     border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
@@ -957,10 +966,12 @@
   <div class="gate-box">
     <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
     <div class="gate-sub">Acceso privado</div>
-    <label class="gate-lbl" for="claveInput">Contraseña</label>
+    <label class="gate-lbl" for="userInput">Usuario</label>
+    <input id="userInput" type="text" placeholder="usuario" autocomplete="username" autocapitalize="none" spellcheck="false">
+    <label class="gate-lbl" for="claveInput" style="margin-top:14px">Contraseña</label>
     <input id="claveInput" type="password" placeholder="••••••••" autocomplete="current-password">
     <button class="gate-btn" onclick="entrar()">Entrar →</button>
-    <div id="gateErr">Contraseña incorrecta.</div>
+    <div id="gateErr">Usuario o contraseña incorrectos.</div>
     <div class="gate-foot">EL ESENSIAL · Uso interno</div>
   </div>
 </div>
@@ -979,6 +990,7 @@
     <div class="ee-brand">
       <img src="logo.png" alt="EL ESENSIAL" class="brandimg">
     </div>
+    <div class="ee-user" id="ee-user"></div>
     <nav class="ee-nav">
       <div class="ee-navsec">Herramientas</div>
       <div class="ee-navitem active" data-page="simulador" onclick="irA('simulador')"><svg class="ic navic"><use href="#i-calc"/></svg><span>Simulador interno</span></div>
@@ -1409,8 +1421,14 @@
 <script src="vendor/jspdf.umd.min.js"></script>
 <script>
 /* ===================== ACCESO ===================== */
-const CLAVE_PBKDF2='103587e8e835513fb738855c2ce8cce301351fadbf050ffa95a9c574c9e9626c';
 const SALT='EL-ESENSIAL-2026', ITER=200000;
+/* Cuentas: usuario -> {nombre, rol, hash PBKDF2 de la contraseña} */
+const CUENTAS={
+  carlos:{nombre:'Carlos Jasso',rol:'Administrador',hash:'e306c5db287b7369ae718793150a070eb41026e7cfb0d2c1d2faf291db469043'},
+  diego :{nombre:'Diego Jasso', rol:'Administrador',hash:'fac3c2945e1b8cb97622c4a1fc510a879be395503fe760a441500782dbdc0005'},
+  tono  :{nombre:'Toño',        rol:'Administrador',hash:'b99b645787da73a5c4afa2ad4a405d219b904a0bc9de82df08d117dbdbc2ff4e'},
+  admin :{nombre:'Administrador',rol:'Dirección',   hash:'103587e8e835513fb738855c2ce8cce301351fadbf050ffa95a9c574c9e9626c'}
+};
 async function derivar(pass){
   const enc=new TextEncoder();
   const key=await crypto.subtle.importKey('raw',enc.encode(pass),'PBKDF2',false,['deriveBits']);
@@ -1419,24 +1437,38 @@ async function derivar(pass){
 }
 function lockGet(){ try{return JSON.parse(localStorage.getItem('ee_lock')||'{}')}catch(e){return{}} }
 function mostrarErr(m){ const e=document.getElementById('gateErr'); e.textContent=m; e.style.display='block'; }
+function sesion(){ try{ return JSON.parse(sessionStorage.getItem('ee_sesion')||'null'); }catch(e){ return null; } }
 async function entrar(){
   const now=Date.now(), L=lockGet();
   if(L.until && now<L.until){ mostrarErr('Demasiados intentos. Espera '+Math.ceil((L.until-now)/1000)+' s.'); return; }
+  const u=document.getElementById('userInput').value.trim().toLowerCase();
   const v=document.getElementById('claveInput').value;
+  const cuenta=CUENTAS[u];
   const btn=document.querySelector('.gate-btn'); btn.disabled=true; btn.textContent='Verificando…';
-  let ok=false; try{ ok=(await derivar(v))===CLAVE_PBKDF2; }catch(e){ ok=(v==='esensial2026'); }
+  let ok=false;
+  if(cuenta){ try{ ok=(await derivar(v))===cuenta.hash; }catch(e){ ok=false; } }
   btn.disabled=false; btn.textContent='Entrar →';
-  if(ok){ localStorage.removeItem('ee_lock'); sessionStorage.setItem('ee_auth','1'); mostrarApp(); return; }
+  if(ok){
+    localStorage.removeItem('ee_lock');
+    sessionStorage.setItem('ee_auth','1');
+    sessionStorage.setItem('ee_sesion',JSON.stringify({user:u,nombre:cuenta.nombre,rol:cuenta.rol}));
+    mostrarApp(); return;
+  }
   const fails=(L.fails||0)+1, nl={fails};
   if(fails>=5) nl.until=now+Math.min(300000,15000*Math.pow(2,fails-5));
   localStorage.setItem('ee_lock',JSON.stringify(nl));
-  mostrarErr(nl.until?('Bloqueado por seguridad. Espera '+Math.ceil((nl.until-now)/1000)+' s.'):'Contraseña incorrecta.');
+  mostrarErr(nl.until?('Bloqueado por seguridad. Espera '+Math.ceil((nl.until-now)/1000)+' s.'):'Usuario o contraseña incorrectos.');
+}
+function pintarSesion(){ const s=sesion(); const el=$('ee-user'); if(!el||!s) return;
+  el.innerHTML=`<span class="uav">${esc(iniciales(s.nombre))}</span>`
+    +`<span class="umeta"><span class="unom">${esc(s.nombre)}</span><span class="urol">${esc(s.rol||'')}</span></span>`;
 }
 function mostrarApp(){ document.getElementById('gate').style.display='none'; document.getElementById('app').style.display='block';
-  invSeed(); usrSeed(); invRefreshFiltros(); invRender(); usrRender(); }
-function salir(){ sessionStorage.removeItem('ee_auth'); location.reload(); }
-document.getElementById('claveInput').addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); });
-setTimeout(()=>{ if(document.getElementById('gate').style.display!=='none') document.getElementById('claveInput').focus(); },100);
+  invSeed(); usrSeed(); invRefreshFiltros(); invRender(); usrRender(); pintarSesion(); }
+function salir(){ sessionStorage.removeItem('ee_auth'); sessionStorage.removeItem('ee_sesion'); location.reload(); }
+['userInput','claveInput'].forEach(id=>{ const el=document.getElementById(id);
+  if(el) el.addEventListener('keydown',e=>{ if(e.key==='Enter') entrar(); }); });
+setTimeout(()=>{ if(document.getElementById('gate').style.display!=='none') document.getElementById('userInput').focus(); },100);
 
 /* ===================== NAVEGACIÓN ===================== */
 function irA(page){
