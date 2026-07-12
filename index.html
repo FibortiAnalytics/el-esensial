@@ -323,6 +323,33 @@
   .chip-p{background:#fde8e9;color:#b3141f}
   .chip-m{background:#eafaf1;color:#0f7a53}
 
+  /* Bloque de acceso (usuario + contraseña) en el perfil */
+  .usr-acceso{background:#fafbfc;border:1px solid var(--linea);border-radius:11px;padding:12px 14px;margin-bottom:14px}
+  .usr-acceso-t{display:flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--gris);font-weight:700;margin-bottom:9px}
+  .usr-acceso-t svg{width:13px;height:13px}
+  .usr-cred{display:flex;align-items:center;gap:10px;padding:5px 0}
+  .usr-cred+.usr-cred{border-top:1px solid #eef0f3}
+  .usr-cred span{font-size:12px;color:var(--gris);width:82px;flex:none}
+  .usr-cred b{font-size:13.5px;font-weight:700;color:var(--tinta)}
+  .usr-cred b.mono{font-family:'Space Mono',ui-monospace,monospace;letter-spacing:.02em}
+  .usr-eye{margin-left:auto;width:28px;height:28px;flex:none;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--linea);border-radius:7px;color:var(--gris);cursor:pointer;background:#fff;transition:.15s}
+  .usr-eye:hover{border-color:var(--rojo);color:var(--rojo)}
+  .usr-eye svg{width:14px;height:14px}
+
+  /* Botones del perfil: minimalistas y limpios */
+  .usr-acts{display:flex;gap:8px;margin-top:14px}
+  .usr-edit{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:38px;
+    border:1px solid var(--linea);background:#fff;border-radius:9px;font-size:13px;font-weight:600;color:var(--tinta-2);
+    cursor:pointer;font-family:inherit;transition:.15s}
+  .usr-edit svg{width:14px;height:14px}
+  .usr-edit:hover{border-color:var(--tinta);color:var(--tinta)}
+  .usr-trash{width:38px;height:38px;flex:none;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--linea);background:#fff;border-radius:9px;color:var(--gris);cursor:pointer;transition:.15s}
+  .usr-trash svg{width:15px;height:15px}
+  .usr-trash:hover{border-color:#dc2626;color:#dc2626;background:#fef4f4}
+
   #usrModal{position:fixed;inset:0;z-index:120;background:rgba(13,13,15,.6);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
   #usrModal.show{display:flex}
 
@@ -931,6 +958,8 @@
 <symbol id="i-rotate" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></symbol>
 <symbol id="i-clip" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></symbol>
 <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+<symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M9.9 4.2A9.8 9.8 0 0 1 12 4c6.5 0 10 8 10 8a17.6 17.6 0 0 1-2.2 3.2M6.6 6.6A17.6 17.6 0 0 0 2 12s3.5 7 10 7a9.5 9.5 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><line x1="2" y1="2" x2="22" y2="22"/></symbol>
 <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.4 11.7 4.5A2 2 0 0 0 10.3 4H5a1 1 0 0 0-1 1v5.3a2 2 0 0 0 .6 1.4l8.9 8.9a2 2 0 0 0 2.8 0l4.3-4.3a2 2 0 0 0 0-2.9z"/><circle cx="8" cy="8" r="1"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
 <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2 6 12 13 22 6"/></symbol>
@@ -2939,13 +2968,16 @@ function cfgCopiar(){ const t=JSON.stringify(CFG(),null,2);
   if(navigator.clipboard) navigator.clipboard.writeText(t).then(()=>toast('Configuración copiada'),()=>alert(t)); else alert(t); }
 
 /* ===================== USUARIOS / PERFILES ===================== */
-const ADMIN=(id,nombre)=>({id,nombre,rol:'Administrador',correo:'',area:'Dirección',
+const ADMIN=(id,nombre,usuario,clave)=>({id,nombre,rol:'Administrador',usuario,clave,correo:'',area:'Dirección',
   permisos:['Ver','Editar','Administrar'],modulos:['Simulador','Inventario','Prospectos','Usuarios'],estado:'activo'});
 const SEED_USERS=[
- ADMIN('u_carlos','Carlos Jasso'),
- ADMIN('u_diego','Diego Jasso'),
- ADMIN('u_tono','Toño'),
+ ADMIN('u_carlos','Carlos Jasso','carlos','carlos2026'),
+ ADMIN('u_diego','Diego Jasso','diego','diego2026'),
+ ADMIN('u_tono','Toño','tono','tono2026'),
 ];
+/* Credenciales por nombre (para completar perfiles ya creados antes) */
+const CREDS_NOMBRE={'carlos jasso':{usuario:'carlos',clave:'carlos2026'},
+  'diego jasso':{usuario:'diego',clave:'diego2026'},'toño':{usuario:'tono',clave:'tono2026'}};
 let editandoUsr=null;
 function usrLoad(){ try{return JSON.parse(localStorage.getItem('ee_usr')||'null')}catch(e){return null} }
 function usrSaveAll(a){ localStorage.setItem('ee_usr',JSON.stringify(a)); }
@@ -2963,8 +2995,13 @@ function usrSeed(){
   }
   // Asegura que los 3 admins existan (no duplica, no borra los que tú agregues)
   SEED_USERS.forEach(a=>{ if(!arr.some(u=>u.nombre.toLowerCase()===a.nombre.toLowerCase())){ arr.push(a); cambio=true; } });
+  // Completa usuario/contraseña en perfiles que ya existían sin esos datos
+  arr.forEach(u=>{ const c=CREDS_NOMBRE[(u.nombre||'').toLowerCase()];
+    if(c && (!u.usuario || !u.clave)){ u.usuario=c.usuario; u.clave=c.clave; cambio=true; } });
   if(cambio) usrSaveAll(arr);
 }
+let usrVer=new Set();
+function usrVerClave(id){ if(usrVer.has(id)) usrVer.delete(id); else usrVer.add(id); usrRender(); }
 function iniciales(n){ return (n||'?').split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase(); }
 function usrRender(){ const arr=usrLoad()||[]; const g=$('usrGrid'); if(!g)return;
   g.innerHTML=arr.map(u=>{ const on=u.estado==='activo';
@@ -2977,6 +3014,14 @@ function usrRender(){ const arr=usrLoad()||[]; const g=$('usrGrid'); if(!g)retur
         </div>
         <span class="usr-estado ${on?'on':'off'}">${on?'● Activo':'○ Inactivo'}</span>
       </div>
+      ${(u.usuario||u.clave)?`<div class="usr-acceso">
+        <div class="usr-acceso-t">${ico('lock','ic-sm')} Acceso</div>
+        <div class="usr-cred"><span>Usuario</span><b>${esc(u.usuario||'—')}</b></div>
+        <div class="usr-cred"><span>Contraseña</span>
+          <b class="mono">${u.clave? (usrVer.has(u.id)? esc(u.clave) : '••••••••') : '—'}</b>
+          ${u.clave?`<button class="usr-eye" onclick="usrVerClave('${u.id}')" title="Ver / ocultar">${ico(usrVer.has(u.id)?'eyeoff':'eye','ic-sm')}</button>`:''}
+        </div>
+      </div>`:''}
       <div class="usr-info">
         <div><span>Correo</span>${esc(u.correo||'—')}</div>
         <div><span>Área</span>${esc(u.area||'—')}</div>
@@ -2985,9 +3030,9 @@ function usrRender(){ const arr=usrLoad()||[]; const g=$('usrGrid'); if(!g)retur
       <div class="usr-chips">${(u.permisos||[]).map(p=>`<span class="chip chip-p">${esc(p)}</span>`).join('')||'<span class="chip">—</span>'}</div>
       <div class="usr-chips-lbl">Módulos con acceso</div>
       <div class="usr-chips">${(u.modulos||[]).map(m=>`<span class="chip chip-m">${esc(m)}</span>`).join('')||'<span class="chip">—</span>'}</div>
-      <div class="cc-acts" style="margin-top:12px">
-        <button class="cc-ed" style="flex:1" onclick="usrEditar('${u.id}')">${ico('edit','ic-sm')} Editar</button>
-        <button class="cc-del" onclick="usrBorrar('${u.id}')" title="Borrar">${ico('trash','ic-sm')}</button>
+      <div class="usr-acts">
+        <button class="usr-edit" onclick="usrEditar('${u.id}')">${ico('edit','ic-sm')} Editar</button>
+        <button class="usr-trash" onclick="usrBorrar('${u.id}')" title="Eliminar">${ico('trash','ic-sm')}</button>
       </div>
     </div>`; }).join('');
 }
@@ -3001,10 +3046,13 @@ function usrEditar(id){ const u=(usrLoad()||[]).find(x=>x.id===id); if(!u)return
   $('usrModal').classList.add('show'); }
 function usrCerrar(){ $('usrModal').classList.remove('show'); }
 function usrGuardar(){ const nombre=$('uNombre').value.trim(); if(!nombre){ alert('Ponle el nombre del usuario.'); return; }
+  const arr=usrLoad()||[];
+  const previo = editandoUsr? arr.find(x=>x.id===editandoUsr) : null;
   const u={ id:editandoUsr||('u'+Date.now()), nombre, rol:$('uRol').value.trim(), correo:$('uCorreo').value.trim(), area:$('uArea').value.trim(),
+    usuario: previo?previo.usuario:undefined, clave: previo?previo.clave:undefined,   // conserva las credenciales
     permisos:$('uPermisos').value.split(',').map(s=>s.trim()).filter(Boolean),
     modulos:$('uModulos').value.split(',').map(s=>s.trim()).filter(Boolean), estado:$('uEstado').value };
-  const arr=usrLoad()||[]; if(editandoUsr){ const i=arr.findIndex(x=>x.id===editandoUsr); if(i>=0)arr[i]=u; } else arr.push(u);
+  if(editandoUsr){ const i=arr.findIndex(x=>x.id===editandoUsr); if(i>=0)arr[i]=u; } else arr.push(u);
   usrSaveAll(arr); usrCerrar(); usrRender(); toast('Usuario guardado'); }
 function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll((usrLoad()||[]).filter(x=>x.id!==id)); usrRender(); }
 
