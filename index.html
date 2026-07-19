@@ -1810,8 +1810,8 @@ const CFG_DEF={
   leadsUrl:'',                          // endpoint que recibe los prospectos (Google Apps Script / VPS)
   heroImg:'',
   promoOn:true,
-  promoText:'¿Te lo llevas esta semana? Te damos 45 días para tu primer pago de la mensualidad — no pagas hasta 45 días después de dar tu apartado.',
-  promoNota:'Aplican restricciones · sujeto a disponibilidad y aprobación.',
+  promoText:'¡Solo esta semana! Aparta tu auto con $5,000 y te lo guardamos 7 días. Y si te lo llevas, tienes 45 días para tu primer pago de la mensualidad.',
+  promoNota:'El apartado reserva la unidad 7 días; si no se concreta, vuelve a la venta. Aplican restricciones · sujeto a disponibilidad y aprobación.',
   videos:[ {t:'Recorrido por el lote', s:'Conoce nuestras unidades', url:'https://www.instagram.com/p/DYtzLeBDpIt/embed', poster:'video-recorrido.jpg'},
            {t:'Proceso de compra seguro', s:'Paso a paso, sin sorpresas', url:'https://www.instagram.com/p/DY1hn4Nj21_/embed', poster:'video-proceso.jpg'},
            {t:'Opciones de financiamiento', s:'Bancario y sin buró', url:'https://www.instagram.com/p/DZE-VO-jPAK/embed', poster:'video-financiam.jpg'} ]
@@ -2068,7 +2068,7 @@ function pbPromoRender(){
   if(!g.promoOn || !txt){ el.style.display='none'; el.innerHTML=''; return; }
   el.style.display='';
   el.innerHTML=`<div class="promoIn">
-    <span class="promoBadge">🔥 45 DÍAS SIN PAGAR</span>
+    <span class="promoBadge">🔥 SOLO ESTA SEMANA</span>
     <div class="promoTxt"><b>${esc(txt)}</b>${g.promoNota?`<small>${esc(g.promoNota)}</small>`:''}</div>
     <button class="promoCta" onclick="pbWhats()">Apártalo esta semana</button>
   </div>`;
