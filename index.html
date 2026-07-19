@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Seguridad: sólo se permite el propio código en línea; nada externo puede cargarse ni inyectarse -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com; connect-src https: blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://player.vimeo.com https://www.instagram.com; connect-src https: blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -403,7 +403,7 @@
   @keyframes scan{0%{top:8%}50%{top:70%}100%{top:8%}}
   .esn .heroInner{position:relative;z-index:2;max-width:1120px;margin:0 auto}
   .esn .eyebrow{color:var(--acid);font-weight:700;letter-spacing:.22em;font-size:13px;margin-bottom:16px}
-  .esn .heroTitle{font-size:clamp(42px,8vw,88px);font-weight:900;line-height:.94;letter-spacing:-.02em;text-transform:uppercase}
+  .esn .heroTitle{font-size:clamp(34px,8vw,88px);font-weight:900;line-height:.94;letter-spacing:-.02em;text-transform:uppercase;overflow-wrap:break-word}
   .esn .heroTitle .acc{position:relative;display:inline-block}
   .esn .heroTitle .acc:after{content:'';position:absolute;left:0;right:0;bottom:6px;height:6px;background:var(--acid);border-radius:3px;
     box-shadow:0 0 18px rgba(225,29,42,.7);animation:grow .8s .3s both ease-out;transform-origin:left}
@@ -838,6 +838,8 @@
   .esn .videoModal{max-width:720px;width:100%;border:1px solid var(--line2);border-radius:18px;padding:18px;background:var(--panel2);animation:pop .3s both}
   .esn .videoFrame{aspect-ratio:16/9;border-radius:12px;overflow:hidden}
   .esn .videoFrame iframe{width:100%;height:100%;border:none}
+  .esn .videoModal--ig{max-width:420px}
+  .esn .videoFrame--ig{aspect-ratio:auto;height:min(78vh,660px);background:#000}
   .esn .videoPh{width:100%;height:100%;display:grid;place-items:center;align-content:center;gap:8px;color:var(--muted);
     background:repeating-linear-gradient(45deg,#0e100e,#0e100e 14px,#121412 14px,#121412 28px)}
   .esn .videoPh svg{width:40px;height:40px}
@@ -1492,8 +1494,8 @@ async function entrar(){
   const v=document.getElementById('claveInput').value;
   const cuenta=CUENTAS[u];
   const btn=document.querySelector('.gate-btn'); btn.disabled=true; btn.textContent='Verificando…';
-  let ok=false;
-  if(cuenta){ try{ ok=(await derivar(v))===cuenta.hash; }catch(e){ ok=false; } }
+  let ok=false, cryptoErr=false;
+  if(cuenta){ try{ ok=(await derivar(v))===cuenta.hash; }catch(e){ cryptoErr=true; } }
   btn.disabled=false; btn.textContent='Entrar →';
   if(ok){
     localStorage.removeItem('ee_lock');
@@ -1501,6 +1503,7 @@ async function entrar(){
     sessionStorage.setItem('ee_sesion',JSON.stringify({user:u,nombre:cuenta.nombre,rol:cuenta.rol}));
     mostrarApp(); return;
   }
+  if(cryptoErr){ mostrarErr('No se pudo verificar en este navegador. Abre el sitio por https:// (no como archivo local) o prueba en otro navegador.'); return; }
   const fails=(L.fails||0)+1, nl={fails};
   if(fails>=5) nl.until=now+Math.min(300000,15000*Math.pow(2,fails-5));
   localStorage.setItem('ee_lock',JSON.stringify(nl));
@@ -1593,7 +1596,7 @@ function invSeed(){ // primera vez: cargar catálogo; v2 añade etiquetas de uso
     if(!ex) arr.push({...c});
     else if(!ex.tags || !ex.tags.length) ex.tags=c.tags.slice();   // backfill
   });
-  invSaveAll(arr); localStorage.setItem('ee_seeded_v2','1');
+  if(invSaveAll(arr)) localStorage.setItem('ee_seeded_v2','1');
 }
 function invImportar(){ // botón: sincronizar/mezclar catálogo del Excel
   const arr=invLoad(); const have=new Set(arr.map(sig)); let add=0;
@@ -1614,7 +1617,7 @@ function invPintarChips(){
   const arr=invLoad();
   const marcas=[...new Set(arr.map(c=>c.marca).filter(Boolean))].sort();
   const chip=(m,label,n,on)=>
-    "<button class=\"mchip"+(on?" on":"")+"\" onclick='invToggleMarca("+JSON.stringify(m)+")'>"
+    "<button class=\"mchip"+(on?" on":"")+"\" onclick=\"invToggleMarca("+esc(JSON.stringify(m))+")\">"
     + (m?(logoMarca(m)||"") : "")
     + "<span>"+esc(label)+"</span>"
     + (n!=null? "<span class=\"n\">"+n+"</span>" : "")
@@ -1725,7 +1728,7 @@ async function fotoElegida(ev){
   const fp=$('fotoPrev'); fp.innerHTML='Procesando…'; fp.style.backgroundImage='';
   try{
     fotoActual=await comprimirFoto(f, 1100, 0.82);
-    const kb=Math.round(fotoActual.length*0.75/1024);
+    const kb=Math.round(fotoActual.length/1024);   // longitud real de la cadena base64 que se guarda
     if(kb>900) fotoActual=await comprimirFoto(f, 900, 0.72);   // segunda pasada si sigue pesada
     fp.style.backgroundImage=`url('${fotoActual}')`; fp.innerHTML='';
   }catch(e){
@@ -1743,7 +1746,7 @@ function invGuardar(){
     plazo:$('fPlazo').value, tasa:+$('fTasa').value||0, notas:$('fNotas').value.trim(), foto:fotoActual, estado:$('fEstado').value,
     tags:$('fTags').value.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean) };
   const arr=invLoad();
-  if(editandoId){ const i=arr.findIndex(x=>x.id===editandoId); if(i>=0)arr[i]=c; } else arr.unshift(c);
+  if(editandoId){ const i=arr.findIndex(x=>x.id===editandoId); if(i>=0)arr[i]=c; else arr.unshift(c); } else arr.unshift(c);
   if(!invSaveAll(arr)) return;
   invCerrar(); invRefreshFiltros(); invRender(); toast('Guardado');
 }
@@ -1780,13 +1783,14 @@ const CFG_DEF={
   whatsapp:'529994476667',              // WhatsApp del lote (Diego Jasso)
   leadsUrl:'',                          // endpoint que recibe los prospectos (Google Apps Script / VPS)
   heroImg:'',
-  videos:[ {t:'Recorrido por el lote', s:'Conoce nuestras unidades', url:''},
-           {t:'Proceso de compra seguro', s:'Paso a paso, sin sorpresas', url:''},
-           {t:'Opciones de financiamiento', s:'Bancario y sin buró', url:''} ]
+  videos:[ {t:'Recorrido por el lote', s:'Conoce nuestras unidades', url:'https://www.instagram.com/p/DYtzLeBDpIt/embed'},
+           {t:'Proceso de compra seguro', s:'Paso a paso, sin sorpresas', url:'https://www.instagram.com/p/DY1hn4Nj21_/embed'},
+           {t:'Opciones de financiamiento', s:'Bancario y sin buró', url:'https://www.instagram.com/p/DZE-VO-jPAK/embed'} ]
 };
 function CFG(){ try{ const s=JSON.parse(localStorage.getItem('ee_wzcfg')||'{}'); const c=Object.assign({},CFG_DEF,s);
   if(!Array.isArray(c.plazos)||!c.plazos.length) c.plazos=CFG_DEF.plazos;
   if(!Array.isArray(c.videos)||c.videos.length!==3) c.videos=CFG_DEF.videos;
+  else c.videos=c.videos.map((v,i)=>({ ...CFG_DEF.videos[i], ...(v||{}), url:(v&&v.url) ? v.url : CFG_DEF.videos[i].url }));
   return c; }catch(e){ return JSON.parse(JSON.stringify(CFG_DEF)); } }
 function CFGsave(o){ localStorage.setItem('ee_wzcfg',JSON.stringify(o)); }
 
@@ -1895,7 +1899,7 @@ const WIKI={
   mensualidad:{t:'Mensualidad estimada',d:'Cálculo aproximado de tu pago mensual según precio, enganche, plazo y una tasa de referencia. El monto final depende de la aprobación y la institución.'},
   cat:{t:'CAT',d:'Costo Anual Total. Resume el costo real de un crédito (tasa + comisiones + cargos) en un solo porcentaje anual. Sirve para comparar opciones de forma justa. Pídelo siempre por escrito antes de firmar.'},
   interesfijo:{t:'Interés fijo',d:'En este esquema el interés se calcula una sola vez sobre el monto financiado y se reparte igual en cada mensualidad, junto con una parte fija de capital. Tu pago nunca cambia. A diferencia del saldo insoluto, el interés no baja conforme amortizas.'},
-  bancario:{t:'Crédito bancario',d:'Financiamiento con instituciones bancarias, tasas preferenciales y plazos de hasta 72 meses. Requiere revisión de buró. Cobertura nacional.'},
+  bancario:{t:'Crédito bancario',d:'Financiamiento con instituciones bancarias, tasas preferenciales y plazos de hasta 60 meses. Requiere revisión de buró. Cobertura nacional.'},
   sinburo:{t:'Sin buró (local)',d:'Financiamiento directo, sin revisión de buró de crédito. Ideal para estrenar sin complicaciones. Suele pedir identificación y comprobante (predial libre de gravamen o aval).'},
   contado:{t:'Pago de contado',d:'Pagas el total del vehículo en una sola exhibición. Es la vía más rápida y sin intereses.'},
   aval:{t:'Aval',d:'Persona que respalda tu crédito y responde por el pago si tú no puedes cubrirlo. Normalmente se pide identificación y un comprobante de propiedad (por ejemplo, predial libre de gravamen). Presentar aval te permite el enganche mínimo del 20%; sin aval, el enganche arranca en 40%.'},
@@ -1910,7 +1914,7 @@ const USOS=[
 ];
 const PAGOS=[
   {id:'contado',t:'De contado',s:'Pago en una exhibición, sin intereses',ic:'wallet',wiki:'contado'},
-  {id:'bancario',t:'Crédito bancario',s:'Tasas preferenciales, hasta 72 meses',ic:'bank',wiki:'bancario'},
+  {id:'bancario',t:'Crédito bancario',s:'Tasas preferenciales, hasta 60 meses',ic:'bank',wiki:'bancario'},
   {id:'sinburo',t:'Sin buró (local)',s:'Directo, entrega inmediata',ic:'key',wiki:'sinburo'}
 ];
 
@@ -1920,6 +1924,7 @@ const NEGOCIO={
   ciudad:'Mérida, Yucatán',
   telefono:'999 447 66 67',
   telE164:'529994476667',
+  mapsUrl:'https://maps.app.goo.gl/J8gvdsqKNNPd72S87',
   responsable:'Diego Jasso',
   lineas:[
     {t:'Venta de seminuevos',s:'Unidades revisadas, de rango medio y alto.',ic:'car'},
@@ -2051,13 +2056,14 @@ function pbRestaurar(){ if(consentimiento()!=='si') return false;
     PB.screen='hero'; PB.stepIdx=0;   // nunca forzar una pantalla
     return true;
   }catch(e){ return false; } }
-function pbOlvidar(){ try{ localStorage.removeItem('ee_pb'); }catch(e){}
-  PB.uso=null; PB.marcas=null; PB.pago=null; PB.aval=null; PB.screen='hero'; PB.stepIdx=0;
+function pbOlvidar(){ try{ ['ee_pb','ee_leads','ee_lead_ts','ee_consent'].forEach(k=>localStorage.removeItem(k)); }catch(e){}
+  PB.uso=null; PB.marcas=null; PB.pago=null; PB.aval=null; PB.nombre=''; PB.whats=''; PB.acepta=false; PB.screen='hero'; PB.stepIdx=0;
   pbRender(); }
 
-function pbWhats(){ window.open('https://wa.me/'+NEGOCIO.telE164,'_blank'); }
+function pbWaNum(){ return (CFG().whatsapp||NEGOCIO.telE164||'').replace(/\D/g,''); }
+function pbWhats(){ window.open('https://wa.me/'+pbWaNum(),'_blank','noopener'); }
 function pbLlamar(){ location.href='tel:+'+NEGOCIO.telE164; }
-function pbMapa(){ window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(NEGOCIO.direccion),'_blank'); }
+function pbMapa(){ window.open(NEGOCIO.mapsUrl || ('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(NEGOCIO.direccion)),'_blank','noopener'); }
 function pbMenu(f){ PB.menu = (f===undefined)? !PB.menu : !!f;
   const m=$('navMenu'); if(m) m.classList.toggle('open', PB.menu); }
 function pbGo(s){ pbMenu(false); PB.screen=s; if(s==='quiz') PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
@@ -2117,7 +2123,7 @@ function pbWAGlobal(){
   t+='━'.repeat(15) + '\nMe interesan:\n';
   list.forEach((v,i)=>{ const m=pbMens(v.precio,PB.pago,PB.enganche,PB.plazo);
     t+=(i+1)+'. '+nombreCoche(v)+' '+(v.anio||'')+' — '+money(v.precio)+(m?' ('+money(m)+'/mes)':'')+'\n'; });
-  window.open('https://wa.me/'+NEGOCIO.telE164+'?text='+encodeURIComponent(t),'_blank');
+  window.open('https://wa.me/'+pbWaNum()+'?text='+encodeURIComponent(t),'_blank','noopener');
 }
 function pbSummary(){ const el=$('pbSummary'); if(!el)return; el.innerHTML=pbSummaryHTML(); }
 
@@ -2149,7 +2155,7 @@ function pbDetalleHTML(){
     </div>`;
 
   const head=`<div class="detHead"><div><span class="detEye">Tu cotización</span><h3>${esc(titulo)}</h3></div>
-      <button class="closeX" onclick="pbCerrarDetalle()">${I.x}</button></div>`;
+      <button class="closeX" aria-label="Cerrar" onclick="pbCerrarDetalle()">${I.x}</button></div>`;
 
   if(contado){
     return head+`<div class="detBody">
@@ -2237,7 +2243,7 @@ function pbNosotros(){
       <p class="nosTel">${I.phone} <b>${esc(NEGOCIO.telefono)}</b> · Atiende ${esc(NEGOCIO.responsable)}</p>
       <div class="heroCtas" style="margin-top:18px">
         <button class="btn btnPrimary" onclick="pbStart()">${I.search} Cotiza tu auto</button>
-        <button class="btn btnGhost" onclick="window.open('https://wa.me/${NEGOCIO.telE164}','_blank')">${I.msg} Escríbenos por WhatsApp</button>
+        <button class="btn btnGhost" onclick="pbWhats()">${I.msg} Escríbenos por WhatsApp</button>
       </div>
     </div>
   </main>`;
@@ -2253,7 +2259,7 @@ function pbOverlay(){
   if(PB.legal){
     o.innerHTML=`<div class="overlay" onclick="PB.legal=false;pbOverlay()"><div class="legalCard" onclick="event.stopPropagation()">
       <div class="wikiTop"><span class="wikiTag">${I.shield} Aviso de privacidad</span>
-        <button class="closeX" onclick="PB.legal=false;pbOverlay()">${I.x}</button></div>
+        <button class="closeX" aria-label="Cerrar" onclick="PB.legal=false;pbOverlay()">${I.x}</button></div>
       <div class="legalBody">${AVISO_PRIVACIDAD}</div>
       <button class="btn btnPrimary full" style="margin-top:16px" onclick="PB.legal=false;pbOverlay()">Entendido</button>
     </div></div>`;
@@ -2261,14 +2267,15 @@ function pbOverlay(){
   }
   if(PB.wiki!=null && WIKI[PB.wiki]){ const w=WIKI[PB.wiki];
     o.innerHTML=`<div class="overlay" onclick="pbCloseModal()"><div class="wikiCard" onclick="event.stopPropagation()">
-      <div class="wikiTop"><span class="wikiTag">${I.info} Referencia</span><button class="closeX" onclick="pbCloseModal()">${I.x}</button></div>
+      <div class="wikiTop"><span class="wikiTag">${I.info} Referencia</span><button class="closeX" aria-label="Cerrar" onclick="pbCloseModal()">${I.x}</button></div>
       <h4 class="wikiT">${esc(w.t)}</h4><p class="wikiD">${esc(w.d)}</p></div></div>`; return; }
   if(PB.video!=null){ const v=CFG().videos[PB.video]||{t:'Video',url:''};
-    o.innerHTML=`<div class="overlay" onclick="pbCloseModal()"><div class="videoModal" onclick="event.stopPropagation()">
-      <div class="wikiTop"><span class="wikiTag">${I.play} ${esc(v.t)}</span><button class="closeX" onclick="pbCloseModal()">${I.x}</button></div>
-      <div class="videoFrame">${v.url
-        ? `<iframe src="${esc(v.url)}" title="${esc(v.t)}" allowfullscreen></iframe>`
-        : `<div class="videoPh">${I.play}<span>Aquí va el video de El Esensial</span><small>Configúralo en Ajustes</small></div>`}</div>
+    const ig=/instagram\.com/.test(v.url||'');
+    o.innerHTML=`<div class="overlay" onclick="pbCloseModal()"><div class="videoModal${ig?' videoModal--ig':''}" onclick="event.stopPropagation()">
+      <div class="wikiTop"><span class="wikiTag">${I.play} ${esc(v.t)}</span><button class="closeX" aria-label="Cerrar" onclick="pbCloseModal()">${I.x}</button></div>
+      <div class="videoFrame${ig?' videoFrame--ig':''}">${v.url
+        ? `<iframe src="${esc(v.url)}" title="${esc(v.t)}" allowfullscreen loading="lazy"></iframe>`
+        : `<div class="videoPh">${I.play}<span>Video muy pronto</span><small>Estamos preparándolo</small></div>`}</div>
       </div></div>`; return; }
   o.innerHTML='';
 }
@@ -2294,7 +2301,7 @@ function pbHero(){
         hasta unidades de alto rendimiento, con los mejores planes de <b>crédito</b>.</p>
       <div class="heroCtas">
         <button class="btn btnPrimary big" onclick="pbStart()">${I.search} Comienza tu cotización</button>
-        <button class="btn btnGhost big" onclick="pbVideo(0)">${I.play} Ver el lote</button>
+        <button class="btn btnGhost big" onclick="pbMapa()">${I.pin} Ver el lote</button>
       </div>
       <p class="videoLead">Míralo antes de venir — recorridos de El Esensial:</p>
       <div class="videoRow">${g.videos.map((v,i)=>`
@@ -2373,7 +2380,7 @@ function pbQuiz(){
     ${sel.length?`<div class="brandSel">${I.check} <span>${esc(pbMarcasTxt())}</span>
       <button class="link" onclick="pbSinPreferencia()">Limpiar</button></div>`:''}`;
   } else if(id==='pago'){
-    body=stepHead('04','¿Cómo prefieres pagar?',`Toca la ${'ⓘ'} para entender cada opción.`)+
+    body=stepHead('04','¿Cómo prefieres pagar?',`Toca el icono de información para entender cada opción.`)+
     `<div class="grid grid3">${PAGOS.map(p=>optBlock(PB.pago===p.id,`pbSetPago('${p.id}')`,p.ic,p.t,p.s,p.wiki)).join('')}</div>`;
   } else if(id==='financiamiento'){
     const est=pbMens((PB.bmin+PB.bmax)/2,PB.pago,PB.enganche,PB.plazo);
@@ -2427,6 +2434,18 @@ function pbQuiz(){
   </main>`;
 }
 function pbResults(){
+  if(!pbCars().length){
+    return `<main class="results">
+      <div class="resHead">
+        <p class="eyebrow">${PB.nombre?`Gracias, ${esc(PB.nombre.split(' ')[0])}`:'Casi listo'}</p>
+        <h2 class="resTitle">Sin unidades <span class="acc">por ahora</span></h2>
+        <p class="resSub">Estamos actualizando el inventario. Escríbenos y te avisamos apenas entren autos como los que buscas.</p>
+      </div>
+      <div class="notice info"><div>${I.info}<span>Un asesor te contacta por WhatsApp con opciones.</span></div>
+        <button class="btn btnWa" onclick="pbWhats()">${I.msg} WhatsApp</button></div>
+      <div style="margin-top:16px"><button class="btn btnGhost" onclick="pbGo('quiz')">Volver</button></div>
+    </main>`;
+  }
   const {lista:list, relajado:rel}=pbBuscar();
   const usoL=PB.uso?(USOS.find(u=>u.id===PB.uso)||{}).t:'';
   const marcaL=(PB.marcas&&PB.marcas.length)?pbMarcasTxt():'';
@@ -2530,7 +2549,7 @@ function pbResults(){
 
 /* ===================== PROSPECTOS (leads) ===================== */
 function leadsLoad(){ try{return JSON.parse(localStorage.getItem('ee_leads')||'[]')}catch(e){return[]} }
-function leadsSave(a){ localStorage.setItem('ee_leads',JSON.stringify(a)); }
+function leadsSave(a){ try{ localStorage.setItem('ee_leads',JSON.stringify(a)); return true; }catch(e){ return false; } }
 
 function pbLeadPayload(){
   const g=CFG(), list=pbMatches();
@@ -2582,9 +2601,11 @@ async function pbEnviarLead(){
   let ok=false, motivo='';
   if(g.leadsUrl){
     try{
-      const r=await fetch(g.leadsUrl,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(L)});
-      ok = r.ok || r.type==='opaque';
-    }catch(e){ motivo=e.message||'sin conexión'; }
+      const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(), 9000);
+      const r=await fetch(g.leadsUrl,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(L),signal:ctrl.signal});
+      clearTimeout(to);
+      ok = r.ok;
+    }catch(e){ motivo=(e&&e.name==='AbortError')?'tardó demasiado':(e.message||'sin conexión'); }
   } else motivo='no hay base de datos configurada';
   pbLeadBox(L, ok, motivo);
 }
@@ -2623,7 +2644,7 @@ function leadsRender(){
       </div>
       <div class="lead-info">
         <div><span>WhatsApp</span>${esc(L.whatsapp||'—')}</div>
-        <div><span>Presupuesto</span>${money(L.presupuesto.min)} – ${money(L.presupuesto.max)}</div>
+        <div><span>Presupuesto</span>${money((L.presupuesto||{}).min)} – ${money((L.presupuesto||{}).max)}</div>
         <div><span>Uso</span>${esc(L.uso||'—')}</div>
         <div><span>Marca</span>${esc(L.marca||'—')}</div>
         <div><span>Pago</span>${esc(L.pago||'—')}</div>
@@ -2631,7 +2652,7 @@ function leadsRender(){
         <div><span>Aval</span>${L.aval==null?'—':(L.aval?'Sí':'No')}</div>
       </div>
       <div class="usr-chips-lbl">Opciones que le interesaron${L.coincidenciaExacta?'':' (cercanas)'}</div>
-      <div class="lead-ops">${L.opciones.map(o=>`<div class="lead-op">
+      <div class="lead-ops">${(L.opciones||[]).map(o=>`<div class="lead-op">
         <span>${esc(o.marca)} ${esc(o.modelo)} ${o.anio||''}</span>
         <b>${money(o.precio)}${o.mensualidad?` · ${money(o.mensualidad)}/mes`:''}</b></div>`).join('')||'<div class="lead-op"><span>—</span></div>'}</div>
       <div class="cc-acts" style="margin-top:12px">
@@ -2975,6 +2996,7 @@ function cfgGuardar(){
     bmin:+$('cBmin').value||200000, bmax:+$('cBmax').value||1200000,
     whatsapp:$('cWhats').value.trim(), heroImg:$('cHero').value.trim(), leadsUrl:$('cLeads').value.trim(),
     videos:[0,1,2].map(i=>({t:$('cVidT'+i).value, s:CFG_DEF.videos[i].s, url:$('cVidU'+i).value.trim()})) };
+  if(g.leadsUrl && !/^https:\/\//i.test(g.leadsUrl)){ alert('La URL de la base de datos de prospectos debe empezar con https:// — de lo contrario el navegador la bloquea por seguridad.'); return; }
   CFGsave(g); cfgCerrar();
   PB.bmin=g.bmin; PB.bmax=g.bmax; PB.enganche=g.engDefault; PB.plazo=g.plazoDefault;
   if(document.getElementById('pub').classList.contains('on')) pbRender();
@@ -3015,7 +3037,8 @@ function usrSeed(){
     localStorage.setItem('ee_usr_admins_v1','1');
   }
   // Asegura que los admins sembrados existan (no duplica, no borra los que tú agregues)
-  SEED_USERS.forEach(a=>{ if(!arr.some(u=>u.nombre.toLowerCase()===a.nombre.toLowerCase())){ arr.push(a); cambio=true; } });
+  let borrados=[]; try{ borrados=JSON.parse(localStorage.getItem('ee_usr_deleted')||'[]'); }catch(e){}
+  SEED_USERS.forEach(a=>{ if(borrados.includes(a.id)) return; if(!arr.some(u=>u.nombre.toLowerCase()===a.nombre.toLowerCase())){ arr.push(a); cambio=true; } });
   // Completa usuario/contraseña en perfiles que ya existían sin esos datos
   arr.forEach(u=>{ const c=CREDS_NOMBRE[(u.nombre||'').toLowerCase()];
     if(c && (!u.usuario || !u.clave)){ u.usuario=c.usuario; u.clave=c.clave; cambio=true; } });
@@ -3075,7 +3098,9 @@ function usrGuardar(){ const nombre=$('uNombre').value.trim(); if(!nombre){ aler
     modulos:$('uModulos').value.split(',').map(s=>s.trim()).filter(Boolean), estado:$('uEstado').value };
   if(editandoUsr){ const i=arr.findIndex(x=>x.id===editandoUsr); if(i>=0)arr[i]=u; } else arr.push(u);
   usrSaveAll(arr); usrCerrar(); usrRender(); toast('Usuario guardado'); }
-function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return; usrSaveAll((usrLoad()||[]).filter(x=>x.id!==id)); usrRender(); }
+function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return;
+  try{ const d=JSON.parse(localStorage.getItem('ee_usr_deleted')||'[]'); if(!d.includes(id)){ d.push(id); localStorage.setItem('ee_usr_deleted',JSON.stringify(d)); } }catch(e){}
+  usrSaveAll((usrLoad()||[]).filter(x=>x.id!==id)); usrRender(); }
 
 /* ===================== SIMULADOR ===================== */
   const MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
