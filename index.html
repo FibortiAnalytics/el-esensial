@@ -2992,10 +2992,13 @@ const SEED_USERS=[
  ADMIN('u_carlos','Carlos Jasso','carlos','carlos2026'),
  ADMIN('u_diego','Diego Jasso','diego','diego2026'),
  ADMIN('u_tono','Toño','tono','tono2026'),
+ ADMIN('u_miguel','Miguel','miguel','miguel2026'),
+ ADMIN('u_niurys','Niurys','niurys','niurys2026'),
 ];
 /* Credenciales por nombre (para completar perfiles ya creados antes) */
 const CREDS_NOMBRE={'carlos jasso':{usuario:'carlos',clave:'carlos2026'},
-  'diego jasso':{usuario:'diego',clave:'diego2026'},'toño':{usuario:'tono',clave:'tono2026'}};
+  'diego jasso':{usuario:'diego',clave:'diego2026'},'toño':{usuario:'tono',clave:'tono2026'},
+  'miguel':{usuario:'miguel',clave:'miguel2026'},'niurys':{usuario:'niurys',clave:'niurys2026'}};
 let editandoUsr=null;
 function usrLoad(){ try{return JSON.parse(localStorage.getItem('ee_usr')||'null')}catch(e){return null} }
 function usrSaveAll(a){ localStorage.setItem('ee_usr',JSON.stringify(a)); }
@@ -3011,7 +3014,7 @@ function usrSeed(){
     if(arr.length!==antes) cambio=true;
     localStorage.setItem('ee_usr_admins_v1','1');
   }
-  // Asegura que los 3 admins existan (no duplica, no borra los que tú agregues)
+  // Asegura que los admins sembrados existan (no duplica, no borra los que tú agregues)
   SEED_USERS.forEach(a=>{ if(!arr.some(u=>u.nombre.toLowerCase()===a.nombre.toLowerCase())){ arr.push(a); cambio=true; } });
   // Completa usuario/contraseña en perfiles que ya existían sin esos datos
   arr.forEach(u=>{ const c=CREDS_NOMBRE[(u.nombre||'').toLowerCase()];
