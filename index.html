@@ -224,6 +224,10 @@
   .res-hero.inicio .lbl{color:#c9f5df}
   .final-live{background:#eafaf1;border:1px solid #bfe8d1;border-radius:10px;padding:10px 12px;margin:-4px 0 14px;font-size:13px;color:#0f7a53;font-weight:700;display:flex;justify-content:space-between;align-items:center}
   .final-live span:first-child{color:#0a5c3e;font-weight:600}
+  .avalInt{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .avalIntBtn{padding:11px 12px;border-radius:10px;border:1.5px solid var(--linea,#e3e6ea);background:#fff;font-weight:700;font-size:13.5px;color:#334;cursor:pointer;transition:.15s}
+  .avalIntBtn:hover{border-color:var(--rojo);color:var(--rojo)}
+  .avalIntBtn.on{background:var(--rojo);border-color:var(--rojo);color:#fff;box-shadow:0 4px 14px rgba(225,29,42,.28)}
   .tabla-card{margin-top:18px}
   .tabla-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px}
   .tabla-head h2{margin:0}
@@ -424,6 +428,15 @@
   .esn .videoMeta{padding:11px 13px;display:flex;flex-direction:column;gap:2px}
   .esn .videoT{font-weight:700;font-size:13.5px}
   .esn .videoS{font-size:12px;color:var(--muted)}
+  .esn .promoBar{background:linear-gradient(100deg,#e11d2a,#b3141f);color:#fff}
+  .esn .promoIn{max-width:1100px;margin:0 auto;padding:11px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center;text-align:center}
+  .esn .promoBadge{background:#f5c518;color:#111;font-weight:900;font-size:12.5px;padding:6px 12px;border-radius:999px;letter-spacing:.02em;white-space:nowrap;flex:none}
+  .esn .promoTxt{display:flex;flex-direction:column;line-height:1.28;min-width:0}
+  .esn .promoTxt b{font-size:15px;font-weight:800}
+  .esn .promoTxt small{font-size:11.5px;opacity:.9;font-weight:600}
+  .esn .promoCta{background:#fff;color:#b3141f;font-weight:800;font-size:13px;padding:9px 16px;border:none;border-radius:10px;cursor:pointer;white-space:nowrap;flex:none}
+  .esn .promoCta:hover{background:#111;color:#fff}
+  @media(max-width:640px){ .esn .promoTxt b{font-size:13px} .esn .promoIn{gap:10px;padding:10px 12px} }
 
   /* BOTONES */
   .esn .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:14px;
@@ -1096,6 +1109,13 @@
               <div class="inbox"><span class="pre">$</span><input type="number" id="bonificacion" class="has-pre" value="0" min="0" step="1000" oninput="calc()"></div>
             </div>
             <div class="final-live"><span>Precio final con tu descuento</span><span id="precioFinalLive">$280,000</span></div>
+            <div class="campo">
+              <label>¿El cliente tiene aval? <span class="hint">(ajusta el enganche automáticamente)</span></label>
+              <div class="avalInt">
+                <button type="button" class="avalIntBtn" id="avalIntSi" onclick="setAvalInt(true)">Con aval · 20%</button>
+                <button type="button" class="avalIntBtn" id="avalIntNo" onclick="setAvalInt(false)">Sin aval · 50%</button>
+              </div>
+            </div>
             <div class="fila2">
               <div class="campo"><label>Enganche <span class="hint">(el pago inicial que das)</span></label>
                 <div class="inbox"><span class="pre">$</span><input type="number" id="enganche" class="has-pre" value="56000" min="0" step="1000" oninput="calc()"></div></div>
@@ -1322,6 +1342,7 @@
 
 <!-- ===================== EXPERIENCIA PÚBLICA ===================== -->
 <div id="pub" class="esn">
+  <div id="pbPromo" class="promoBar" style="display:none"></div>
   <div class="edbar" id="pubEdbar" style="display:none">
     <span>● Modo editor</span>
     <button onclick="pbCfg()"><svg class="ic ic-sm"><use href="#i-cog"/></svg> Ajustes</button>
@@ -1422,6 +1443,11 @@
     <div class="campo"><label>Foto de portada (URL) <span class="hint">(opcional)</span></label><input type="text" id="cHero" placeholder="https://..."></div>
     <div class="campo"><label>Base de datos de prospectos (URL) <span class="hint">(Google Apps Script o tu servidor — recibe POST con el JSON del prospecto)</span></label>
       <input type="text" id="cLeads" placeholder="https://script.google.com/macros/s/.../exec"></div>
+
+    <div class="cfg-sec">Promoción (banner superior)</div>
+    <div class="campo"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="cPromoOn" style="width:auto"> Mostrar el banner de promoción arriba</label></div>
+    <div class="campo"><label>Texto del banner</label><input type="text" id="cPromoTxt" placeholder="¿Te lo llevas esta semana? Te damos 45 días..."></div>
+    <div class="campo"><label>Restricción / nota <span class="hint">(letra chica)</span></label><input type="text" id="cPromoNota" placeholder="Aplican restricciones..."></div>
 
     <div class="cfg-sec">Videos de la portada</div>
     <div class="campo"><label>Video 1 · título / URL embed</label><input type="text" id="cVidT0"><input type="text" id="cVidU0" style="margin-top:6px" placeholder="https://www.youtube.com/embed/..."></div>
@@ -1783,9 +1809,12 @@ const CFG_DEF={
   whatsapp:'529994476667',              // WhatsApp del lote (Diego Jasso)
   leadsUrl:'',                          // endpoint que recibe los prospectos (Google Apps Script / VPS)
   heroImg:'',
-  videos:[ {t:'Recorrido por el lote', s:'Conoce nuestras unidades', url:'https://www.instagram.com/p/DYtzLeBDpIt/embed'},
-           {t:'Proceso de compra seguro', s:'Paso a paso, sin sorpresas', url:'https://www.instagram.com/p/DY1hn4Nj21_/embed'},
-           {t:'Opciones de financiamiento', s:'Bancario y sin buró', url:'https://www.instagram.com/p/DZE-VO-jPAK/embed'} ]
+  promoOn:true,
+  promoText:'¿Te lo llevas esta semana? Te damos 45 días para tu primer pago de la mensualidad — no pagas hasta 45 días después de dar tu apartado.',
+  promoNota:'Aplican restricciones · sujeto a disponibilidad y aprobación.',
+  videos:[ {t:'Recorrido por el lote', s:'Conoce nuestras unidades', url:'https://www.instagram.com/p/DYtzLeBDpIt/embed', poster:'video-recorrido.jpg'},
+           {t:'Proceso de compra seguro', s:'Paso a paso, sin sorpresas', url:'https://www.instagram.com/p/DY1hn4Nj21_/embed', poster:'video-proceso.jpg'},
+           {t:'Opciones de financiamiento', s:'Bancario y sin buró', url:'https://www.instagram.com/p/DZE-VO-jPAK/embed', poster:'video-financiam.jpg'} ]
 };
 function CFG(){ try{ const s=JSON.parse(localStorage.getItem('ee_wzcfg')||'{}'); const c=Object.assign({},CFG_DEF,s);
   if(!Array.isArray(c.plazos)||!c.plazos.length) c.plazos=CFG_DEF.plazos;
@@ -1902,7 +1931,7 @@ const WIKI={
   bancario:{t:'Crédito bancario',d:'Financiamiento con instituciones bancarias, tasas preferenciales y plazos de hasta 60 meses. Requiere revisión de buró. Cobertura nacional.'},
   sinburo:{t:'Sin buró (local)',d:'Financiamiento directo, sin revisión de buró de crédito. Ideal para estrenar sin complicaciones. Suele pedir identificación y comprobante (predial libre de gravamen o aval).'},
   contado:{t:'Pago de contado',d:'Pagas el total del vehículo en una sola exhibición. Es la vía más rápida y sin intereses.'},
-  aval:{t:'Aval',d:'Persona que respalda tu crédito y responde por el pago si tú no puedes cubrirlo. Normalmente se pide identificación y un comprobante de propiedad (por ejemplo, predial libre de gravamen). Presentar aval te permite el enganche mínimo del 20%; sin aval, el enganche arranca en 40%.'},
+  aval:{t:'Aval',d:'Persona que respalda tu crédito y responde por el pago si tú no puedes cubrirlo. Normalmente se pide identificación y un comprobante de propiedad (por ejemplo, predial libre de gravamen). Presentar aval te permite el enganche mínimo del 20%; sin aval, el enganche arranca en 50%.'},
   km:{t:'Kilometraje',d:'Distancia total recorrida por el vehículo. A menor kilometraje, normalmente mayor vida útil por delante.'}
 };
 const USOS=[
@@ -1935,7 +1964,7 @@ const NEGOCIO={
   financiamiento:[
     'Sin revisión de buró de crédito.',
     'Con aval: enganche desde el 20% del valor del vehículo.',
-    'Sin aval: el enganche mínimo es del 40% al 50%.',
+    'Sin aval: el enganche mínimo es del 50% del valor del vehículo.',
     'Plazos de 12 a 60 meses, según el año de la unidad.',
     'Interés del 2% mensual.',
     'Si liquidas antes, se eliminan los intereses futuros.',
@@ -1969,7 +1998,7 @@ const PB={screen:'hero',stepIdx:0,editor:false,bmin:0,bmax:0,uso:null,marcas:nul
 const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' Km';
 function pbCars(){ return invLoad().filter(c=>c.estado==='disponible'); }
 function pbMarcas(){ return [...new Set(pbCars().map(c=>c.marca).filter(Boolean))].sort(); }
-function pbEngMin(){ return PB.aval===false ? 40 : 20; }
+function pbEngMin(){ return PB.aval===false ? 50 : 20; }
 function pbSetAval(v){ PB.aval=v; if(PB.enganche<pbEngMin()) PB.enganche=pbEngMin(); pbRender(); }
 function pbTasa(pago){ const g=CFG(); return pago==='bancario' ? (+g.tasaBancario||13) : (+g.tasaSinBuro||24); }
 function pbMens(precio,pago,engPct,plazo){
@@ -2030,7 +2059,19 @@ function mostrarPub(editor){
   if(g.heroImg) document.getElementById('pub').style.setProperty('--hero-img',`url('${g.heroImg}')`);
   if(!PB.editor) pbRestaurar();
   pbRender();
+  pbPromoRender();
   mostrarCookieBar();
+}
+function pbPromoRender(){
+  const el=$('pbPromo'); if(!el) return;
+  const g=CFG(), txt=(g.promoText||'').trim();
+  if(!g.promoOn || !txt){ el.style.display='none'; el.innerHTML=''; return; }
+  el.style.display='';
+  el.innerHTML=`<div class="promoIn">
+    <span class="promoBadge">🔥 45 DÍAS SIN PAGAR</span>
+    <div class="promoTxt"><b>${esc(txt)}</b>${g.promoNota?`<small>${esc(g.promoNota)}</small>`:''}</div>
+    <button class="promoCta" onclick="pbWhats()">Apártalo esta semana</button>
+  </div>`;
 }
 function salirPub(){
   document.getElementById('pub').classList.remove('on');
@@ -2306,7 +2347,7 @@ function pbHero(){
       <p class="videoLead">Míralo antes de venir — recorridos de El Esensial:</p>
       <div class="videoRow">${g.videos.map((v,i)=>`
         <button class="videoCard" onclick="pbVideo(${i})">
-          <div class="videoThumb"><span class="playBtn">${I.play}</span></div>
+          <div class="videoThumb"${v.poster?` style="background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.45)),url('${esc(v.poster)}') center/cover"`:''}><span class="playBtn">${I.play}</span></div>
           <div class="videoMeta"><span class="videoT">${esc(v.t)}</span><span class="videoS">${esc(v.s)}</span></div>
         </button>`).join('')}</div>
     </div></main>`;
@@ -2390,7 +2431,7 @@ function pbQuiz(){
       <div class="avalQ">¿Cuentas con un aval? <button class="infoChip" onclick="pbWiki('aval')">${I.info}</button></div>
       <div class="grid" style="grid-template-columns:1fr 1fr">
         ${optBlock(PB.aval===true,"pbSetAval(true)","userCheck","Sí, tengo aval","Enganche desde el 20%")}
-        ${optBlock(PB.aval===false,"pbSetAval(false)","wallet","No tengo aval","Enganche desde el 40%")}
+        ${optBlock(PB.aval===false,"pbSetAval(false)","wallet","No tengo aval","Enganche desde el 50%")}
       </div>
     </div>
     ${PB.aval===null?`<div class="avalHint">${I.info} Elige una opción para continuar.</div>`:""}
@@ -2983,6 +3024,7 @@ function cfgAbrir(){ const g=CFG();
   $('cEngDef').value=g.engDefault; $('cPlazos').value=g.plazos.join(', '); $('cPlazoDef').value=g.plazoDefault;
   $('cBmin').value=g.bmin; $('cBmax').value=g.bmax;
   $('cWhats').value=g.whatsapp||''; $('cHero').value=g.heroImg||''; $('cLeads').value=g.leadsUrl||'';
+  $('cPromoOn').checked=g.promoOn!==false; $('cPromoTxt').value=g.promoText||''; $('cPromoNota').value=g.promoNota||'';
   for(let i=0;i<3;i++){ $('cVidT'+i).value=g.videos[i].t; $('cVidU'+i).value=g.videos[i].url||''; }
   $('cfgModal').classList.add('show');
 }
@@ -2995,11 +3037,12 @@ function cfgGuardar(){
     engDefault:+$('cEngDef').value||20, plazos:numList($('cPlazos').value,CFG_DEF.plazos), plazoDefault:+$('cPlazoDef').value||48,
     bmin:+$('cBmin').value||200000, bmax:+$('cBmax').value||1200000,
     whatsapp:$('cWhats').value.trim(), heroImg:$('cHero').value.trim(), leadsUrl:$('cLeads').value.trim(),
-    videos:[0,1,2].map(i=>({t:$('cVidT'+i).value, s:CFG_DEF.videos[i].s, url:$('cVidU'+i).value.trim()})) };
+    promoOn:$('cPromoOn').checked, promoText:$('cPromoTxt').value.trim(), promoNota:$('cPromoNota').value.trim(),
+    videos:[0,1,2].map(i=>({t:$('cVidT'+i).value, s:CFG_DEF.videos[i].s, url:$('cVidU'+i).value.trim(), poster:CFG_DEF.videos[i].poster})) };
   if(g.leadsUrl && !/^https:\/\//i.test(g.leadsUrl)){ alert('La URL de la base de datos de prospectos debe empezar con https:// — de lo contrario el navegador la bloquea por seguridad.'); return; }
   CFGsave(g); cfgCerrar();
   PB.bmin=g.bmin; PB.bmax=g.bmax; PB.enganche=g.engDefault; PB.plazo=g.plazoDefault;
-  if(document.getElementById('pub').classList.contains('on')) pbRender();
+  if(document.getElementById('pub').classList.contains('on')){ pbRender(); pbPromoRender(); }
   toast('Configuración guardada');
 }
 function cfgRestaurar(){ if(!confirm('¿Restaurar la configuración por defecto del cotizador?')) return;
@@ -3118,6 +3161,14 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return;
     const precio=Math.max(0,precioLista-bonif); const pct=+$('engPct').value||0;
     $('enganche').value=Math.round(precio*pct/100); calc();
   }
+  function setAvalInt(v){
+    $('engPct').value = v ? 20 : 50;
+    const si=$('avalIntSi'), no=$('avalIntNo');
+    if(si) si.classList.toggle('on', v===true);
+    if(no) no.classList.toggle('on', v===false);
+    setEngPct();
+  }
+  window.setAvalInt=setAvalInt;
   let ultimo={};
   function calc(){
     const precioLista=+$('precio').value||0;
