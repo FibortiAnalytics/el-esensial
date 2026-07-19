@@ -149,7 +149,7 @@
     .inv-grid{grid-template-columns:1fr}
     .usr-grid{grid-template-columns:1fr}
     .inv-form{padding:20px 18px}
-    #invModal,#usrModal{padding:16px 10px}
+    #invModal,#usrModal,#cfgModal{padding:16px 10px}
     .pasos{flex-direction:column}
   }
 
@@ -1205,7 +1205,7 @@
               <div class="kpi"><div class="k">Monto que financias</div><div class="v" id="rFinanciar">$0</div><div class="d">Lo que pagas en mensualidades.</div></div>
               <div class="kpi"><div class="k">Intereses del plazo</div><div class="v oro" id="rInteres">$0</div><div class="d">El costo de pagar a meses.</div></div>
               <div class="kpi"><div class="k">Terminas de pagar</div><div class="v" id="rLiquida" style="font-size:15px">—</div><div class="d">Fecha en que el auto queda liquidado.</div></div>
-              <div class="kpi total wide"><div class="k">Total que pagarías en total</div><div class="v" id="rTotal">$0</div><div class="d">Inicio + todas las mensualidades juntas.</div></div>
+              <div class="kpi total wide"><div class="k">Total que pagarías</div><div class="v" id="rTotal">$0</div><div class="d">Inicio + todas las mensualidades juntas.</div></div>
             </div>
           </div>
         </div>
@@ -1243,7 +1243,7 @@
         <div class="inv-toolbar">
           <input type="text" id="qSearch" placeholder="Buscar marca, modelo, color…" oninput="invRender()">
           <select id="fltAnio" onchange="invRender()"><option value="">Todos los años</option></select>
-          <select id="fltTrans" onchange="invRender()"><option value="">Transmisión</option><option value="AUT">Automático</option><option value="STD">Estándar</option></select>
+          <select id="fltTrans" onchange="invRender()"><option value="">Transmisión</option><option value="AUT">Automática</option><option value="STD">Estándar</option></select>
           <select id="fltEstado" onchange="invRender()"><option value="">Disponibles</option><option value="disponible">Solo disponibles</option><option value="vendido">Vendidos</option><option value="oculto">Ocultos</option></select>
         </div>
         <div class="marca-chips" id="fltMarcas"></div>
@@ -1313,7 +1313,7 @@
     </div>
     <div class="fila2">
       <div class="campo"><label>Versión <span class="hint">(opcional)</span></label><input type="text" id="fVersion" placeholder="Ej: FR, Serie 4, Hybrid"></div>
-      <div class="campo"><label>Transmisión</label><select id="fTrans"><option value="AUT">Automático</option><option value="STD">Estándar</option></select></div>
+      <div class="campo"><label>Transmisión</label><select id="fTrans"><option value="AUT">Automática</option><option value="STD">Estándar</option></select></div>
     </div>
     <div class="fila2">
       <div class="campo"><label>Kilometraje <span class="hint">(opcional)</span></label><input type="text" id="fKm" placeholder="Ej: 45,000 km"></div>
@@ -1481,6 +1481,10 @@
       <div class="campo"><label>Correo</label><input type="text" id="uCorreo" placeholder="correo@elesensial.com"></div>
       <div class="campo"><label>Área asignada</label><input type="text" id="uArea" placeholder="Ej: Piso de ventas"></div>
     </div>
+    <div class="fila2">
+      <div class="campo"><label>Usuario <span class="hint">(para iniciar sesión)</span></label><input type="text" id="uUsuario" placeholder="ej: juan" autocapitalize="none" autocomplete="off" spellcheck="false"></div>
+      <div class="campo"><label>Contraseña <span class="hint">(mín. 4 caracteres)</span></label><input type="text" id="uClave" placeholder="ej: juan2026" autocomplete="off"></div>
+    </div>
     <div class="campo"><label>Permisos <span class="hint">(separa con comas)</span></label><input type="text" id="uPermisos" placeholder="Ver, Editar, Simular, Administrar"></div>
     <div class="campo"><label>Módulos con acceso <span class="hint">(separa con comas)</span></label><input type="text" id="uModulos" placeholder="Simulador, Inventario, Usuarios"></div>
     <div class="campo"><label>Estado</label><select id="uEstado"><option value="activo">Activo</option><option value="inactivo">Inactivo</option></select></div>
@@ -1520,13 +1524,18 @@ async function entrar(){
   const v=document.getElementById('claveInput').value;
   const cuenta=CUENTAS[u];
   const btn=document.querySelector('.gate-btn'); btn.disabled=true; btn.textContent='Verificando…';
-  let ok=false, cryptoErr=false;
-  if(cuenta){ try{ ok=(await derivar(v))===cuenta.hash; }catch(e){ cryptoErr=true; } }
+  let ok=false, cryptoErr=false, sesNombre='', sesRol='';
+  if(cuenta){ try{ ok=(await derivar(v))===cuenta.hash; }catch(e){ cryptoErr=true; } if(ok){ sesNombre=cuenta.nombre; sesRol=cuenta.rol; } }
+  if(!ok && !cryptoErr){
+    // Perfiles creados desde el panel Usuarios (usuario + contraseña en ee_usr)
+    try{ const p=(usrLoad()||[]).find(x=> (x.usuario||'').toLowerCase()===u && x.clave===v && (x.estado||'activo')==='activo');
+      if(p){ ok=true; sesNombre=p.nombre; sesRol=p.rol||'Usuario'; } }catch(e){}
+  }
   btn.disabled=false; btn.textContent='Entrar →';
   if(ok){
     localStorage.removeItem('ee_lock');
     sessionStorage.setItem('ee_auth','1');
-    sessionStorage.setItem('ee_sesion',JSON.stringify({user:u,nombre:cuenta.nombre,rol:cuenta.rol}));
+    sessionStorage.setItem('ee_sesion',JSON.stringify({user:u,nombre:sesNombre,rol:sesRol}));
     mostrarApp(); return;
   }
   if(cryptoErr){ mostrarErr('No se pudo verificar en este navegador. Abre el sitio por https:// (no como archivo local) o prueba en otro navegador.'); return; }
@@ -1573,30 +1582,30 @@ const ICO={
 };
 // Catálogo real (Excel "concentrado venta") — 24 unidades
 const SEED_CARS=[
- ['Mercedez-Benz','GLE 450 4Matic',2021,'Gris','','AUT',849000,169800,679200,33960,['lujo','familiar']],
+ ['Mercedes-Benz','GLE 450 4Matic',2021,'Gris','','AUT',849000,169800,679200,33960,['lujo','familiar']],
  ['Audi','Q3',2021,'Blanca','','AUT',459000,91800,367200,18360,['familiar','ciudad']],
- ['Audi','Q2',2022,'Azul Obscuro','','AUT',369000,73800,295200,14760,['ciudad']],
+ ['Audi','Q2',2022,'Azul Oscuro','','AUT',369000,73800,295200,14760,['ciudad']],
  ['Seat','Tarraco FR',2024,'Verde','','AUT',479000,95800,383200,19160,['familiar']],
  ['Tesla','Cybertruck',2024,'Negro','','AUT',2100000,420000,1680000,84000,['pickup','offroad','lujo']],
- ['Volkswaguen','Tiguan',2023,'Blanco','','AUT',435000,87000,348000,17400,['familiar']],
+ ['Volkswagen','Tiguan',2023,'Blanco','','AUT',435000,87000,348000,17400,['familiar']],
  ['Toyota','Camry',2022,'Café','','AUT',389000,77800,311200,15560,['ciudad','lujo']],
  ['MINI','Cooper Chili',2029,'Crema','','AUT',269000,53800,215200,10760,['ciudad']],
  ['MG','5',2024,'Blanco','','AUT',225000,45000,180000,9000,['ciudad']],
  ['Chevrolet','Onix',2023,'Blanco','','AUT',235000,47000,188000,9400,['ciudad']],
  ['Renault','Koleos',2023,'Blanco','','AUT',349000,69800,279200,13960,['familiar']],
- ['Volkswaguen','Jetta',2019,'Azul Claro','','AUT',229000,45800,183200,9160,['ciudad']],
- ['Ford','Bronco',2021,'Azul Obscuro','Outer Banks','AUT',445000,89000,356000,17800,['offroad']],
+ ['Volkswagen','Jetta',2019,'Azul Claro','','AUT',229000,45800,183200,9160,['ciudad']],
+ ['Ford','Bronco',2021,'Azul Oscuro','Outer Banks','AUT',445000,89000,356000,17800,['offroad']],
  ['Tesla','Y',2025,'Gris','','AUT',849000,169800,679200,33960,['familiar','lujo']],
  ['BMW','320i',2020,'Negro','','AUT',425000,85000,340000,17000,['lujo','ciudad']],
- ['Kia','k3',2027,'N/A','','AUT',369000,73800,295200,14760,['ciudad']],
+ ['Kia','K3',2027,'N/A','','AUT',369000,73800,295200,14760,['ciudad']],
  ['Kia','K3',2027,'N/A','','STD',339000,67800,271200,13560,['ciudad']],
  ['Ducati','Scrambler',2021,'Gris','','STD',159000,31800,127200,6360,['offroad']],
- ['Volkswaguen','Tiguan',2018,'Gris','','AUT',299000,59800,239200,11960,['familiar']],
- ['Volkswaguen','Tiguan',2018,'Blanco','','AUT',299000,59800,239200,11960,['familiar']],
+ ['Volkswagen','Tiguan',2018,'Gris','','AUT',299000,59800,239200,11960,['familiar']],
+ ['Volkswagen','Tiguan',2018,'Blanco','','AUT',299000,59800,239200,11960,['familiar']],
  ['Ford','Explorer',2019,'Blanco','','AUT',479000,95800,383200,19160,['familiar','offroad']],
- ['BMW','440i',2023,'Azul Obscuro','Serie 4','AUT',969000,193800,775200,38760,['lujo']],
+ ['BMW','440i',2023,'Azul Oscuro','Serie 4','AUT',969000,193800,775200,38760,['lujo']],
  ['Jeep','Gladiator',2020,'Gris','','AUT',785000,157000,628000,31400,['pickup','offroad']],
- ['Mercedez-Benz','C 200 Sport',2024,'Negro','Hybrid','AUT',775000,155000,620000,31000,['lujo']],
+ ['Mercedes-Benz','C 200 Sport',2024,'Negro','Hybrid','AUT',775000,155000,620000,31000,['lujo']],
 ].map((r,i)=>({ id:'seed'+(i+1), marca:r[0], modelo:r[1], anio:r[2], color:r[3], version:r[4],
   transmision:r[5], km:'', motor:r[4]==='Hybrid'?'4 cil':'', precio:r[6], enganche:r[7], saldo:r[8],
   comision:r[9], tags:r[10], tasa:16.9, plazo:'24', notas:'', foto:'', estado:'disponible' }));
@@ -1615,6 +1624,11 @@ function invSaveAll(a){
 function nombreCoche(c){ return [c.marca,c.modelo].filter(Boolean).join(' ')||'Sin nombre'; }
 function sig(c){ return (c.marca+'|'+c.modelo+'|'+c.anio+'|'+c.precio+'|'+c.color).toLowerCase(); }
 function invSeed(){ // primera vez: cargar catálogo; v2 añade etiquetas de uso
+  // Migración una sola vez: corrige nombres de marca mal escritos en inventario ya guardado
+  try{ if(!localStorage.getItem('ee_fix_marcas_v1')){
+    const a=invLoad(); if(a && a.length){ const fix={'Mercedez-Benz':'Mercedes-Benz','Volkswaguen':'Volkswagen'}; let ch=false;
+      a.forEach(c=>{ if(fix[c.marca]){ c.marca=fix[c.marca]; ch=true; } }); if(ch) invSaveAll(a); }
+    localStorage.setItem('ee_fix_marcas_v1','1'); } }catch(e){}
   if(localStorage.getItem('ee_seeded_v2')) return;
   const arr=invLoad(); const have=new Map(arr.map(c=>[sig(c),c]));
   SEED_CARS.forEach(c=>{
@@ -1736,8 +1750,8 @@ function comprimirFoto(file, maxLado, calidad){
       img.onerror=()=>rej(new Error('imagen'));
       img.onload=()=>{
         let {width:w,height:h}=img;
-        const esc=Math.min(1, maxLado/Math.max(w,h));
-        w=Math.round(w*esc); h=Math.round(h*esc);
+        const escala=Math.min(1, maxLado/Math.max(w,h));
+        w=Math.round(w*escala); h=Math.round(h*escala);
         const c=document.createElement('canvas'); c.width=w; c.height=h;
         const ctx=c.getContext('2d');
         ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h);          // fondo blanco para PNG transparentes
@@ -1810,7 +1824,7 @@ const CFG_DEF={
   leadsUrl:'',                          // endpoint que recibe los prospectos (Google Apps Script / VPS)
   heroImg:'',
   promoOn:true,
-  promoText:'¡Solo esta semana! Aparta tu auto con $5,000 y te lo guardamos 7 días. Y si te lo llevas, tienes 45 días para tu primer pago de la mensualidad.',
+  promoText:'Aparta tu auto con solo $5,000 y te lo guardamos 7 días. Si te lo llevas, tienes 45 días para tu primer pago de la mensualidad.',
   promoNota:'El apartado reserva la unidad 7 días; si no se concreta, vuelve a la venta. Aplican restricciones · sujeto a disponibilidad y aprobación.',
   videos:[ {t:'Recorrido por el lote', s:'Conoce nuestras unidades', url:'https://www.instagram.com/p/DYtzLeBDpIt/embed', poster:'video-recorrido.jpg'},
            {t:'Proceso de compra seguro', s:'Paso a paso, sin sorpresas', url:'https://www.instagram.com/p/DY1hn4Nj21_/embed', poster:'video-proceso.jpg'},
@@ -1821,7 +1835,7 @@ function CFG(){ try{ const s=JSON.parse(localStorage.getItem('ee_wzcfg')||'{}');
   if(!Array.isArray(c.videos)||c.videos.length!==3) c.videos=CFG_DEF.videos;
   else c.videos=c.videos.map((v,i)=>({ ...CFG_DEF.videos[i], ...(v||{}), url:(v&&v.url) ? v.url : CFG_DEF.videos[i].url }));
   return c; }catch(e){ return JSON.parse(JSON.stringify(CFG_DEF)); } }
-function CFGsave(o){ localStorage.setItem('ee_wzcfg',JSON.stringify(o)); }
+function CFGsave(o){ try{ localStorage.setItem('ee_wzcfg',JSON.stringify(o)); return true; }catch(e){ alert('No se pudo guardar la configuración (almacenamiento lleno).'); return false; } }
 
 /* ===== MOTOR DE AMORTIZACIÓN =====
    'fijo'     → interés fijo (add-on): interés y capital constantes cada mes.
@@ -1901,7 +1915,7 @@ const I={
   dl:SV('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>')
 };
 
-const MARCA_SLUG={"Mercedez-Benz":"mercedes","Audi":"audi","Seat":"seat","Tesla":"tesla","Volkswaguen":"volkswagen",
+const MARCA_SLUG={"Mercedes-Benz":"mercedes","Audi":"audi","Seat":"seat","Tesla":"tesla","Volkswagen":"volkswagen",
   "Toyota":"toyota","MINI":"mini","MG":"mg","Chevrolet":"chevrolet","Renault":"renault","Ford":"ford",
   "BMW":"bmw","Kia":"kia","Ducati":"ducati","Jeep":"jeep"};
 /* SOLO fotos reales de la unidad, subidas por el lote desde el inventario.
@@ -1995,7 +2009,7 @@ Fundamento: Ley Federal de Protección de Datos Personales en Posesión de los P
 const PB={screen:'hero',stepIdx:0,editor:false,bmin:0,bmax:0,uso:null,marcas:null,pago:null,
   enganche:20,plazo:48,aval:null,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false,menu:false,detalle:null,detPago:null};
 
-const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' Km';
+const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' km';
 function pbCars(){ return invLoad().filter(c=>c.estado==='disponible'); }
 function pbMarcas(){ return [...new Set(pbCars().map(c=>c.marca).filter(Boolean))].sort(); }
 function pbEngMin(){ return PB.aval===false ? 50 : 20; }
@@ -2070,7 +2084,7 @@ function pbPromoRender(){
   el.innerHTML=`<div class="promoIn">
     <span class="promoBadge">🔥 SOLO ESTA SEMANA</span>
     <div class="promoTxt"><b>${esc(txt)}</b>${g.promoNota?`<small>${esc(g.promoNota)}</small>`:''}</div>
-    <button class="promoCta" onclick="pbWhats()">Apártalo esta semana</button>
+    <button class="promoCta" onclick="pbWhats()">Apártalo ahora</button>
   </div>`;
 }
 function salirPub(){
@@ -2534,9 +2548,9 @@ function pbResults(){
           ${(v.color&&v.color!=='N/A')?`<div class="carColorLine">${colorDot(v.color)}<b>${esc(v.color)}</b></div>`:''}
           <div class="carSpecs">
             <span>${I.cal} ${v.anio||'—'}</span>
-            <span>${I.gauge} ${v.km?fmtKm(String(v.km).replace(/\D/g,'')):'Km n/d'}</span>
+            <span>${I.gauge} ${v.km?fmtKm(String(v.km).replace(/\D/g,'')):'Km por confirmar'}</span>
             <span>${I.car} ${v.transmision==='STD'?'Estándar':'Automática'}</span>
-            <span>${I.fuel} ${esc(v.motor||'Gasolina')}</span>
+            ${v.motor?`<span>${I.fuel} ${esc(v.motor)}</span>`:''}
           </div>
           <div class="carPriceRow">
             <div class="carPrice">${money(v.precio||0)}</div>
@@ -2622,7 +2636,7 @@ function pbLeadPayload(){
 function leadTexto(L){
   let t=`🆕 *Nuevo prospecto — EL ESENSIAL*\n━━━━━━━━━━━━━━━\n`;
   t+=`Nombre: ${L.nombre}\nWhatsApp: ${L.whatsapp}\n`;
-  t+=`Presupuesto: ${money(L.presupuesto.min)} – ${money(L.presupuesto.max)}\n`;
+  t+=`Presupuesto: ${money((L.presupuesto||{}).min)} – ${money((L.presupuesto||{}).max)}\n`;
   t+=`Uso: ${L.uso||'—'}\nMarca: ${L.marca||'—'}\nPago: ${L.pago||'—'}\n`;
   if(L.plazo) t+=`Aval: ${L.aval?'Sí':'No'} · Enganche: ${L.enganchePct}% · Plazo: ${L.plazo} meses · Tasa ${L.tasaRef}%\n`;
   t+=`━━━━━━━━━━━━━━━\nOpciones que le mostramos${L.coincidenciaExacta?'':' (cercanas)'}:\n`;
@@ -2716,7 +2730,7 @@ function leadWA(id){ const L=leadsLoad().find(x=>x.id===id); if(!L)return;
 function leadsCSV(){
   const a=leadsLoad(); if(!a.length){ alert('No hay prospectos.'); return; }
   const cab=['Fecha','Nombre','WhatsApp','Presup. min','Presup. max','Uso','Marca','Pago','Aval','Enganche %','Plazo','Tasa','Exacta','Estado','Opciones'];
-  const filas=a.map(L=>[new Date(L.fecha).toLocaleString('es-MX'),L.nombre,L.whatsapp,L.presupuesto.min,L.presupuesto.max,
+  const filas=a.map(L=>[new Date(L.fecha).toLocaleString('es-MX'),L.nombre,L.whatsapp,(L.presupuesto||{}).min,(L.presupuesto||{}).max,
     L.uso||'',L.marca||'',L.pago||'',(L.aval==null?'':(L.aval?'Sí':'No')),L.enganchePct||'',L.plazo||'',L.tasaRef||'',L.coincidenciaExacta?'Sí':'No',L.estado,
     L.opciones.map(o=>`${o.marca} ${o.modelo} ${o.anio||''} (${o.precio})`).join(' | ')]);
   const csv=[cab,...filas].map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
@@ -2778,7 +2792,7 @@ function pdfCotizacion(o){
   const T=contado? null : tabla(P, o.tasa, o.plazo, o.esquema||'fijo', 0, false, null);
   const filas=contado?'':T.filas.map(f=>
     `<tr><td>${f.m}</td><td>${money(f.pago)}</td><td>${money(f.interes)}</td><td>${money(f.capital)}</td><td>${money(f.saldo)}</td></tr>`).join('');
-  const specs=[v.version, v.transmision==='STD'?'Estándar':'Automático', (v.color&&v.color!=='N/A')?v.color:'', v.motor]
+  const specs=[v.version, v.transmision==='STD'?'Estándar':'Automática', (v.color&&v.color!=='N/A')?v.color:'', v.motor]
     .filter(Boolean).join(' · ')||'—';
   const d=new Date(); const fecha=d.getDate()+' de '+MESES_L[d.getMonth()]+' de '+d.getFullYear();
   const folio=pdfFolio(v);
@@ -2877,7 +2891,7 @@ async function descargarCotizacionPDF(o){
   fila('Marca', v.marca||'—');
   fila('Modelo', v.modelo||'—');
   fila('Año', v.anio||'—');
-  const specs=[v.version, v.transmision==='STD'?'Estándar':'Automático',
+  const specs=[v.version, v.transmision==='STD'?'Estándar':'Automática',
     (v.color&&v.color!=='N/A')?v.color:'', v.motor].filter(Boolean).join(' · ')||'—';
   fila('Versión / especificaciones', specs);
   if(v.km) fila('Kilometraje', v.km);
@@ -3066,7 +3080,7 @@ const CREDS_NOMBRE={'carlos jasso':{usuario:'carlos',clave:'carlos2026'},
   'miguel':{usuario:'miguel',clave:'miguel2026'},'niurys':{usuario:'niurys',clave:'niurys2026'}};
 let editandoUsr=null;
 function usrLoad(){ try{return JSON.parse(localStorage.getItem('ee_usr')||'null')}catch(e){return null} }
-function usrSaveAll(a){ localStorage.setItem('ee_usr',JSON.stringify(a)); }
+function usrSaveAll(a){ try{ localStorage.setItem('ee_usr',JSON.stringify(a)); return true; }catch(e){ return false; } }
 function usrSeed(){
   let arr=usrLoad();
   if(!arr){ usrSaveAll(SEED_USERS); return; }
@@ -3124,23 +3138,31 @@ function usrRender(){ const arr=usrLoad()||[]; const g=$('usrGrid'); if(!g)retur
     </div>`; }).join('');
 }
 function usrAbrir(){ editandoUsr=null; $('usrFormTitle').textContent='Agregar usuario';
-  ['uNombre','uRol','uCorreo','uArea','uPermisos','uModulos'].forEach(id=>$(id).value='');
+  ['uNombre','uRol','uCorreo','uArea','uPermisos','uModulos','uUsuario','uClave'].forEach(id=>$(id).value='');
   $('uEstado').value='activo'; $('usrModal').classList.add('show'); }
 function usrEditar(id){ const u=(usrLoad()||[]).find(x=>x.id===id); if(!u)return; editandoUsr=id;
   $('usrFormTitle').textContent='Editar usuario';
   $('uNombre').value=u.nombre||''; $('uRol').value=u.rol||''; $('uCorreo').value=u.correo||''; $('uArea').value=u.area||'';
+  $('uUsuario').value=u.usuario||''; $('uClave').value=u.clave||'';
   $('uPermisos').value=(u.permisos||[]).join(', '); $('uModulos').value=(u.modulos||[]).join(', '); $('uEstado').value=u.estado||'activo';
   $('usrModal').classList.add('show'); }
 function usrCerrar(){ $('usrModal').classList.remove('show'); }
 function usrGuardar(){ const nombre=$('uNombre').value.trim(); if(!nombre){ alert('Ponle el nombre del usuario.'); return; }
   const arr=usrLoad()||[];
-  const previo = editandoUsr? arr.find(x=>x.id===editandoUsr) : null;
+  const usuario=$('uUsuario').value.trim().toLowerCase();
+  const clave=$('uClave').value;
+  if(usuario){
+    if(clave.length<4){ alert('La contraseña debe tener al menos 4 caracteres para poder iniciar sesión.'); return; }
+    if(CUENTAS[usuario]){ alert('Ese nombre de usuario está reservado por el sistema. Elige otro.'); return; }
+    const dup=arr.find(x=>x.id!==editandoUsr && (x.usuario||'').toLowerCase()===usuario);
+    if(dup){ alert('Ya existe otro perfil con el usuario "'+usuario+'". Elige uno distinto.'); return; }
+  }
   const u={ id:editandoUsr||('u'+Date.now()), nombre, rol:$('uRol').value.trim(), correo:$('uCorreo').value.trim(), area:$('uArea').value.trim(),
-    usuario: previo?previo.usuario:undefined, clave: previo?previo.clave:undefined,   // conserva las credenciales
+    usuario: usuario||undefined, clave: usuario? clave : undefined,
     permisos:$('uPermisos').value.split(',').map(s=>s.trim()).filter(Boolean),
     modulos:$('uModulos').value.split(',').map(s=>s.trim()).filter(Boolean), estado:$('uEstado').value };
-  if(editandoUsr){ const i=arr.findIndex(x=>x.id===editandoUsr); if(i>=0)arr[i]=u; } else arr.push(u);
-  usrSaveAll(arr); usrCerrar(); usrRender(); toast('Usuario guardado'); }
+  if(editandoUsr){ const i=arr.findIndex(x=>x.id===editandoUsr); if(i>=0)arr[i]=u; else arr.push(u); } else arr.push(u);
+  usrSaveAll(arr); usrCerrar(); usrRender(); toast(usuario? 'Usuario guardado · ya puede iniciar sesión' : 'Usuario guardado'); }
 function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return;
   try{ const d=JSON.parse(localStorage.getItem('ee_usr_deleted')||'[]'); if(!d.includes(id)){ d.push(id); localStorage.setItem('ee_usr_deleted',JSON.stringify(d)); } }catch(e){}
   usrSaveAll((usrLoad()||[]).filter(x=>x.id!==id)); usrRender(); }
