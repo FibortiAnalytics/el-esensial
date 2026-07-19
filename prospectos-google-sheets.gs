@@ -16,7 +16,7 @@
  * Listo. Cada persona que complete el cotizador aparecerá como una fila nueva.
  */
 
-const AVISAR_A = 'agencia@fiborti.com';   // deja '' para no enviar correo
+const AVISAR_A = 'elesensial@gmail.com';   // deja '' para no enviar correo
 const HOJA     = 'Prospectos';
 
 function doPost(e) {

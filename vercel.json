@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    { "source": "/cotizadorpublico", "destination": "/index.html" },
+    { "source": "/interno", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

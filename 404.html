@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>EL ESENSIAL</title>
+<script>
+/* SPA fallback para GitHub Pages: guarda la ruta pedida (/cotizadorpublico, /interno)
+   y vuelve a la raíz, donde index.html la restaura. Así las URLs bonitas funcionan
+   aunque no existan como archivos. */
+(function(){
+  var l = location;
+  var ruta = l.pathname.replace(/^\/+|\/+$/g, '');
+  var extra = l.search ? ('&' + l.search.slice(1)) : '';
+  l.replace(l.origin + '/?ee=' + encodeURIComponent(ruta) + extra + l.hash);
+})();
+</script>
+</head>
+<body></body>
+</html>
