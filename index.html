@@ -603,6 +603,23 @@
   .esn .detStat .l{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   .esn .detStat .v{font-size:22px;font-weight:800;font-family:'Space Mono',monospace;letter-spacing:-.02em;margin-top:2px}
   .esn .detStat .s{font-size:11px;color:var(--muted)}
+  .esn .detFicha{margin-bottom:18px}
+  .esn .detFoto{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:#0c0e0c;margin-bottom:12px;border:1px solid var(--line)}
+  .esn .detFoto img{width:100%;height:100%;object-fit:cover;display:block}
+  .esn .detFotoPh{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#9aa0a6}
+  .esn .detFotoPh .phLogo{width:66px;height:auto;opacity:.55}
+  .esn .detFotoPh .phLogo svg,.esn .detFotoPh .phLogo img{width:100%;height:auto}
+  .esn .detFotoPh .phTxt{font-size:12px;font-weight:600}
+  .esn .detFotoBrand{position:absolute;left:10px;bottom:10px;background:rgba(255,255,255,.94);border-radius:8px;padding:5px 9px;display:flex;align-items:center}
+  .esn .detFotoBrand svg,.esn .detFotoBrand img{height:18px;width:auto}
+  .esn .detFotoYear{position:absolute;right:10px;top:10px;background:var(--rojo);color:#fff;font-weight:800;font-size:12px;padding:4px 11px;border-radius:999px}
+  .esn .detSpecs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .esn .detSpec{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:9px 11px;min-width:0}
+  .esn .detSpec svg{width:17px;height:17px;color:var(--acid);flex:none}
+  .esn .detSpecTxt{display:flex;flex-direction:column;min-width:0}
+  .esn .detSpec span{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+  .esn .detSpec b{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  @media(max-width:520px){ .esn .detSpecs{grid-template-columns:1fr} }
   .esn .detStat.ok{border-color:rgba(37,211,102,.35)}
   .esn .detStat.ok .v{color:#4ade80}
   .esn .detStat.acc{border-color:rgba(225,29,42,.35)}
@@ -946,10 +963,9 @@
 }catch(e){} })();
 /* Decide el modo ANTES de pintar, para no mostrar el login (interno) en la vista pública */
 (function(){ try{
-  // Modo según la ruta (/cotizadorpublico · /interno) o por ?publico=1 (compatibilidad)
+  // Solo /interno es panel; TODO lo demás (raíz, /cotizadorpublico, ?publico=1) abre el cotizador público
   var seg=''; try{ var p=location.pathname.replace(/\/+$/,'').toLowerCase(); seg=p.substring(p.lastIndexOf('/')+1); }catch(e){}
-  var qpub=false; try{ qpub=new URLSearchParams(location.search).get('publico')==='1'; }catch(e){}
-  var modo = (qpub || seg==='cotizadorpublico') ? 'publico' : (seg==='interno' ? 'interno' : 'root');
+  var modo = (seg==='interno') ? 'interno' : 'publico';
   window.__EE_MODO = modo;
   var authed = false; try{ authed = sessionStorage.getItem('ee_auth')==='1'; }catch(e){}
   var cl = document.documentElement.classList;
@@ -2209,11 +2225,31 @@ function pbDetalleHTML(){
       <button class="${contado?'':'on'}" onclick="pbDetPago('${credito}')">Financiado</button>
     </div>`;
 
-  const head=`<div class="detHead"><div><span class="detEye">Tu cotización</span><h3>${esc(titulo)}</h3></div>
+  const head=`<div class="detHead"><div><span class="detEye">Ficha del vehículo</span><h3>${esc(titulo)}</h3></div>
       <button class="closeX" aria-label="Cerrar" onclick="pbCerrarDetalle()">${I.x}</button></div>`;
+
+  // Ficha del vehículo: foto + especificaciones (para que se aprecie el auto, no solo el financiamiento)
+  const foto=fotoDe(v).src;
+  const chip=(ic,l,val)=>`<div class="detSpec">${ic||''}<div class="detSpecTxt"><span>${l}</span><b>${val}</b></div></div>`;
+  const ficha=`<div class="detFicha">
+      <div class="detFoto">${foto
+        ? `<img src="${esc(foto)}" alt="${esc(titulo)}" loading="lazy">`
+        : `<div class="detFotoPh"><span class="phLogo">${logoMarca(v.marca)||I.car}</span><span class="phTxt">Foto próximamente</span></div>`}
+        ${logoMarca(v.marca)?`<span class="detFotoBrand">${logoMarca(v.marca)}</span>`:''}
+        ${v.anio?`<span class="detFotoYear">${v.anio}</span>`:''}</div>
+      <div class="detSpecs">
+        ${chip(I.cal,'Año',v.anio||'—')}
+        ${chip(I.gauge,'Kilometraje',v.km?fmtKm(String(v.km).replace(/\D/g,'')):'Por confirmar')}
+        ${chip(I.car,'Transmisión',v.transmision==='STD'?'Estándar':'Automática')}
+        ${(v.color&&v.color!=='N/A')?chip('','Color',`${colorDot(v.color)} ${esc(v.color)}`):''}
+        ${v.motor?chip(I.fuel,'Motor',esc(v.motor)):''}
+        ${v.version?chip('','Versión',esc(v.version)):''}
+        ${chip('','Precio',money(v.precio||0))}
+      </div></div>`;
 
   if(contado){
     return head+`<div class="detBody">
+        ${ficha}
         ${seg}
         <div class="detStats">${stat('Precio de contado',money(v.precio||0),'Pago en una exhibición','acc')}</div>
         ${row('Marca / Modelo',esc(nombreCoche(v)))}
@@ -2234,6 +2270,7 @@ function pbDetalleHTML(){
   const estimado = PB.pago==='contado';   // llegó desde contado: los valores son sugeridos
 
   return head+`<div class="detBody">
+      ${ficha}
       ${seg}
       ${estimado?`<p class="detEstim">${I.info} Estimación con <b>${PB.enganche}% de enganche</b> a <b>${PB.plazo} meses</b>. Ajusta estos valores en el cuestionario.</p>`:''}
       <div class="detStats">
@@ -2854,7 +2891,7 @@ function cargarLogo(){
 async function descargarCotizacionPDF(o){
   const JS = window.jspdf && window.jspdf.jsPDF;
   if(!JS){ pdfCotizacion(o); return; }              // respaldo: diálogo de impresión
-
+  try{
   const v=o.car, eng=+o.enganche||0, contado=!!o.contado;
   const P=Math.max(0,(v.precio||0)-eng);
   const T=contado? null : tabla(P, o.tasa, o.plazo, o.esquema||'fijo', 0, false, null);
@@ -2965,10 +3002,22 @@ async function descargarCotizacionPDF(o){
   }
 
   guardarPDF(doc, nombreArchivo(v)+'.pdf');
+  }catch(e){ pdfCotizacion(o); toast && toast('Abrimos la versión para imprimir/guardar como PDF'); }
 }
 
-/* Descarga robusta bajo CSP estricta: intenta blob -> data-uri -> nueva pestaña */
+/* Descarga robusta y multi-dispositivo: móvil abre en pestaña; escritorio descarga (blob -> data-uri -> nueva pestaña) */
 function guardarPDF(doc, nombre){
+  const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test((navigator.userAgent||''));
+  // En móvil el <a download> de un blob no descarga (iOS/Android): abrimos el PDF en una pestaña para verlo/guardarlo/compartirlo.
+  if(isMobile){
+    try{
+      const url=URL.createObjectURL(doc.output('blob'));
+      const w=window.open(url,'_blank');
+      if(!w) location.href=url;                 // si el navegador bloqueó el popup
+      setTimeout(()=>URL.revokeObjectURL(url), 60000);
+      return;
+    }catch(e){ try{ doc.output('dataurlnewwindow'); return; }catch(e2){} }
+  }
   let ok=false;
   try{
     const blob=doc.output('blob');
@@ -3332,9 +3381,9 @@ function usrBorrar(id){ if(!confirm('¿Borrar este usuario?'))return;
     if(s.style.display==='none'){s.style.display='';b.textContent='Ocultar tabla';} else {s.style.display='none';b.textContent='Mostrar tabla';} }
   calc();
 
-  // Arranque: modo público (?publico=1) sin contraseña, o auto-entrar al panel interno
+  // Arranque: público por defecto (raíz y /cotizadorpublico); /interno pide login o auto-entra
   (function(){
-    const modo = window.__EE_MODO || 'root';
+    const modo = window.__EE_MODO || 'publico';
     if(modo==='publico'){
       document.getElementById('gate').style.display='none';
       mostrarPub(false);
