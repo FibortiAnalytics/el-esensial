@@ -1435,8 +1435,8 @@
         <option value="insoluto">Saldo insoluto (francesa)</option>
       </select></div>
     <div class="fila2">
-      <div class="campo"><label>Tasa crédito bancario</label><div class="inbox"><input type="number" id="cTasaBanc" class="has-suf" min="0" step="0.1"><span class="suf">%</span></div></div>
-      <div class="campo"><label>Tasa sin buró</label><div class="inbox"><input type="number" id="cTasaSB" class="has-suf" min="0" step="0.1"><span class="suf">%</span></div></div>
+      <div class="campo"><label>Tasa de la financiera <span class="hint">(% anual)</span></label><div class="inbox"><input type="number" id="cTasaSB" class="has-suf" min="0" step="0.1"><span class="suf">%</span></div></div>
+      <div class="campo"><label>Tasa alternativa <span class="hint">(referencia, opcional)</span></label><div class="inbox"><input type="number" id="cTasaBanc" class="has-suf" min="0" step="0.1"><span class="suf">%</span></div></div>
     </div>
     <div class="fila2">
       <div class="campo"><label>Seguro anual</label><div class="inbox"><span class="pre">$</span><input type="number" id="cSeguro" class="has-pre" min="0" step="500"></div></div>
@@ -1834,7 +1834,7 @@ const CFG_DEF={
   esquema:'fijo',                       // 'fijo' (add-on) | 'insoluto' (francesa)
   tasaBancario:13, tasaSinBuro:24,      // 24% = 2% mensual (dato del formulario del cliente)
   seguroAnual:12000, gpsMensual:250,
-  engDefault:20, plazos:[12,24,36,48,60], plazoDefault:48,   // hasta 60 meses según el año del auto
+  engDefault:20, plazos:[12,24,36,48,60,72], plazoDefault:48,   // financiera interna: 12 a 72 meses
   bmin:250000, bmax:1200000,            // rangos de venta del lote
   whatsapp:'529994476667',              // WhatsApp del lote (Diego Jasso)
   leadsUrl:'',                          // endpoint que recibe los prospectos (Google Apps Script / VPS)
@@ -1958,8 +1958,7 @@ const WIKI={
   mensualidad:{t:'Mensualidad estimada',d:'Cálculo aproximado de tu pago mensual según precio, enganche, plazo y una tasa de referencia. El monto final depende de la aprobación y la institución.'},
   cat:{t:'CAT',d:'Costo Anual Total. Resume el costo real de un crédito (tasa + comisiones + cargos) en un solo porcentaje anual. Sirve para comparar opciones de forma justa. Pídelo siempre por escrito antes de firmar.'},
   interesfijo:{t:'Interés fijo',d:'En este esquema el interés se calcula una sola vez sobre el monto financiado y se reparte igual en cada mensualidad, junto con una parte fija de capital. Tu pago nunca cambia. A diferencia del saldo insoluto, el interés no baja conforme amortizas.'},
-  bancario:{t:'Crédito bancario',d:'Financiamiento con instituciones bancarias, tasas preferenciales y plazos de hasta 60 meses. Requiere revisión de buró. Cobertura nacional.'},
-  sinburo:{t:'Sin buró (local)',d:'Financiamiento directo, sin revisión de buró de crédito. Ideal para estrenar sin complicaciones. Suele pedir identificación y comprobante (predial libre de gravamen o aval).'},
+  credito:{t:'Crédito El Esensial',d:'Financiamiento directo con la financiera interna de El Esensial (no con bancos): plazos de 12 a 72 meses, interés del 2% mensual y sin revisión de buró de crédito. Con aval el enganche arranca en 20%; sin aval, en 50%.'},
   contado:{t:'Pago de contado',d:'Pagas el total del vehículo en una sola exhibición. Es la vía más rápida y sin intereses.'},
   aval:{t:'Aval',d:'Persona que respalda tu crédito y responde por el pago si tú no puedes cubrirlo. Normalmente se pide identificación y un comprobante de propiedad (por ejemplo, predial libre de gravamen). Presentar aval te permite el enganche mínimo del 20%; sin aval, el enganche arranca en 50%.'},
   km:{t:'Kilometraje',d:'Distancia total recorrida por el vehículo. A menor kilometraje, normalmente mayor vida útil por delante.'}
@@ -1973,8 +1972,8 @@ const USOS=[
 ];
 const PAGOS=[
   {id:'contado',t:'De contado',s:'Pago en una exhibición, sin intereses',ic:'wallet',wiki:'contado'},
-  {id:'bancario',t:'Crédito bancario',s:'Tasas preferenciales, hasta 60 meses',ic:'bank',wiki:'bancario'},
-  {id:'sinburo',t:'Sin buró (local)',s:'Directo, entrega inmediata',ic:'key',wiki:'sinburo'}
+  {id:'credito_sinaval',t:'Crédito sin aval',s:'12 a 72 meses · enganche desde 50%',ic:'key',wiki:'credito'},
+  {id:'credito_conaval',t:'Crédito con aval',s:'12 a 72 meses · enganche desde 20%',ic:'userCheck',wiki:'credito'}
 ];
 
 /* Datos reales del negocio (fuente: "FORMULARIO/ El Esensial" — Google Drive) */
@@ -1995,7 +1994,7 @@ const NEGOCIO={
     'Sin revisión de buró de crédito.',
     'Con aval: enganche desde el 20% del valor del vehículo.',
     'Sin aval: el enganche mínimo es del 50% del valor del vehículo.',
-    'Plazos de 12 a 60 meses, según el año de la unidad.',
+    'Plazos de 12 a 72 meses con nuestra financiera interna (no bancos).',
     'Interés del 2% mensual.',
     'Si liquidas antes, se eliminan los intereses futuros.',
     'Autorización del crédito en 24 a 48 horas.'
@@ -2030,7 +2029,7 @@ function pbCars(){ return invLoad().filter(c=>c.estado==='disponible'); }
 function pbMarcas(){ return [...new Set(pbCars().map(c=>c.marca).filter(Boolean))].sort(); }
 function pbEngMin(){ return PB.aval===false ? 50 : 20; }
 function pbSetAval(v){ PB.aval=v; if(PB.enganche<pbEngMin()) PB.enganche=pbEngMin(); pbRender(); }
-function pbTasa(pago){ const g=CFG(); return pago==='bancario' ? (+g.tasaBancario||13) : (+g.tasaSinBuro||24); }
+function pbTasa(pago){ return +CFG().tasaSinBuro||24; }   // financiera interna El Esensial (2% mensual = 24% anual)
 function pbMens(precio,pago,engPct,plazo){
   if(!pago||pago==='contado') return null;
   const g=CFG(); const P=Math.max(0,(+precio||0)*(1-engPct/100));
@@ -2165,7 +2164,11 @@ function pbMarcasTxt(){
   if(PB.marcas.length<=2) return PB.marcas.join(' + ');
   return PB.marcas.length+' marcas';
 }
-function pbSetPago(v){ PB.pago=v; pbRender(); }
+function pbSetPago(v){ PB.pago=v;
+  // El aval queda definido por la opción de crédito elegida
+  PB.aval = v==='credito_conaval' ? true : (v==='credito_sinaval' ? false : null);
+  if(PB.aval!==null && PB.enganche<pbEngMin()) PB.enganche=pbEngMin();
+  pbRender(); }
 function pbSetPlazo(n){ PB.plazo=n; pbRender(); }
 function pbBudget(el,which){
   const v=+el.value;
@@ -2208,11 +2211,11 @@ function pbCloseModal(){ PB.wiki=null; PB.video=null; pbOverlay(); }
 function pbLegal(){ PB.legal=true; pbOverlay(); window.scrollTo(0,0); }
 
 /* ---------- Desglose de la cotización en pantalla (sin salir a un PDF) ---------- */
-function pbDetalle(id){ PB.detalle=id; PB.detPago=PB.pago||'sinburo'; pbOverlay(); }
+function pbDetalle(id){ PB.detalle=id; PB.detPago=PB.pago||'credito_sinaval'; pbOverlay(); }
 function pbCerrarDetalle(){ PB.detalle=null; PB.detPago=null; pbOverlay(); }
 function pbDetPago(v){ PB.detPago=v; pbOverlay(); }
 /* Forma de pago vigente en el modal (puede diferir de la del cuestionario) */
-function pbPagoDet(){ return PB.detPago || PB.pago || 'sinburo'; }
+function pbPagoDet(){ return PB.detPago || PB.pago || 'credito_sinaval'; }
 
 function pbDetalleHTML(){
   const v=pbCars().find(c=>c.id===PB.detalle); if(!v) return '';
@@ -2220,7 +2223,7 @@ function pbDetalleHTML(){
   const titulo=[nombreCoche(v),v.anio,v.version].filter(Boolean).join(' ');
   const stat=(l,val,sub,cls)=>`<div class="detStat ${cls||''}"><span class="l">${l}</span><b class="v">${val}</b>${sub?`<span class="s">${sub}</span>`:''}</div>`;
   const row=(k,val)=>`<div class="detRow"><span>${k}</span><b>${val}</b></div>`;
-  const credito = (PB.pago && PB.pago!=='contado') ? PB.pago : 'sinburo';
+  const credito = (PB.pago && PB.pago!=='contado') ? PB.pago : 'credito_sinaval';
 
   // Cambiar entre contado y financiado sin salir del desglose
   const seg=`<div class="detSeg">
@@ -2480,21 +2483,15 @@ function pbQuiz(){
   } else if(id==='financiamiento'){
     const est=pbMens((PB.bmin+PB.bmax)/2,PB.pago,PB.enganche,PB.plazo);
     const eMin=pbEngMin();
-    body=stepHead('05','Arma tu crédito','Primero dinos si cuentas con aval: define tu enganche mínimo.')+
-    `<div class="avalBox">
-      <div class="avalQ">¿Cuentas con un aval? <button class="infoChip" onclick="pbWiki('aval')">${I.info}</button></div>
-      <div class="grid" style="grid-template-columns:1fr 1fr">
-        ${optBlock(PB.aval===true,"pbSetAval(true)","userCheck","Sí, tengo aval","Enganche desde el 20%")}
-        ${optBlock(PB.aval===false,"pbSetAval(false)","wallet","No tengo aval","Enganche desde el 50%")}
-      </div>
-    </div>
-    ${PB.aval===null?`<div class="avalHint">${I.info} Elige una opción para continuar.</div>`:""}
-    <div class="finGrid" ${PB.aval===null?'style="opacity:.35;pointer-events:none"':''}>
+    const conAval=PB.aval===true;
+    body=stepHead('05','Arma tu crédito',`Financiamiento directo con la financiera de El Esensial · ${conAval?'con aval':'sin aval'}. Ajusta el enganche y el plazo.`)+
+    `<div class="avalHint">${I.info} ${conAval?'Con aval: enganche desde 20%.':'Sin aval: enganche desde 50%.'} <button class="link" onclick="pbBack()">Cambiar tipo de crédito</button></div>
+    <div class="finGrid">
       <div class="finControls">
         <div class="finRow"><div class="finLabel">Enganche <button class="infoChip" onclick="pbWiki('enganche')">${I.info}</button></div>
           <b class="finBig" id="pbEngVal">${PB.enganche}%</b></div>
         <input type="range" min="${eMin}" max="60" step="5" value="${PB.enganche}" oninput="pbEng(this.value)">
-        <div class="avalMin">Mínimo ${eMin}% ${PB.aval===false?"(sin aval)":"(con aval)"}</div>
+        <div class="avalMin">Mínimo ${eMin}% ${conAval?"(con aval)":"(sin aval)"}</div>
         <div class="finRow" style="margin-top:22px"><div class="finLabel">Plazo <button class="infoChip" onclick="pbWiki('plazo')">${I.info}</button></div>
           <b class="finBig">${PB.plazo} meses</b></div>
         <div class="chips">${g.plazos.map(p=>`<button class="chip${PB.plazo===p?' chipOn':''}" onclick="pbSetPlazo(${p})">${p}</button>`).join('')}</div>
@@ -2788,7 +2785,7 @@ function leadsCSV(){
 function pbPlanCoche(v){
   const g=CFG(); const eng=(v.precio||0)*PB.enganche/100;
   const P=Math.max(0,(v.precio||0)-eng);
-  const T=tabla(P, pbTasa(PB.pago||'sinburo'), PB.plazo, g.esquema||'fijo',0,false,null);
+  const T=tabla(P, pbTasa(PB.pago||'credito_sinaval'), PB.plazo, g.esquema||'fijo',0,false,null);
   return {eng,P,T};
 }
 function pbWA(id){
@@ -3056,7 +3053,7 @@ function pbPDF(id){
   const v=pbCars().find(c=>c.id===id); if(!v)return;
   const g=CFG();
   // si el modal está abierto para este auto, respeta el switch contado/financiado
-  const pago = (PB.detalle===id && PB.detPago) ? PB.detPago : (PB.pago||'sinburo');
+  const pago = (PB.detalle===id && PB.detPago) ? PB.detPago : (PB.pago||'credito_sinaval');
   const contado = pago==='contado';
   descargarCotizacionPDF({ car:v, contado,
     enganche: Math.round((v.precio||0)*PB.enganche/100),
@@ -3080,7 +3077,7 @@ function pbAlSim(id){
   cargarCoche(id,false);
   $('enganche').value=Math.round((v.precio||0)*PB.enganche/100);
   $('plazo').value=String(PB.plazo);
-  $('tasa').value=pbTasa(PB.pago||'sinburo');
+  $('tasa').value=pbTasa(PB.pago||'credito_sinaval');
   $('esquema').value=CFG().esquema||'fijo';
   calc(); irA('simulador'); toast('Cargado en el simulador interno');
 }
