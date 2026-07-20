@@ -1373,7 +1373,7 @@
       <span class="brandtxt">EL ESENSIAL</span>
     </div>
     <nav class="navLinks">
-      <a onclick="pbGo('results')">Catálogo</a>
+      <a onclick="pbCatalogo()">Catálogo</a>
       <a onclick="pbStart()">Financiamiento</a>
       <a onclick="pbGo('nosotros')">Nosotros</a>
     </nav>
@@ -1389,7 +1389,7 @@
   </header>
 
   <div class="navMenu" id="navMenu">
-    <button onclick="pbGo('results');pbMenu(false)">Catálogo</button>
+    <button onclick="pbCatalogo();pbMenu(false)">Catálogo</button>
     <button onclick="pbStart();pbMenu(false)">Financiamiento</button>
     <button onclick="pbGo('nosotros');pbMenu(false)">Nosotros</button>
     <div class="navMenuSep"></div>
@@ -2022,7 +2022,7 @@ const AVISO_PRIVACIDAD=`
 <p class="legal-fecha">Última actualización: 9 de julio de 2026 · Versión ${AVISO_VERSION}<br>
 Fundamento: Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP).</p>`;
 
-const PB={screen:'hero',stepIdx:0,editor:false,bmin:0,bmax:0,uso:null,marcas:null,pago:null,
+const PB={screen:'hero',stepIdx:0,editor:false,verTodo:false,bmin:0,bmax:0,uso:null,marcas:null,pago:null,
   enganche:20,plazo:48,aval:null,nombre:'',whats:'',acepta:false,trampa:'',wiki:null,video:null,legal:false,menu:false,detalle:null,detPago:null};
 
 const fmtKm=n=>(+n||0).toLocaleString('es-MX')+' km';
@@ -2041,6 +2041,8 @@ function pbMens(precio,pago,engPct,plazo){
    Nunca devolvemos cero resultados. */
 function pbBuscar(){
   const cars=pbCars();
+  // Catálogo completo: todas las unidades disponibles, sin filtros de búsqueda
+  if(PB.verTodo) return {lista: cars.slice().sort((a,b)=>(a.precio||0)-(b.precio||0)), relajado:[]};
   const usoTag = PB.uso ? (USOS.find(u=>u.id===PB.uso)||{}).tag : null;
   const enB = v => v.precio >= PB.bmin*0.85 && v.precio <= PB.bmax*1.15;
   const okM = v => !PB.marcas || !PB.marcas.length || PB.marcas.includes(v.marca);
@@ -2137,8 +2139,9 @@ function pbLlamar(){ location.href='tel:+'+NEGOCIO.telE164; }
 function pbMapa(){ window.open(NEGOCIO.mapsUrl || ('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(NEGOCIO.direccion)),'_blank','noopener'); }
 function pbMenu(f){ PB.menu = (f===undefined)? !PB.menu : !!f;
   const m=$('navMenu'); if(m) m.classList.toggle('open', PB.menu); }
-function pbGo(s){ pbMenu(false); PB.screen=s; if(s==='quiz') PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
-function pbStart(){ PB.screen='quiz'; PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
+function pbGo(s){ pbMenu(false); PB.verTodo=false; PB.screen=s; if(s==='quiz') PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
+function pbStart(){ PB.verTodo=false; PB.screen='quiz'; PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
+function pbCatalogo(){ pbMenu(false); PB.verTodo=true; PB.screen='results'; pbRender(); window.scrollTo(0,0); }
 function pbRestart(){ PB.screen='hero'; PB.stepIdx=0; pbRender(); window.scrollTo(0,0); }
 function pbNext(){ if(!pbCanNext())return; const t=pbSteps().length;
   if(PB.stepIdx<t-1){ PB.stepIdx++; pbRender(); window.scrollTo(0,0); return; }
@@ -2554,16 +2557,20 @@ function pbResults(){
   else if(rel.includes('marca'))
     aviso=`No hay <b>${esc(marcaL)}</b> en tu presupuesto. Te mostramos otras marcas para uso <b>${esc(usoL||'—')}</b>.`;
 
+  const vt=!!PB.verTodo;
   return `<main class="results">
     <div class="resHead">
-      <p class="eyebrow">${PB.nombre?`Listo, ${esc(PB.nombre.split(' ')[0])}`:'Tus resultados'}</p>
-      <h2 class="resTitle">${list.length} ${list.length===1?'auto':'autos'} ${rel.length?'para <span class="acc">ti</span>':'hacen <span class="acc">match</span>'}</h2>
-      <p class="resSub">${marcaL?esc(marcaL)+' · ':''}${usoL?esc(usoL)+' · ':''}${money(PB.bmin)}–${money(PB.bmax)}${PB.pago&&PB.pago!=='contado'?' · '+PB.plazo+' meses':''}</p>
+      <p class="eyebrow">${vt?'Catálogo completo':(PB.nombre?`Listo, ${esc(PB.nombre.split(' ')[0])}`:'Tus resultados')}</p>
+      <h2 class="resTitle">${list.length} ${list.length===1?'auto':'autos'} ${vt?'<span class="acc">disponibles</span>':(rel.length?'para <span class="acc">ti</span>':'hacen <span class="acc">match</span>')}</h2>
+      <p class="resSub">${vt?'Todo el inventario del lote. Contesta unas preguntas y te calculamos la mensualidad.':`${marcaL?esc(marcaL)+' · ':''}${usoL?esc(usoL)+' · ':''}${money(PB.bmin)}–${money(PB.bmax)}${PB.pago&&PB.pago!=='contado'?' · '+PB.plazo+' meses':''}`}</p>
     </div>
-    ${aviso?`<div class="notice info">
+    ${(!vt&&aviso)?`<div class="notice info">
       <div>${I.info}<span>${aviso}</span></div>
       <button class="btn btnGhost" onclick="pbGo('quiz')">Ajustar filtros</button></div>`:''}
-    <div class="planBar">
+    ${vt?`<div class="planBar">
+      ${chip('Mostrando','Todas las unidades')}
+      <button class="btn btnPrimary" onclick="pbStart()">${I.search} Calcular mi financiamiento</button>
+    </div>`:`<div class="planBar">
       ${chip('Pago',esc(pagoL||'—'))}
       ${PB.pago&&PB.pago!=='contado'&&PB.aval!==null?chip('Aval',PB.aval?'Sí':'No'):''}
       ${PB.pago&&PB.pago!=='contado'?chip('Enganche',PB.enganche+'%'):''}
@@ -2571,7 +2578,8 @@ function pbResults(){
       ${PB.pago&&PB.pago!=='contado'?chip('Tasa ref.',pbTasa(PB.pago)+'%'):''}
       ${chip('Presupuesto',money(PB.bmin)+'–'+money(PB.bmax))}
       <button class="btn btnGhost" onclick="pbGo('quiz')">Ajustar</button>
-    </div>
+      <button class="btn btnGhost" onclick="pbCatalogo()">Ver todo el catálogo</button>
+    </div>`}
     <div class="grid gridCars">${list.map(v=>{
       const men=pbMens(v.precio,PB.pago,PB.enganche,PB.plazo);
       return `<article class="carCard">
