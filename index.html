@@ -963,9 +963,11 @@
 }catch(e){} })();
 /* Decide el modo ANTES de pintar, para no mostrar el login (interno) en la vista pública */
 (function(){ try{
-  // Solo /interno es panel; TODO lo demás (raíz, /cotizadorpublico, ?publico=1) abre el cotizador público
+  // Solo /interno (o ?interno=1, acceso directo sin pasar por el 404) es panel; TODO lo demás abre el cotizador público
   var seg=''; try{ var p=location.pathname.replace(/\/+$/,'').toLowerCase(); seg=p.substring(p.lastIndexOf('/')+1); }catch(e){}
-  var modo = (seg==='interno') ? 'interno' : 'publico';
+  var qs=null; try{ qs=new URLSearchParams(location.search); }catch(e){}
+  var esInterno = (seg==='interno') || (qs && qs.get('interno')==='1');
+  var modo = esInterno ? 'interno' : 'publico';
   window.__EE_MODO = modo;
   var authed = false; try{ authed = sessionStorage.getItem('ee_auth')==='1'; }catch(e){}
   var cl = document.documentElement.classList;
